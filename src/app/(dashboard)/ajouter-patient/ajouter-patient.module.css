@@ -1,0 +1,892 @@
+/* CSS Module for Ajouter Patient */
+
+.header {
+    background-color: #00BFA5;
+    color: white;
+    padding: 0.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 1rem 1rem 0 0;
+}
+
+.closeBtn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: opacity 0.2s;
+}
+
+.closeBtn:hover {
+    opacity: 0.8;
+}
+
+.container {
+    display: flex;
+    min-height: calc(100vh - 120px);
+    background-color: white;
+    border-radius: 0 0 1rem 1rem;
+}
+
+.sidebar {
+    width: 280px;
+    background-color: white;
+    padding: 2rem 0;
+    border-right: 1px solid #E2E8F0;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    padding: 1rem 2rem;
+    gap: 1rem;
+    color: #2D3748;
+    opacity: 0.7;
+    position: relative;
+    transition: all 0.2s;
+}
+
+.step.active {
+    opacity: 1;
+    background-color: #EDF2F7;
+}
+
+.step.completed {
+    opacity: 1;
+}
+
+.step.completed .stepIcon {
+    background-color: #00BFA5;
+    color: white;
+}
+
+.step.accessible {
+    opacity: 1;
+    cursor: pointer;
+}
+
+.step.accessible:hover {
+    background-color: #F7FAFC;
+}
+
+.step {
+    cursor: pointer;
+}
+
+.step:hover {
+    background-color: #F7FAFC;
+}
+
+.stepIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    background-color: white;
+    border-radius: 8px;
+    color: #2E6DB4;
+    position: relative;
+    z-index: 2;
+}
+
+.stepIcon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.step.active .stepIcon {
+    background-color: #2E6DB4;
+    color: white;
+}
+
+.line {
+    height: 2.5rem;
+    margin: 0 0 0 2.75rem;
+    z-index: 1;
+}
+
+.line img {
+    width: 2rem;
+    height: 2.5rem;
+    object-fit: contain;
+}
+
+.content {
+    flex: 1;
+    padding: 2rem 4rem;
+    max-width: calc(100% - 280px);
+    overflow-x: hidden;
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+.sectionHeader {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.sectionHeader img {
+    width: 48px;
+    height: 48px;
+}
+
+.sectionHeader h2 {
+    color: #2D3748;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.formStep {
+    display: none;
+}
+
+.formStep.active {
+    display: block;
+}
+
+.scrollableContent {
+    max-height: calc(100vh - 300px);
+    overflow-y: auto;
+    padding-right: 1rem;
+}
+
+.required {
+    color: #E53E3E;
+}
+
+.cardGrid {
+    display: flex;
+    gap: 4rem;
+    margin-bottom: 3rem;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.card {
+    overflow: visible;
+    position: relative;
+    transition: transform 0.2s;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 1rem;
+    width: 30%;
+    border: 2px solid transparent;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.card.selected {
+    border: 2px solid #00BFA5;
+    box-shadow: 0 4px 16px rgba(0, 191, 165, 0.3);
+}
+
+.checkIcon {
+    position: absolute;
+    top: -20px;
+    right: 20px;
+    background-color: #00BFA5;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.card.selected .checkIcon {
+    display: flex;
+}
+
+.card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+}
+
+.card h4 {
+    padding: 1rem;
+    text-align: center;
+    font-weight: 500;
+    margin: 0;
+    color: white;
+    background-color: #2E6DB4;
+    border-radius: 1rem 1rem 0 0;
+    order: -1;
+}
+
+.selectBtn {
+    width: 100%;
+    padding: 1rem;
+    background-color: #00BFA5;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+    font-size: 0.9rem;
+    border-radius: 0 0 1rem 1rem;
+}
+
+.selectBtn:hover {
+    background-color: #00A895;
+}
+
+.checkIcon {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 2rem;
+    height: 2rem;
+    background-color: #00BFA5;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 10;
+}
+
+.card.selected .checkIcon {
+  opacity: 1;
+}
+
+/* Pack selection container */
+.scrollablePacks {
+  margin-top: 20px;
+}
+
+.formGroup {
+    margin-bottom: 1.5rem;
+}
+
+.formGroup label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.inputDetails {
+    background-color: #E2E8F0;
+    width: 50%;
+    padding: 0.75rem;
+    border: 1px solid #E2E8F0;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.dateInputs {
+    display: flex;
+    gap: 1rem;
+}
+
+.dateInputs input {
+    width: 80px;
+    text-align: center;
+}
+
+.radioGroup {
+    display: flex;
+    flex-direction: column;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.radioOption {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.radioOption input[type="radio"] {
+    width: 1.2rem;
+    height: 1.2rem;
+    accent-color: #00BFA5;
+}
+
+.radioOption label {
+    margin-bottom: 0;
+    cursor: pointer;
+}
+
+.conditionGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.conditionTag {
+    padding: 0.5rem 1rem;
+    background-color: white;
+    border: 1px solid #E2E8F0;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    min-width: 120px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    line-height: 1.2;
+}
+
+.conditionTag.selected {
+    background-color: #2E6DB4;
+    color: white;
+    border-color: #2E6DB4;
+}
+
+.errorText {
+    color: #E53E3E;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.formGroup input[type="text"],
+.formGroup input[type="date"] {
+    padding: 0.75rem;
+    border: 1px solid #E2E8F0;
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.required {
+    color: #E53E3E;
+}
+
+.actionButtons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    margin-top: 2rem;
+    border-top: 1px solid #E2E8F0;
+}
+
+.rightButtons {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btnBack {
+    color: #2D3748;
+    border: none;
+    background: none;
+}
+
+.btnCancel {
+    background: none;
+    color: #E53E3E;
+    padding: 0.5rem;
+    border: 1px solid #E53E3E;
+}
+
+.btnPrimary {
+    background-color: #00BFA5;
+    color: white;
+    border: none;
+}
+
+.btnNext {
+    color: #2D3748;
+    border: none;
+    background: none;
+}
+
+.btnIcon {
+    width: 2rem;
+    height: 2rem;
+}
+
+.btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.errorMessage {
+    background-color: #fed7d7;
+    color: #E53E3E;
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 2rem;
+    border: 1px solid #feb2b2;
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+    .container {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        display: flex;
+        overflow-x: auto;
+        padding: 1rem 0;
+        border-right: none;
+        border-bottom: 1px solid #E2E8F0;
+    }
+    
+    .step {
+        flex-shrink: 0;
+        min-width: 200px;
+    }
+    
+    .content {
+        max-width: 100%;
+        padding: 2rem;
+    }
+    
+    .cardGrid {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .card {
+        width: 100%;
+        max-width: 300px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .photoGrid {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 0.6rem;
+    }
+    
+    .photoUploadBox {
+        max-width: 100%;
+        padding: 0.8rem;
+    }
+    
+    .photoUploadBox img {
+        width: 100%;
+        max-width: 160px;
+        height: 160px;
+    }
+    
+    .uploadBtn {
+        width: 100%;
+        max-width: 160px;
+        font-size: 0.8rem;
+        line-height: 35px;
+    }
+    
+    .radioGrid {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 0.6rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .content {
+        padding: 1rem;
+    }
+    
+    .actionButtons {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .dateInputs {
+        flex-direction: column;
+    }
+    
+    .radioGroup {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .conditionGrid {
+        grid-template-columns: 1fr;
+    }
+    
+    .photoGrid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 0.4rem;
+        padding: 0 0.5rem;
+    }
+    
+    .photoUploadBox {
+        max-width: 100%;
+        padding: 0.6rem;
+    }
+    
+    .photoUploadBox img {
+        width: 100%;
+        max-width: 140px;
+        height: 140px;
+    }
+    
+    .uploadBtn {
+        width: 100%;
+        max-width: 140px;
+        font-size: 0.75rem;
+        line-height: 32px;
+    }
+    
+    .radioGrid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 0.4rem;
+    }
+}
+
+/* Photos / Radiographies Section Styles */
+.scrollableContent {
+    max-height: 70vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.photoSection {
+  margin-bottom: 2rem;
+}
+
+.uploadInstruction {
+  color: #007bff;
+  margin-bottom: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.fileSizeLimit {
+  color: #999;
+  font-size: 0.8rem;
+}
+
+.photoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.8rem;
+  margin-bottom: 2rem;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.photoUploadBox {
+  background: white;
+  padding: 0.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  position: relative;
+  max-width: 100%;
+  box-sizing: border-box;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.photoUploadBox:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.photoUploadBox img {
+  display: block;
+  width: 100%;
+  max-width: 180px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px 8px 0 0;
+  margin: 0;
+  padding: 0;
+  line-height: 0;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+}
+
+.uploadBtn {
+  display: block;
+  width: 100%;
+  max-width: 180px;
+  background-color: #2E6DB4;
+  color: white;
+  border: none;
+  height: 40px;
+  line-height: 40px;
+  border-radius: 0 0 8px 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  text-decoration: none;
+}
+
+.uploadBtn:hover {
+  background-color: #1B4B87;
+}
+
+.photoLabel {
+  font-weight: 500;
+  margin-top: 1rem;
+}
+
+.hiddenInput {
+    opacity: 0;
+    position: absolute;
+}
+
+.radioSection {
+    margin-top: 2rem;
+    width: 100%;
+}
+
+.radioGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.8rem;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+.loadingSpinner {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+}
+
+/* Dialog de confirmation */
+.dialogOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.dialogBox {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow: hidden;
+}
+
+.dialogHeader {
+    padding: 1.5rem 1.5rem 1rem 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.dialogHeader h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.dialogContent {
+    padding: 1rem 1.5rem;
+}
+
+.dialogContent p {
+    margin: 0;
+    color: #6b7280;
+    line-height: 1.5;
+}
+
+.dialogActions {
+    padding: 1rem 1.5rem 1.5rem 1.5rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+}
+
+.btnSecondary {
+    background-color: #f3f4f6;
+    color: #374151;
+    border: 1px solid #d1d5db;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    min-width: 120px;
+}
+
+.btnSecondary:hover {
+    background-color: #e5e7eb;
+}
+
+.btnDanger {
+    background-color: #dc2626;
+    color: white;
+    border: 1px solid #dc2626;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    min-width: 140px;
+}
+
+.btnDanger:hover {
+    background-color: #b91c1c;
+}
+
+/* Scans Section Styles */
+.scanUploadContainer {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px 8px 0 0;
+  overflow: hidden;
+}
+
+.uploadOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px 8px 0 0;
+}
+
+.checkIconOverlay {
+  background-color: var(--primary-color, #00BFA5);
+  color: white;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  animation: checkmark 0.8s ease-in-out forwards;
+}
+
+@keyframes checkmark {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.img1 {
+  display: block;
+  width: 100%;
+  max-width: 180px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px 8px 0 0;
+  margin: 0;
+  padding: 0;
+  line-height: 0;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+}
+
+/* Styles pour la section de vérification */
+.reviewSection {
+  padding: 2rem;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+.reviewSection h3 {
+  color: #2D3748;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.reviewItem {
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.reviewItem h4 {
+  color: #00BFA5;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #00BFA5;
+  padding-bottom: 0.5rem;
+}
+
+.reviewItem p {
+  color: #4A5568;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.reviewItem p strong {
+  color: #2D3748;
+  font-weight: 600;
+  margin-right: 0.5rem;
+}
+
+.reviewItem:last-child {
+  margin-bottom: 0;
+}

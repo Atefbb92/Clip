@@ -1,0 +1,1150 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Roboto", sans-serif;
+}
+
+:root {
+    --primary-color: #00BFA5;
+    --primary-dark: #00A895;
+    --secondary-color: #2E6DB4;
+    --background-color: #F8F9FA;
+    --sidebar-color: #EDF2F7;
+    --text-color: #2D3748;
+    --border-color: #E2E8F0;
+    --error-color: #E53E3E;
+}
+
+body {
+    background-color: #f8f9fa;
+    color: #425567;
+}
+
+
+main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+/* form section1&2 */
+.header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.5rem 2rem;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 1rem 1rem 0 0;
+}
+
+.closeBtn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+.container {
+    display: flex;
+    min-height: calc(100vh - 64px);
+}
+
+.sidebar {
+    width: 280px;
+    background-color: white;
+    padding: 2rem 0;
+    border-radius: 0 0 1rem 1rem;
+    margin-right: 0.5rem;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    padding: 1rem 2rem;
+    gap: 2rem;
+    color: var(--text-color);
+    opacity: 0.7;
+    position: relative;
+}
+
+.step.active {
+    opacity: 1;
+    background-color: var(--sidebar-color);
+}
+
+.step.completed .stepIcon {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.stepIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    background-color: white;
+    border-radius: 8px;
+    color: var(--secondary-color);
+    position: relative;
+    z-index: 2;
+}
+
+.step.active .stepIcon {
+    background-color: var(--secondary-color);
+    color: white;
+}
+
+.line {
+    height: 2.5rem;
+    margin: 0 0 0 2.75rem;
+    z-index: 1;
+}
+
+.content {
+    flex: 1;
+    padding: 4rem;
+    max-width: 79%;
+    height: 100%;
+    margin: 0 auto;
+    background-color: white;
+    border-radius: 0 0 1rem 1rem;
+}
+
+.sectionHeader {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.sub {
+    justify-content: space-between;
+}
+
+.subsectionHeader {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.sectionIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background-color: var(--secondary-color);
+    border-radius: 8px;
+    color: white;
+}
+
+.patientTypeSelection h3 {
+    margin-bottom: 2rem;
+    font-weight: 500;
+}
+
+.required {
+    color: var(--error-color);
+}
+
+.cardGrid {
+    display: flex;
+    gap: 4rem;
+    margin-bottom: 3rem;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.card {
+    overflow: visible;
+    position: relative;
+    transition: transform 0.2s;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 1rem;
+    width: 30%;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+}
+
+.card img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.card h4 {
+    padding: 1rem;
+    text-align: center;
+    font-weight: 500;
+    margin: 0;
+    color: white;
+    background-color: var(--secondary-color);
+    border-radius: 1rem 1rem 0 0;
+}
+
+.selectBtn {
+    width: 100%;
+    padding: 1rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+    border-radius: 0 0 1rem 1rem;
+}
+
+.selectBtn:hover {
+    background-color: var(--primary-dark);
+}
+
+.card.selected {
+    border: 2px solid var(--primary-color);
+}
+
+.checkIcon {
+    position: absolute;
+    top: -20px;
+    right: 20px;
+    background-color: var(--primary-color);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.card.selected .checkIcon {
+    display: flex;
+}
+
+.actionButtons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    margin-top: 2rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.rightButtons {
+    display: flex;
+    gap: 1rem;
+}
+
+.btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btnBack {
+    color: var(--text-color);
+    border: none;
+    background: none;
+}
+
+.btnCancel {
+    background: none;
+    color: var(--error-color);
+    padding: 0.5rem;
+    border: 1px solid var(--error-color);
+}
+
+.btnPrimary {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+}
+
+.btnNext {
+    color: var(--text-color);
+    border: none;
+    background: none;
+}
+
+.btnIcon {
+    width: 2rem;
+    height: 2rem;
+}
+
+.btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+
+
+/* Patient Details Form Styles */
+.formStep {
+    display: none;
+    width: 100%;
+    height: 100%;
+}
+
+.formStep.active {
+    display: block !important;
+}
+
+.formGroup {
+    margin-bottom: 1.5rem;
+}
+
+.inputDetails {
+    background-color: var(--border-color);
+    width: 50%;
+}
+
+.formGroup label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+.formGroup input[type="text"],
+.formGroup input[type="date"] {
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 1rem;
+}
+
+.dateInputs {
+    display: flex;
+    gap: 1rem;
+}
+
+.dateInputs input {
+    width: 80px;
+    text-align: center;
+}
+
+.radioGroup {
+    display: flex;
+    flex-direction: column;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.radioOption {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.conditionGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.conditionTag {
+    padding: 0.5rem 1rem;
+    background-color: white;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.conditionTag.selected {
+    background-color: var(--secondary-color);
+    color: white;
+    border-color: var(--secondary-color);
+}
+
+.errorText {
+    color: var(--error-color);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* photos step */
+.contentContainer {
+    flex: 1;
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    border-radius: 0 0 1rem 1rem;
+}
+
+.sectionHeader {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.sectionIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    background-color: var(--secondary-color);
+    border-radius: 8px;
+    color: white;
+}
+
+.required {
+    color: var(--error-color);
+}
+
+/* Scrollable content */
+.scrollableContent {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 1rem;
+    max-height: 800px;
+}
+
+.scrollableContent::-webkit-scrollbar {
+    width: 8px;
+}
+
+.scrollableContent::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 4px;
+}
+
+/* Photo section styles */
+.photoSection {
+    margin-bottom: 3rem;
+}
+
+.uploadInstruction {
+    color: var(--secondary-color);
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+}
+
+.photoGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+.photoUploadBox {
+    background: white;
+    padding: 1.5rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    position: relative;
+}
+
+.photoUploadBox img {
+    display: block;
+    width: 250px;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 8px 8px 0 0;
+    margin: 0;
+    padding: 0;
+    line-height: 0;
+    object-fit: cover;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    image-rendering: pixelated;
+}
+
+.uploadBtn {
+    display: block;
+    width: 250px;
+    background-color: var(--secondary-color);
+    color: white;
+    border: none;
+    height: 40px;
+    line-height: 40px;
+    border-radius: 0 0 8px 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+    margin: 0;
+    padding: 0;
+}
+
+.photoLabel {
+    font-weight: 500;
+    margin-top: 1rem;
+}
+
+.hiddenInput {
+    opacity: 0;
+    /* Makes it invisible but still clickable */
+    position: absolute;
+    /* This hides the file input */
+}
+
+/* Radio section styles */
+.radioSection {
+    margin-top: 2rem;
+    width: 100%;
+}
+
+.radioOptionSection3 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+.radioGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    width: 100%;
+}
+
+.radioUploadBox {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.radioUploadBox h4 {
+    margin-bottom: 1rem;
+    color: var(--text-color);
+}
+
+.radioUploadBox img {
+    width: 100%;
+    height: 200px;
+    object-fit: contain;
+    margin-bottom: 1rem;
+}
+
+
+/* Form step visibility */
+.form-step {
+    display: none;
+}
+
+.form-step.active {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    max-height: 800px;
+}
+
+/* prescription*/
+.perimg {
+    width: 90%;
+    display: block;
+    margin: 0 auto;
+}
+
+.prescription-form {
+    background-color: white;
+    border-radius: 4px;
+    padding: 1.5rem;
+}
+
+.headerpr {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.headerpr h2 {
+    color: #2c5282;
+    font-size: 1.2rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+.headerpr h2::before {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-color: #2c5282;
+    margin-right: 8px;
+    border-radius: 2px;
+}
+
+.patient-type {
+    color: #666;
+    font-size: 0.9rem;
+    margin-left: 50%;
+}
+
+.section {
+    margin-bottom: 1.5rem;
+}
+
+h3 {
+    margin-bottom: 1rem;
+    color: #425567;
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.sub-options {
+    margin-left: 1.8rem;
+}
+
+.nested-options {
+    margin-left: 1.8rem;
+    margin-top: 0.3rem;
+    margin-bottom: 0.3rem;
+}
+
+.teeth-grid {
+    margin: 1rem;
+    position: relative;
+    width: 70%;
+}
+
+.teeth-row {
+    position: relative;
+}
+
+.teeth-numbers {
+    display: grid;
+    grid-template-columns: repeat(16, 1fr);
+    gap: 4px;
+    text-align: center;
+    font-size: 0.7rem;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.teeth-boxes {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.tooth-box {
+    position: relative;
+    margin: 0;
+    padding: 0;
+}
+
+.tooth-box input[type="checkbox"] {
+    width: 2rem;
+    height: 2rem;
+    margin: 0;
+    background-color: #e5e5e5;
+    border: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.tooth-box input[type="checkbox"]:checked {
+    background-color: #666;
+}
+
+.vertical-line {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    background-color: #666;
+    height: 10rem;
+    top: -20px;
+    z-index: 1;
+}
+
+.jaw-labels {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.label-d,
+.label-g {
+    position: absolute;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #666;
+    top: -10px;
+}
+
+.label-d {
+    left: -2rem;
+}
+
+.label-g {
+    right: -2rem;
+}
+
+.horizontal-line {
+    position: relative;
+    width: 100%;
+    height: 2px;
+    background-color: #666;
+    margin: 1rem;
+}
+
+.ap-table {
+    width: 70%;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+}
+
+.ap-table th,
+.ap-table td {
+    padding: 0.5rem;
+    text-align: center;
+    border-bottom: none;
+}
+
+.ap-table th {
+    font-weight: normal;
+    color: #333;
+    width: 30px;
+}
+
+
+.ap-table .td1 {
+    text-align: left;
+}
+
+.options-section {
+    background-color: transparent;
+    padding: 0;
+    border-radius: 0;
+    margin-top: 1rem;
+}
+
+.options-section h4 {
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-size: 0.9rem;
+    font-weight: normal;
+}
+
+.checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.checkbox-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+input[type="radio"] {
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    margin: 0;
+}
+
+input[type="checkbox"] {
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    margin: 0;
+}
+
+input[type="radio"]:disabled,
+input[type="checkbox"]:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.radio-option span,
+.checkbox-option span {
+    color: #333;
+}
+
+/* section valider*/
+.soumettre {
+    background: white;
+    padding: 30px;
+    border-radius: 4px;
+}
+
+
+.soumettre h1 {
+    font-size: 16px;
+    margin: 0 0 25px 0;
+    font-weight: normal;
+}
+
+.sec {
+    margin-bottom: 20px;
+}
+
+.sec-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.sec h2 {
+    color: #425567;
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.modifier {
+    color: #0066cc;
+    text-decoration: underline;
+    font-size: 14px;
+    cursor: pointer;
+    margin-left: 15px;
+    white-space: nowrap;
+}
+
+p {
+    margin: 0 0 4px 0;
+    font-size: 14px;
+}
+
+.options {
+    margin-top: 8px;
+}
+
+.indent {
+    margin-left: 20px;
+}
+
+.precision-cuts {
+    margin-left: 40px;
+}
+
+.step3Container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.step3Container h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+.imagesGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.imageUploadContainer {
+    aspect-ratio: 1;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.imageUploadLabel {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    background-color: #f5f5f5;
+    transition: all 0.3s ease;
+}
+
+.imageUploadLabel:hover {
+    background-color: #e0e0e0;
+}
+
+.uploadedImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.uploadPlaceholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+    color: #666;
+    font-size: 14px;
+    border: 2px dashed #ccc;
+}
+
+.uploadPlaceholder:hover {
+    border-color: #999;
+    color: #333;
+}
+
+.validationStep {
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+.loading {
+    text-align: center;
+    padding: 20px;
+    font-size: 16px;
+    color: #666;
+}
+
+.errorMessage {
+    background-color: #fff3f3;
+    color: #d32f2f;
+    padding: 12px;
+    border-radius: 4px;
+    margin: 10px 0;
+    border: 1px solid #ffa4a4;
+    font-size: 14px;
+}
+
+.loadingSpinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    color: var(--primary-color);
+}
+
+.loadingSpinner::after {
+    content: '';
+    width: 24px;
+    height: 24px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-left: 8px;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+
+.successfulUpload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(76, 175, 80, 0.1);
+    border: 2px solid #4CAF50;
+    border-radius: 8px;
+    padding: 15px;
+}
+
+.checkIcon {
+    margin-bottom: 10px;
+    animation: checkmark 0.8s ease-in-out forwards;
+}
+
+.uploadSuccess {
+    font-weight: 600;
+    color: #4CAF50;
+    margin: 5px 0;
+}
+
+.fileName {
+    font-size: 0.85rem;
+    color: #666;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@keyframes checkmark {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.scanUploadContainer {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px 8px 0 0;
+    overflow: hidden;
+}
+
+.uploadOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px 8px 0 0;
+}
+
+
+.checkIconOverlay {
+    background-color: var(--primary-color);
+    color: white;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    animation: checkmark 0.8s ease-in-out forwards;
+}
+
+@keyframes checkmark {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.fileSizeLimit {
+    font-size: 0.85rem;
+    color: #666;
+    font-style: italic;
+}
+
+.scrollablePacks {
+    width: 100%;
+    overflow-x: auto;
+    padding: 20px 0;
+    margin-bottom: 20px;
+}
+
+.scrollablePacks::-webkit-scrollbar {
+    height: 8px;
+}
+
+.scrollablePacks::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.scrollablePacks::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+
+.scrollablePacks::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Add these new styles for photo upload container */
+.photoContainer {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px 8px 0 0;
+    overflow: hidden;
+    width: 250px;
+    height: 250px;
+}
+
+/* Reuse the existing overlay styles */
+.uploadOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px 8px 0 0;
+}
+
+.checkIconOverlay {
+    background-color: var(--primary-color);
+    color: white;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    animation: checkmark 0.8s ease-in-out forwards;
+}

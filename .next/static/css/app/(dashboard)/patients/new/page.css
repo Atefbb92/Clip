@@ -1,0 +1,1380 @@
+/*!***********************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!./src/components/prescription/prescription.module.css ***!
+  \***********************************************************************************************************************************************************************************************************************************************************************************************/
+/* prescription.module.css */
+.prescription_formStep__DmIC0 {
+    display: none;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+}
+
+.prescription_formStep__DmIC0.prescription_active__ufg2x {
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.prescription_sectionHeader__hDljL {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.prescription_sub__J7Yat {
+    justify-content: space-between;
+}
+
+.prescription_subsectionHeader__m6HvL {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Image styles */
+.prescription_perimg__iR5Hw {
+    width: 90%;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Prescription form container */
+.prescription_prescriptionForm__pOhsg {
+    background-color: white;
+    border-radius: 4px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+/* Header styles */
+.prescription_headerPr__GY9IN {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.prescription_headerPr__GY9IN h2 {
+    color: #2c5282;
+    font-size: 1.2rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+.prescription_headerPr__GY9IN h2::before {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-color: #2c5282;
+    margin-right: 8px;
+    border-radius: 2px;
+}
+
+/* Patient type label */
+.prescription_patientType__YQ_3V {
+    color: #666;
+    font-size: 0.9rem;
+    margin-left: 50%;
+}
+
+/* Section styles */
+.prescription_section__TTTR6 {
+    margin-bottom: 30px;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+}
+
+.prescription_section__TTTR6.prescription_active__ufg2x {
+    border-color: #007bff;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.2);
+    background-color: #f8f9ff;
+}
+
+.prescription_section__TTTR6 h3 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+}
+
+/* Scrollable content */
+.prescription_scrollableContent__cSQJc {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 1rem;
+    max-height: calc(100vh - 300px);
+}
+
+.prescription_scrollableContent__cSQJc::-webkit-scrollbar {
+    width: 8px;
+}
+
+.prescription_scrollableContent__cSQJc::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 4px;
+}
+
+/* Radio group styles */
+.prescription_radioGroup__cIkmb {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+/* Add specific style for Milieux inter-incisifs section */
+.prescription_milieuxRadioGroup__V92e9 {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.prescription_milieuxRadioGroup__V92e9 .prescription_radioOption__80WmI {
+    margin-right: 0;
+}
+
+/* Add specific style for Arcade section */
+.prescription_arcadeRadioGroup__WveIJ {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.prescription_arcadeRadioGroup__WveIJ .prescription_radioOption__80WmI {
+    margin-right: 0;
+}
+
+.prescription_radioOption__80WmI {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    margin-right: 1rem;
+}
+
+.prescription_radioInput__xlwzI {
+    margin: 0;
+}
+
+.prescription_radioOption__80WmI span {
+    font-size: 0.9rem;
+    color: #4a5568;
+}
+
+.prescription_subOptions__UAegx {
+    margin-left: 1.8rem;
+}
+
+.prescription_nestedOptions__wI_M9 {
+    margin-left: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+/* Teeth grid styles */
+.prescription_teethGrid__BqUbr {
+    margin: 1rem;
+    position: relative;
+    width: 70%;
+}
+
+.prescription_teethRow__kJWE7 {
+    position: relative;
+}
+
+.prescription_teethNumbers__DZ3_j {
+    display: grid;
+    grid-template-columns: repeat(16, 1fr);
+    gap: 4px;
+    text-align: center;
+    font-size: 0.7rem;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.prescription_teethBoxes__VRJJo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.prescription_toothBox__ca73w {
+    position: relative;
+    margin: 0;
+    padding: 0;
+}
+
+.prescription_toothBox__ca73w .prescription_checkboxInput__NEpZ3 {
+    width: 2rem;
+    height: 2rem;
+    margin: 0;
+    background-color: #e5e5e5;
+    border-radius: 0.2rem;
+    border: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.prescription_toothBox__ca73w .prescription_checkboxInput__NEpZ3:checked {
+    background-color: #666;
+}
+
+.prescription_verticalLine__b2wX0 {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    background-color: #666;
+    height: 6rem;
+    top: -20px;
+    z-index: 1;
+}
+
+.prescription_jawLabels__LK_9D {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.prescription_labelD__UWU33,
+.prescription_labelG__DsaOn {
+    position: absolute;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #666;
+    top: -10px;
+}
+
+.prescription_labelD__UWU33 {
+    left: -2rem;
+}
+
+.prescription_labelG__DsaOn {
+    right: -2rem;
+}
+
+.prescription_horizontalLine__EEKFN {
+    position: relative;
+    width: 100%;
+    height: 2px;
+    background-color: #666;
+    margin: 1rem;
+}
+
+/* Table styles */
+.prescription_apTable__Oiyjd {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.prescription_apTable__Oiyjd td, .prescription_apTable__Oiyjd th {
+    text-align: left;
+    vertical-align: middle;
+    padding: 0.25rem 0.5rem;
+}
+
+.prescription_apTable__Oiyjd td:first-child, .prescription_apTable__Oiyjd th:first-child {
+    min-width: 180px;
+    width: 180px;
+}
+
+.prescription_apTable__Oiyjd td:not(:first-child), .prescription_apTable__Oiyjd th:not(:first-child) {
+    min-width: 120px;
+    width: 120px;
+}
+
+.prescription_apTable__Oiyjd td label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* Options section */
+.prescription_optionsSection__EiqFU {
+    background-color: transparent;
+    padding: 0;
+    border-radius: 0;
+    margin-top: 1rem;
+}
+
+.prescription_optionsSection__EiqFU h4 {
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-size: 0.9rem;
+    font-weight: normal;
+}
+
+.prescription_checkboxGroup__SQZF0 {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.prescription_checkboxOption__XF7sQ {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+}
+
+.prescription_checkboxInput__NEpZ3 {
+    margin: 0;
+}
+
+/* Input styles */
+.prescription_radioInput__xlwzI {
+    width: 14px;
+    height: 14px;
+    margin-right: 8px;
+    accent-color: #007bff;
+}
+
+.prescription_checkboxInput__NEpZ3 {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: #007bff;
+}
+
+.prescription_radioOption__80WmI {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+}
+
+.prescription_radioOption__80WmI span {
+    margin-left: 8px;
+}
+
+.prescription_nestedOptions__wI_M9 {
+    margin-left: 24px;
+    margin-top: 8px;
+}
+
+.prescription_nestedOptions__wI_M9 .prescription_radioOption__80WmI {
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #666;
+}
+
+/* Submit section */
+.prescription_soumettre__sJFdc {
+    background: white;
+    padding: 30px;
+    border-radius: 4px;
+}
+
+.prescription_soumettre__sJFdc h1 {
+    font-size: 16px;
+    margin: 0 0 25px 0;
+    font-weight: normal;
+}
+
+.prescription_sec__UHw2U {
+    margin-bottom: 20px;
+}
+
+.prescription_secHeader__dWNNK {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.prescription_sec__UHw2U h2 {
+    color: #425567;
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.prescription_modifier__d4HXN {
+    color: #0066cc;
+    text-decoration: underline;
+    font-size: 14px;
+    cursor: pointer;
+    margin-left: 15px;
+    white-space: nowrap;
+}
+
+.prescription_paragraph__AgHTm {
+    margin: 0 0 4px 0;
+    font-size: 14px;
+}
+
+.prescription_options__q_JES {
+    margin-top: 8px;
+}
+
+.prescription_indent__ATYBI {
+    margin-left: 20px;
+}
+
+.prescription_precisionCuts__HOBo7 {
+    margin-left: 40px;
+}
+
+/* Step 3 container */
+.prescription_step3Container__MtKoa {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.prescription_step3Container__MtKoa h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+.prescription_imagesGrid____lbq {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.prescription_imageUploadContainer__FPcUh {
+    aspect-ratio: 1;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.prescription_imageUploadLabel__ziAHv {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    background-color: #f5f5f5;
+    transition: all 0.3s ease;
+}
+
+.prescription_imageUploadLabel__ziAHv:hover {
+    background-color: #e0e0e0;
+}
+
+.prescription_uploadedImage__878zZ {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.prescription_uploadPlaceholder__uFRzr {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+    color: #666;
+    font-size: 14px;
+    border: 2px dashed #ccc;
+}
+
+.prescription_uploadPlaceholder__uFRzr:hover {
+    border-color: #999;
+    color: #333;
+}
+
+.prescription_tout__NXfMU {
+    margin:0.5rem  0.5rem 0 0;
+    display:flex;
+    justify-content:flex-start;
+    align-items: center;
+    gap:0.5rem;
+}
+
+.prescription_instructions__S1Jr3 {
+    width: 100%;
+    height:200px;
+    padding: 0.5rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    resize: vertical;
+}
+
+.prescription_error__rjGU1 {
+  color: #d32f2f;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.prescription_submitSection__mKS0q {
+  margin-top: 2rem;
+  padding: 1rem;
+  text-align: center;
+}
+#prescription_instructions__S1Jr3 {
+  width: 100%;
+  min-height: 100px;
+  padding: 0.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  resize: vertical;
+}
+
+@keyframes prescription_highlightSection__qdXxI {
+  0% {
+    background-color: rgba(0, 123, 255, 0.1);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.prescription_highlight__08NqC {
+  animation: prescription_highlightSection__qdXxI 2s ease-out;
+}
+.prescription_disabled__ZDkNy {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+  
+.prescription_disabled__ZDkNy input {
+    cursor: not-allowed;
+}
+
+
+/* DentalChartModal.module.css */
+
+.prescription_modalOverlay__upXji {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .prescription_modalContainer__TD9k3 {
+    background-color: white;
+    border-radius: 12px;
+    padding: 20px;
+    width: 90%;
+    max-width: 1200px;
+    max-height: 90vh;
+    overflow: auto;
+    position: relative;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  }
+  
+  .prescription_closeButton__yA1gZ {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: #f3f4f6;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+  }
+  
+  .prescription_closeButton__yA1gZ:hover {
+    background-color: #e5e7eb;
+  }
+  
+  .prescription_modalHeader__fiLzZ {
+    margin-bottom: 16px;
+  }
+  
+  .prescription_modalTitle___i5Ah {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+  
+  .prescription_modalSubtitle__QeO30 {
+    font-size: 14px;
+    color: #6b7280;
+    margin-top: 4px;
+  }
+  
+  .prescription_chartContainer__E07Vr {
+    display: flex;
+    justify-content: center;
+    overflow: auto;
+    padding-bottom: 80px;
+  }
+  
+  .prescription_modalFooter__m8M2b {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 20;
+  }
+  
+  .prescription_footerContent__5aJck {
+    padding: 16px 24px;
+    border-top: 1px solid #e5e7eb;
+    background-color: white;
+    box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.05);
+  }
+  
+  .prescription_footerActions__pSwJv {
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .prescription_containerdental___B9zr {
+    width: 100%;
+    max-width: 1400px; /* This is the default Tailwind container max-width */
+    margin-left: auto;
+    margin-right: auto;
+    padding: 1.5rem; /* equivalent to p-6 (6 × 0.25rem = 1.5rem) */
+  }
+
+  /* Add these styles to your styles.module.css file */
+
+.prescription_modalOverlay__upXji {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .prescription_modalContainer__TD9k3 {
+    background-color: white;
+    border-radius: 12px;
+    padding: 20px;
+    width: 90%;
+    max-width: 1200px;
+    max-height: 90vh;
+    overflow: auto;
+    position: relative;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  }
+  
+  .prescription_closeButton__yA1gZ {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: #f3f4f6;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+  }
+  
+  .prescription_closeButton__yA1gZ:hover {
+    background-color: #e5e7eb;
+  }
+  
+  .prescription_modalHeader__fiLzZ {
+    margin-bottom: 16px;
+  }
+  
+  .prescription_modalTitle___i5Ah {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+  
+  .prescription_modalSubtitle__QeO30 {
+    font-size: 14px;
+    color: #6b7280;
+    margin-top: 4px;
+  }
+  
+  .prescription_chartContainer__E07Vr {
+    display: flex;
+    justify-content: center;
+    overflow: auto;
+    padding-bottom: 80px;
+  }
+  
+  .prescription_modalFooter__m8M2b {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 20;
+  }
+  
+  .prescription_footerContent__5aJck {
+    padding: 16px 24px;
+    border-top: 1px solid #e5e7eb;
+    background-color: white;
+    box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.05);
+  }
+  
+  .prescription_footerButtons__H64Z6 {
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .prescription_submitButton__Ywz2K {
+    background-color: #2563eb;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 16px;
+    transition: background-color 0.2s ease;
+  }
+  
+  .prescription_submitButton__Ywz2K:hover {
+    background-color: #1d4ed8;
+  }
+
+/* DDM Section Styles */
+.prescription_ddmSection__2_DS8 {
+    margin-top: 2rem;
+}
+
+.prescription_ddmTitle__rII8J {
+    font-size: 20px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+}
+
+.prescription_ddmSubtitle__OaQGX {
+    font-size: 22px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 1.5rem 0 1rem 0;
+}
+
+.prescription_ddmSubSubtitle__rIrsR {
+    font-size: 16px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 1.25rem 0 1rem 0;
+}
+
+/* Make subtitle smaller than Encombrement */
+.prescription_resolutionSubtitle__Mwo_5 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #425567;
+    margin: 1rem 0 0.5rem 0;
+}
+
+.prescription_ddmTable__XD5Ii {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.75rem;
+    margin: 1rem 0 2rem 0;
+}
+
+.prescription_ddmTable__XD5Ii th, .prescription_ddmTable__XD5Ii td {
+    text-align: left;
+    vertical-align: middle;
+    font-size: 16px;
+    color: #425567;
+    font-weight: 400;
+    padding: 0.25rem 0.75rem 0.25rem 0;
+}
+
+.prescription_ddmTable__XD5Ii th {
+    font-weight: 500;
+    color: #2c3e50;
+    font-size: 16px;
+    padding-bottom: 0.5rem;
+}
+
+.prescription_ddmTable__XD5Ii td:first-child, .prescription_ddmTable__XD5Ii th:first-child {
+    padding-right: 0.25rem;
+}
+
+.prescription_ddmTable__XD5Ii td:not(:first-child), .prescription_ddmTable__XD5Ii th:not(:first-child) {
+    padding-left: 0;
+    padding-right: 0.75rem;
+}
+
+.prescription_ddmTable__XD5Ii .prescription_radioInput__xlwzI {
+    margin-right: 0.5rem;
+    accent-color: #2563eb;
+    width: 16px;
+    height: 16px;
+}
+
+.prescription_ddmTable__XD5Ii label {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 400;
+    cursor: pointer;
+    gap: 1rem;
+}
+
+.prescription_ddmTable__XD5Ii .prescription_radioOption__80WmI {
+    margin-right: 2rem;
+}
+
+/* Add spacing above Espacement/Encombrement blocks */
+.prescription_ddmBlock__IY2LS {
+    margin-bottom: 2rem;
+}
+
+.prescription_ddmTable__XD5Ii td {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0.25rem 0.75rem 0.25rem 0;
+    margin: 0;
+    min-width: 100px;
+}
+
+.prescription_apTable__Oiyjd td label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.prescription_apTable__Oiyjd td label > .prescription_radioInput__xlwzI + span {
+  margin-left: 0.75rem !important;
+}
+
+.prescription_radioInline__SNyS2 {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  white-space: nowrap;
+}
+
+.prescription_resolutionIndented__k27vC {
+  margin-left: 2rem;
+}
+/*!*******************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[10].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[10].use[3]!./src/components/prescription/dental-dialog.css ***!
+  \*******************************************************************************************************************************************************************************************************************************************************************************************/
+/* Styles personnalisés pour le modal du tableau dentaire */
+/* Standard CSS instead of Tailwind directives */
+
+/* Dark mode variant */
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+:root {
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+  
+  /* Animation variables */
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+}
+
+/* Base styles */
+* {
+  border-color: var(--border);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+/* Modal specific styles */
+[data-slot="dialog-content"].dental-modal {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: calc(100vw - 4rem) !important;
+  height: calc(100vh - 4rem) !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 16px !important;
+  padding-bottom: 80px !important;
+}
+
+/* Assurez-vous que le bouton de fermeture est visible */
+[data-slot="dialog-content"].dental-modal [data-slot="dialog-close"] {
+  z-index: 100;
+}
+
+/* Pour s'assurer que le centrage fonctionne correctement */
+[data-slot="dialog-portal"] {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/*!*****************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[5].use[3]!./src/components/dental-chart/dental.module.css ***!
+  \*****************************************************************************************************************************************************************************************************************************************************************************************/
+/* styles.module.css */
+.dental_chartContainer__VW6Tf {
+  width: fit-content;
+  margin: 0 auto;
+  padding-top: 20px;
+  padding-bottom: 40px;
+  transform: scale(1);
+  transform-origin: top center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: linear-gradient(
+    45deg,
+    white 0%,
+    white 15%,
+    rgba(0, 188, 227, 0.1) 35%,
+    rgba(0, 188, 227, 0.3) 50%,
+    rgba(0, 188, 227, 0.1) 65%,
+    white 85%,
+    white 100%
+  );
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.dental_dentImage___3iiq:hover > div {
+  z-index: 10;
+  transform: scale(1.1);
+  transition: transform 0.2s ease;
+  opacity: 0.7;
+}
+
+.dental_noHover__ZwbRS .dental_dentImage___3iiq:hover > div,
+.dental_chartContainer__VW6Tf:has(.dental_noHover__ZwbRS:hover) .dental_dentImage___3iiq:hover > div {
+  transform: none;
+  opacity: 1;
+}
+
+.dental_dentImage___3iiq > div {
+  transition: all 0.2s ease;
+}
+
+.dental_dentImage___3iiq:hover img {
+  border-radius: 4px;
+}
+
+.dental_orientationTop__i6HWp {
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  position: relative;
+}
+
+.dental_orientationBottom__Rc_EO {
+  margin-top: 20px;
+  padding-top: 10px;
+  position: relative;
+}
+
+.dental_dentGroup__5eE4I {
+  padding: 5px 8px;
+  margin: 0 2px;
+}
+
+.dental_incisorsGroup__lh1xQ {
+  min-width: 230px;
+}
+
+.dental_chartTitle__Z8QFn {
+  position: absolute;
+  top: 8px;
+  left: 20px;
+  margin: 0;
+  padding: 0;
+  font-size: 18px;
+  font-weight: 500;
+  color: rgba(100, 100, 100, 0.8);
+  font-family: sans-serif;
+  letter-spacing: 0.5px;
+}
+
+.dental_chartContainer__VW6Tf::before,
+.dental_chartContainer__VW6Tf::after {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(80, 80, 80, 0.9);
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 1.5px;
+  font-family: sans-serif;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
+  background-color: rgba(255, 255, 255, 0.5);
+  padding: 4px 8px;
+  border-radius: 4px;
+  z-index: 5;
+}
+
+.dental_chartContainer__VW6Tf::after {
+  content: "GAUCHE";
+  right: -15px;
+}
+
+.dental_chartContainer__VW6Tf::before {
+  content: "DROITE";
+  left: -15px;
+}
+
+.dental_teethNormal__EMZux {
+  background-color: transparent;
+}
+
+.dental_teethAbsente__yZ2UY {
+  position: relative !important;
+  display: inline-block;
+}
+
+.dental_teethAbsente__yZ2UY img {
+  filter: brightness(0) !important;
+  opacity: 1 !important;
+  transform: scale(0.9) !important;
+}
+
+.dental_teethCouronne___ZAvT {
+  position: relative !important;
+  display: inline-block;
+}
+
+.dental_teethCouronne___ZAvT img {
+  filter: none !important;
+}
+
+.dental_teethPontique__fThwo {
+  position: relative !important;
+  display: inline-block;
+}
+
+.dental_teethPontique__fThwo img {
+  filter: none !important;
+}
+
+.dental_teethImplant__WU5Jl {
+  position: relative !important;
+  display: inline-block;
+}
+
+.dental_teethImplant__WU5Jl img {
+  filter: none !important;
+}
+
+.dental_teethDentTemporaire__4gWKf {
+  position: relative !important;
+  display: inline-block;
+}
+
+.dental_teethDentTemporaire__4gWKf img {
+  filter: hue-rotate(180deg) !important;
+}
+
+.dental_stateOpen__yalid {
+  animation: dental_fadeIn__Hakp8 0.2s ease;
+}
+
+.dental_stateClosed__ZRWxE {
+  animation: dental_fadeOut__9lJVf 0.2s ease;
+}
+
+.dental_teethTooltip__WjNdt {
+  position: relative;
+}
+
+.dental_teethTooltip__WjNdt:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: -28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(40, 40, 40, 0.85);
+  color: white;
+  padding: 3px 8px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  z-index: 40;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+}
+
+.dental_teethTooltip__WjNdt:hover::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: rgba(40, 40, 40, 0.85) transparent transparent transparent;
+  z-index: 40;
+  pointer-events: none;
+}
+
+@keyframes dental_fadeIn__Hakp8 {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes dental_fadeOut__9lJVf {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+
+/* dental.module.css */
+
+.dental_chartContainer__VW6Tf {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.dental_orientationContainer__Lh3Mx {
+  display: flex;
+  gap: 0.125rem;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+}
+
+.dental_orientationTop__i6HWp {
+  /* Top orientation specific styles if needed */
+}
+
+.dental_orientationBottom__Rc_EO {
+  /* Bottom orientation specific styles if needed */
+}
+
+.dental_dentGroup__5eE4I {
+  display: flex;
+  flex-direction: column;
+  padding: 0.125rem;
+}
+
+.dental_flexColReverse__Guab6 {
+  flex-direction: column-reverse;
+}
+
+.dental_incisorsGroup__lh1xQ {
+  /* Specific styles for incisor groups */
+}
+
+.dental_teethRow__R_Fyw {
+  display: flex;
+  gap: 0.25rem;
+  align-items: center;
+  justify-content: center;
+}
+
+.dental_teethWrapper__XCDPH {
+  width: 100%;
+  position: relative;
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+}
+
+.dental_teethTooltip__WjNdt {
+  position: relative;
+}
+
+.dental_dentImage___3iiq {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+  position: relative;
+  padding: 0.25rem;
+  cursor: pointer;
+}
+
+.dental_teethContainer__6Iu5x {
+  position: relative;
+  width: 4rem;
+  height: 4rem;
+  cursor: pointer;
+}
+
+.dental_scaleUp__CapU8 {
+  transform: scale(1.05);
+}
+
+.dental_scaleNormal__dZhHr {
+  transform: scale(1);
+}
+
+.dental_relative__HY1kc {
+  position: relative;
+}
+
+.dental_fallbackContainer__Lx5lR {
+  width: 100%;
+  height: 100%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.dental_fallbackText__3azFW {
+  font-size: 0.75rem;
+  font-weight: 500;
+  z-index: 10;
+}
+
+.dental_contextualMenuContainer__nN8pb {
+  position: absolute;
+  z-index: 50;
+  background-color: white;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  border-radius: 0.375rem;
+}
+
+.dental_stateOpen__yalid {
+  /* Additional styles for when contextual menu is open */
+}
+
+/* Teeth type specific styles */
+.dental_teethNormal__EMZux {
+  /* Default styles for normal teeth */
+}
+
+.dental_teethAbsente__yZ2UY {
+  /* Styles for absent teeth */
+}
+
+.dental_teethCouronne___ZAvT {
+  /* Styles for crowned teeth */
+}
+
+.dental_teethPontique__fThwo {
+  /* Styles for pontic teeth */
+}
+
+.dental_teethImplant__WU5Jl {
+  /* Styles for implant teeth */
+}
+
+.dental_teethDentTemporaire__4gWKf {
+  /* Styles for temporary teeth */
+}

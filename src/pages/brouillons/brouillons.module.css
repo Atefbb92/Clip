@@ -1,0 +1,153 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Roboto", sans-serif;
+}
+
+
+:root {
+    --primary-blue: #2E6DB4;
+    --secondary-blue: #1B4B87;
+    --accent-teal: #00BFA5;
+    --light-gray: #F5F5F5;
+    --border-gray: #E0E0E0;
+    --text-dark: #333333;
+    --text-gray: #666666;
+    --timeline-line: #E5E7EB;
+}
+
+body {
+    background-color: #f8f9fa;
+}
+
+
+
+.main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.welcomeSection {
+    margin: 32px;
+    display: flex;
+    gap: 1.5rem;
+}
+
+.welcomeSection p {
+    padding: 1rem;
+    font-size: 1.5rem;
+    line-height: 2rem;
+    width: 30%;
+}
+
+.doctorName {
+    font-weight: bold;
+}
+
+.banner {
+    margin-bottom: 32px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.banner img {
+    width: 100%;
+    height: auto;
+}
+
+.group {
+    display: flex;
+    flex-direction: column;
+}
+
+
+
+.headerContent {
+    background-color: var(--primary-blue);
+    padding: 0.75rem 2rem;
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 1rem 1rem 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1400px;
+    margin: 0.5rem auto;
+}
+
+.headerContent h1 {
+    font-size: 1.5rem;
+    font-weight: 500;
+}
+
+.addPatientBtn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: var(--accent-teal);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.25rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+}
+
+.addPatientBtn:hover {
+    background-color: #00AB95;
+}
+
+.tabs {
+    padding: 0 0 0.5rem;
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.tab {
+    padding: 1rem 2rem;
+    border: none;
+    background-color: #EAEAEA;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--text-dark);
+    font-weight: bold;
+    position: relative;
+    transition: color 0.2s;
+    border-radius: 1rem 1rem 0 0;
+    width: 15%;
+}
+
+.tab.active {
+    background-color: white;
+    border-bottom: none;
+}
+
+.searchContainer {
+    margin-left: auto;
+    position: relative;
+}
+
+.searchInput {
+    padding: 1rem 2rem 1rem 1rem;
+    border-radius: 4px;
+    border: none;
+    font-size: 0.9rem;
+    width: 300px;
+    color: var(--text-dark);
+}
+
+.searchInput::placeholder {
+    color: #2969AC;
+}
+
+.searchIcon {
+    position: absolute;
+    left: 87%;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #2969AC;
+}

@@ -1,0 +1,284 @@
+/* Header Styles */
+.header {
+  background-color: white;
+  padding: 15px 0;
+  transition: all 0.5s;
+  z-index: 1000;
+  position: sticky;
+  top: 0;
+  right: 0;
+  left: 0;
+  width: 100%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.containerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logoLink {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  gap: 10px;
+}
+
+.logoImage {
+  max-height: 40px;
+  width: auto;
+}
+
+.logoText {
+  font-size: 32px;
+  font-weight: 300;
+  color: var(--color-secondary);
+  font-family: "Poppins", sans-serif;
+}
+
+.logoHighlight {
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+.navbar {
+  padding: 0;
+  position: relative;
+}
+
+.navList {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  list-style: none;
+  align-items: center;
+  gap: 20px;
+}
+
+.navItem {
+  position: relative;
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  padding: 14px 20px;
+  font-family: "Poppins", sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: #333;
+  white-space: nowrap;
+  transition: 0.3s;
+  position: relative;
+  text-decoration: none;
+}
+
+.navLink:hover,
+.active,
+.active:focus,
+.navItem:hover .navLink {
+  color: var(--primary-color);
+}
+
+.navLink::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: var(--primary-color);
+  visibility: hidden;
+  transition: all 0.3s ease-in-out;
+  transform: scaleX(0);
+}
+
+.navLink:hover::before,
+.navItem:hover .navLink::before,
+.active::before {
+  visibility: visible;
+  transform: scaleX(0.7);
+}
+
+.headerButtons {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.getStartedBtn {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  text-decoration: none;
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.getStartedBtn:hover {
+  background-color: #1565c0;
+  color: white;
+  transform: translateY(-2px);
+}
+
+.signInBtn {
+  color: var(--primary-color);
+  padding: 10px 20px;
+  border: 2px solid var(--primary-color);
+  border-radius: 10px;
+  text-decoration: none;
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.signInBtn:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.mobileNavToggle {
+  display: none;
+  flex-direction: column;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.mobileNavToggle span {
+  width: 25px;
+  height: 3px;
+  background-color: var(--color-secondary);
+  margin: 3px 0;
+  transition: 0.3s;
+}
+/* Mobile Navbar */
+@media (max-width: 1279px) {
+  .navbar {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(128, 128, 128, 0.95);
+    transition: 0.3s;
+    z-index: 9997;
+    flex-direction: column;
+    padding-top: 80px;
+  }
+
+  .mobileNavActive .navbar {
+    right: 0;
+  }
+
+  .navbar .ms-auto {
+    margin: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    width: 100%;
+    padding: 2rem;
+  }
+
+  .navLink {
+    display: flex;
+    justify-content: flex-start;
+    padding: 1rem 2rem;
+    font-size: 18px;
+    font-weight: 500;
+    color: white;
+    width: 100%;
+    text-align: left;
+  }
+
+  .navLink:hover,
+  .active,
+  .active:focus,
+  .navItem:hover .navLink {
+    color: #55BCB3;
+  }
+
+  .mobileNavToggle {
+    display: block;
+    color: #264D59;
+    font-size: 28px;
+    cursor: pointer;
+    line-height: 0;
+    transition: 0.5s;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    border: none;
+    background: none;
+    padding: 0.5rem;
+  }
+
+  .mobileNavActive .mobileNavToggle {
+    color: gray;
+  }
+
+  /* Show button in mobile menu */
+  .btnContainer {
+    bottom:10rem ;
+    right:3rem;
+    position: fixed;
+  }
+  .btn2 {
+    width: 100%;
+  }
+}
+
+@media (min-width: 1280px) {
+  .mobileNavToggle {
+    display: none;
+  }
+
+  /* Hide button in desktop view */
+}
+
+/* Button Styles */
+.btnContainer {
+  margin:0 1rem;
+  display: flex;
+  justify-content: space-between;
+  gap:1rem;
+}
+
+.btn2 {
+  color: #000;
+  font-weight: 900;
+  font-size: 16px;
+  padding: 10px;
+  margin-right: 100px;
+  border: #000 2px solid;
+  border-radius: 10px;
+  font-family: "Poppins", "Arial Black", "Impact", sans-serif;
+  background-color: white;
+}
+
+.btn2:hover {
+  color:#55BCB3;
+  background-color: white;
+  border:#000 2px solid;
+}
+
+
+.header .logo {
+  height: 3.5rem;
+}

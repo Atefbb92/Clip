@@ -1,0 +1,71 @@
+/* Styles personnalisés pour la sidebar */
+.dashboardSidebar {
+  overflow-x: hidden !important;
+  max-width: 16rem;
+  min-width: 16rem;
+  width: 16rem;
+}
+
+/* .dashboardSidebar * selector removed */
+
+/* Amélioration des boutons de menu */
+.sidebarMenuButton {
+  transition: all 0.2s ease-in-out;
+  border-radius: 0.5rem;
+  margin: 0.125rem 0.5rem;
+  color: #e2e8f0;
+}
+
+.sidebarMenuButton:hover {
+  background-color: #c1dff6;
+  transform: translateX(2px);
+  color: #1e40af;
+}
+
+.sidebarMenuButton.active {
+  background-color: #c1dff6;
+  border-left: 3px solid #3b82f6;
+  color: #1e40af;
+}
+
+/* Styles pour les icônes */
+.sidebarIcon {
+  flex-shrink: 0;
+  width: 1rem;
+  height: 1rem;
+}
+
+/* Styles pour le texte des menus */
+.sidebarText {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+
+/* Animation pour le logo */
+.logoContainer {
+  transition: transform 0.2s ease-in-out;
+}
+
+.logoContainer:hover {
+  transform: scale(1.02);
+}
+
+/* Scrollbar personnalisée */
+.dashboardSidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.dashboardSidebar::-webkit-scrollbar-track {
+  background: rgba(148, 163, 184, 0.1);
+}
+
+.dashboardSidebar::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 2px;
+}
+
+.dashboardSidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.5);
+}

@@ -1,0 +1,876 @@
+/* prescription.module.css */
+.formStep {
+    display: none;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+}
+
+.formStep.active {
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.sectionHeader {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.sub {
+    justify-content: space-between;
+}
+
+.subsectionHeader {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Image styles */
+.perimg {
+    width: 90%;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Prescription form container */
+.prescriptionForm {
+    background-color: white;
+    border-radius: 4px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+/* Header styles */
+.headerPr {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.headerPr h2 {
+    color: #2c5282;
+    font-size: 1.2rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+.headerPr h2::before {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-color: #2c5282;
+    margin-right: 8px;
+    border-radius: 2px;
+}
+
+/* Patient type label */
+.patientType {
+    color: #666;
+    font-size: 0.9rem;
+    margin-left: 50%;
+}
+
+/* Section styles */
+.section {
+    margin-bottom: 30px;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    transition: all 0.3s ease;
+}
+
+.section.active {
+    border-color: #007bff;
+    box-shadow: 0 0 10px rgba(0, 123, 255, 0.2);
+    background-color: #f8f9ff;
+}
+
+.section h3 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 1.2rem;
+}
+
+/* Scrollable content */
+.scrollableContent {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 1rem;
+    max-height: calc(100vh - 300px);
+}
+
+.scrollableContent::-webkit-scrollbar {
+    width: 8px;
+}
+
+.scrollableContent::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 4px;
+}
+
+/* Radio group styles */
+.radioGroup {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+/* Add specific style for Milieux inter-incisifs section */
+.milieuxRadioGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.milieuxRadioGroup .radioOption {
+    margin-right: 0;
+}
+
+/* Add specific style for Arcade section */
+.arcadeRadioGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.arcadeRadioGroup .radioOption {
+    margin-right: 0;
+}
+
+.radioOption {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    margin-right: 1rem;
+}
+
+.radioInput {
+    margin: 0;
+}
+
+.radioOption span {
+    font-size: 0.9rem;
+    color: #4a5568;
+}
+
+.subOptions {
+    margin-left: 1.8rem;
+}
+
+.nestedOptions {
+    margin-left: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+/* Teeth grid styles */
+.teethGrid {
+    margin: 1rem;
+    position: relative;
+    width: 70%;
+}
+
+.teethRow {
+    position: relative;
+}
+
+.teethNumbers {
+    display: grid;
+    grid-template-columns: repeat(16, 1fr);
+    gap: 4px;
+    text-align: center;
+    font-size: 0.7rem;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.teethBoxes {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.toothBox {
+    position: relative;
+    margin: 0;
+    padding: 0;
+}
+
+.toothBox .checkboxInput {
+    width: 2rem;
+    height: 2rem;
+    margin: 0;
+    background-color: #e5e5e5;
+    border-radius: 0.2rem;
+    border: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+.toothBox .checkboxInput:checked {
+    background-color: #666;
+}
+
+.verticalLine {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    background-color: #666;
+    height: 6rem;
+    top: -20px;
+    z-index: 1;
+}
+
+.jawLabels {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.labelD,
+.labelG {
+    position: absolute;
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #666;
+    top: -10px;
+}
+
+.labelD {
+    left: -2rem;
+}
+
+.labelG {
+    right: -2rem;
+}
+
+.horizontalLine {
+    position: relative;
+    width: 100%;
+    height: 2px;
+    background-color: #666;
+    margin: 1rem;
+}
+
+/* Table styles */
+.apTable {
+    width: 100%;
+    table-layout: fixed;
+}
+
+.apTable td, .apTable th {
+    text-align: left;
+    vertical-align: middle;
+    padding: 0.25rem 0.5rem;
+}
+
+.apTable td:first-child, .apTable th:first-child {
+    min-width: 180px;
+    width: 180px;
+}
+
+.apTable td:not(:first-child), .apTable th:not(:first-child) {
+    min-width: 120px;
+    width: 120px;
+}
+
+.apTable td label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* Options section */
+.optionsSection {
+    background-color: transparent;
+    padding: 0;
+    border-radius: 0;
+    margin-top: 1rem;
+}
+
+.optionsSection h4 {
+    margin-bottom: 0.5rem;
+    color: #333;
+    font-size: 0.9rem;
+    font-weight: normal;
+}
+
+.checkboxGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.checkboxOption {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+}
+
+.checkboxInput {
+    margin: 0;
+}
+
+/* Input styles */
+.radioInput {
+    width: 14px;
+    height: 14px;
+    margin-right: 8px;
+    accent-color: #007bff;
+}
+
+.checkboxInput {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: #007bff;
+}
+
+.radioOption {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+}
+
+.radioOption span {
+    margin-left: 8px;
+}
+
+.nestedOptions {
+    margin-left: 24px;
+    margin-top: 8px;
+}
+
+.nestedOptions .radioOption {
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #666;
+}
+
+/* Submit section */
+.soumettre {
+    background: white;
+    padding: 30px;
+    border-radius: 4px;
+}
+
+.soumettre h1 {
+    font-size: 16px;
+    margin: 0 0 25px 0;
+    font-weight: normal;
+}
+
+.sec {
+    margin-bottom: 20px;
+}
+
+.secHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.sec h2 {
+    color: #425567;
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.modifier {
+    color: #0066cc;
+    text-decoration: underline;
+    font-size: 14px;
+    cursor: pointer;
+    margin-left: 15px;
+    white-space: nowrap;
+}
+
+.paragraph {
+    margin: 0 0 4px 0;
+    font-size: 14px;
+}
+
+.options {
+    margin-top: 8px;
+}
+
+.indent {
+    margin-left: 20px;
+}
+
+.precisionCuts {
+    margin-left: 40px;
+}
+
+/* Step 3 container */
+.step3Container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.step3Container h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+.imagesGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.imageUploadContainer {
+    aspect-ratio: 1;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.imageUploadLabel {
+    display: block;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    background-color: #f5f5f5;
+    transition: all 0.3s ease;
+}
+
+.imageUploadLabel:hover {
+    background-color: #e0e0e0;
+}
+
+.uploadedImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.uploadPlaceholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+    color: #666;
+    font-size: 14px;
+    border: 2px dashed #ccc;
+}
+
+.uploadPlaceholder:hover {
+    border-color: #999;
+    color: #333;
+}
+
+.tout {
+    margin:0.5rem  0.5rem 0 0;
+    display:flex;
+    justify-content:flex-start;
+    align-items: center;
+    gap:0.5rem;
+}
+
+.instructions {
+    width: 100%;
+    height:200px;
+    padding: 0.5rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    resize: vertical;
+}
+
+.error {
+  color: #d32f2f;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.submitSection {
+  margin-top: 2rem;
+  padding: 1rem;
+  text-align: center;
+}
+#instructions {
+  width: 100%;
+  min-height: 100px;
+  padding: 0.5rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  resize: vertical;
+}
+
+@keyframes highlightSection {
+  0% {
+    background-color: rgba(0, 123, 255, 0.1);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.highlight {
+  animation: highlightSection 2s ease-out;
+}
+.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+  
+.disabled input {
+    cursor: not-allowed;
+}
+
+
+/* DentalChartModal.module.css */
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .modalContainer {
+    background-color: white;
+    border-radius: 12px;
+    padding: 20px;
+    width: 90%;
+    max-width: 1200px;
+    max-height: 90vh;
+    overflow: auto;
+    position: relative;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  }
+  
+  .closeButton {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: #f3f4f6;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+  }
+  
+  .closeButton:hover {
+    background-color: #e5e7eb;
+  }
+  
+  .modalHeader {
+    margin-bottom: 16px;
+  }
+  
+  .modalTitle {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+  
+  .modalSubtitle {
+    font-size: 14px;
+    color: #6b7280;
+    margin-top: 4px;
+  }
+  
+  .chartContainer {
+    display: flex;
+    justify-content: center;
+    overflow: auto;
+    padding-bottom: 80px;
+  }
+  
+  .modalFooter {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 20;
+  }
+  
+  .footerContent {
+    padding: 16px 24px;
+    border-top: 1px solid #e5e7eb;
+    background-color: white;
+    box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.05);
+  }
+  
+  .footerActions {
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .containerdental {
+    width: 100%;
+    max-width: 1400px; /* This is the default Tailwind container max-width */
+    margin-left: auto;
+    margin-right: auto;
+    padding: 1.5rem; /* equivalent to p-6 (6 × 0.25rem = 1.5rem) */
+  }
+
+  /* Add these styles to your styles.module.css file */
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .modalContainer {
+    background-color: white;
+    border-radius: 12px;
+    padding: 20px;
+    width: 90%;
+    max-width: 1200px;
+    max-height: 90vh;
+    overflow: auto;
+    position: relative;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  }
+  
+  .closeButton {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: #f3f4f6;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+  }
+  
+  .closeButton:hover {
+    background-color: #e5e7eb;
+  }
+  
+  .modalHeader {
+    margin-bottom: 16px;
+  }
+  
+  .modalTitle {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+  
+  .modalSubtitle {
+    font-size: 14px;
+    color: #6b7280;
+    margin-top: 4px;
+  }
+  
+  .chartContainer {
+    display: flex;
+    justify-content: center;
+    overflow: auto;
+    padding-bottom: 80px;
+  }
+  
+  .modalFooter {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 20;
+  }
+  
+  .footerContent {
+    padding: 16px 24px;
+    border-top: 1px solid #e5e7eb;
+    background-color: white;
+    box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.05);
+  }
+  
+  .footerButtons {
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .submitButton {
+    background-color: #2563eb;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 16px;
+    transition: background-color 0.2s ease;
+  }
+  
+  .submitButton:hover {
+    background-color: #1d4ed8;
+  }
+
+/* DDM Section Styles */
+.ddmSection {
+    margin-top: 2rem;
+}
+
+.ddmTitle {
+    font-size: 20px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+}
+
+.ddmSubtitle {
+    font-size: 22px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin: 1.5rem 0 1rem 0;
+}
+
+.ddmSubSubtitle {
+    font-size: 16px;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 1.25rem 0 1rem 0;
+}
+
+/* Make subtitle smaller than Encombrement */
+.resolutionSubtitle {
+    font-size: 14px;
+    font-weight: 600;
+    color: #425567;
+    margin: 1rem 0 0.5rem 0;
+}
+
+.ddmTable {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.75rem;
+    margin: 1rem 0 2rem 0;
+}
+
+.ddmTable th, .ddmTable td {
+    text-align: left;
+    vertical-align: middle;
+    font-size: 16px;
+    color: #425567;
+    font-weight: 400;
+    padding: 0.25rem 0.75rem 0.25rem 0;
+}
+
+.ddmTable th {
+    font-weight: 500;
+    color: #2c3e50;
+    font-size: 16px;
+    padding-bottom: 0.5rem;
+}
+
+.ddmTable td:first-child, .ddmTable th:first-child {
+    padding-right: 0.25rem;
+}
+
+.ddmTable td:not(:first-child), .ddmTable th:not(:first-child) {
+    padding-left: 0;
+    padding-right: 0.75rem;
+}
+
+.ddmTable .radioInput {
+    margin-right: 0.5rem;
+    accent-color: #2563eb;
+    width: 16px;
+    height: 16px;
+}
+
+.ddmTable label {
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 400;
+    cursor: pointer;
+    gap: 1rem;
+}
+
+.ddmTable .radioOption {
+    margin-right: 2rem;
+}
+
+/* Add spacing above Espacement/Encombrement blocks */
+.ddmBlock {
+    margin-bottom: 2rem;
+}
+
+.ddmTable td {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0.25rem 0.75rem 0.25rem 0;
+    margin: 0;
+    min-width: 100px;
+}
+
+.apTable td label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.apTable td label > .radioInput + span {
+  margin-left: 0.75rem !important;
+}
+
+.radioInline {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  white-space: nowrap;
+}
+
+.resolutionIndented {
+  margin-left: 2rem;
+}
