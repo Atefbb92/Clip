@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { ChevronDown } from 'lucide-react'
 import RadioGroup from '../ui/RadioGroup'
 import TabButton from '../ui/TabButton'
+import { useTranslation } from '@/hooks/useTranslation'
 
 interface FonctionnalitesSectionProps {
   activeTab: string
@@ -14,6 +15,7 @@ export default function FonctionnalitesSection({
   activeTab,
   setActiveTab,
 }: FonctionnalitesSectionProps) {
+  const { t } = useTranslation()
   const [taquetsStep, setTaquetsStep] = useState(1)
   const [dropdownOpen, setDropdownOpen] = useState(false)
 
@@ -21,16 +23,16 @@ export default function FonctionnalitesSection({
     <>
       <div className="flex gap-6 border-b border-gray-200 mb-6">
         <TabButton active={activeTab === 'taquets'} onClick={() => setActiveTab('taquets')}>
-          Taquets
+          {t('preferences_cliniques.sections.fonctionnalites.tabs.attachments')}
         </TabButton>
         <TabButton active={activeTab === 'decoupes'} onClick={() => setActiveTab('decoupes')}>
-          Pose des élastiques
+          {t('preferences_cliniques.sections.fonctionnalites.tabs.elastics')}
         </TabButton>
         <TabButton active={activeTab === 'rampes'} onClick={() => setActiveTab('rampes')}>
-          Rampes d&apos;occlusion
+          {t('preferences_cliniques.sections.fonctionnalites.tabs.ramps')}
         </TabButton>
         <TabButton active={activeTab === 'crete'} onClick={() => setActiveTab('crete')}>
-          Ligne de coupe
+          {t('preferences_cliniques.sections.fonctionnalites.tabs.cutline')}
         </TabButton>
       </div>
 
@@ -38,23 +40,23 @@ export default function FonctionnalitesSection({
         <>
           <div className="mb-6">
             <div className="text-sm font-medium text-gray-700 mb-4">
-              Taille des taquets optimisés
+              {t('preferences_cliniques.sections.fonctionnalites.attachments.size')}
             </div>
             <div className="grid grid-cols-2 gap-6">
               <div>
-                <div className="text-sm font-medium mb-2">Pour les dents antérieures</div>
+                <div className="text-sm font-medium mb-2">{t('preferences_cliniques.sections.fonctionnalites.attachments.anterior')}</div>
                 <RadioGroup
-                  options={['Normal', 'Le plus grand qui convienne']}
+                  options={[t('preferences_cliniques.sections.fonctionnalites.attachments.options.normal'), t('preferences_cliniques.sections.fonctionnalites.attachments.options.largest')]}
                   name="taquets-ant"
-                  defaultValue="Normal"
+                  defaultValue={t('preferences_cliniques.sections.fonctionnalites.attachments.options.normal')}
                 />
               </div>
               <div>
-                <div className="text-sm font-medium mb-2">Pour les dents postérieures</div>
+                <div className="text-sm font-medium mb-2">{t('preferences_cliniques.sections.fonctionnalites.attachments.posterior')}</div>
                 <RadioGroup
-                  options={['Normal', 'Le plus grand qui convienne']}
+                  options={[t('preferences_cliniques.sections.fonctionnalites.attachments.options.normal'), t('preferences_cliniques.sections.fonctionnalites.attachments.options.largest')]}
                   name="taquets-post"
-                  defaultValue="Normal"
+                  defaultValue={t('preferences_cliniques.sections.fonctionnalites.attachments.options.normal')}
                 />
               </div>
             </div>
@@ -62,7 +64,7 @@ export default function FonctionnalitesSection({
 
           <div className="mb-4">
             <label className="text-sm font-medium mb-2 block">
-              Pose des taquets à partir de l&apos;étape:
+              {t('preferences_cliniques.sections.fonctionnalites.attachments.start_step')}
             </label>
             <div className="relative">
               <button
@@ -92,7 +94,7 @@ export default function FonctionnalitesSection({
           </div>
 
           <p className="text-sm text-gray-600 mt-2">
-            « Étape à retarder » est définie sur l&apos;étape 1 pour les produits à étapes limitées.
+            {t('preferences_cliniques.sections.fonctionnalites.attachments.delay_note')}
           </p>
         </>
       )}
@@ -100,22 +102,22 @@ export default function FonctionnalitesSection({
       {activeTab === 'decoupes' && (
         <>
           <div className="mb-6">
-            <div className="text-sm font-medium mb-4">Découpes de précision</div>
+            <div className="text-sm font-medium mb-4">{t('preferences_cliniques.sections.fonctionnalites.elastics.precision_cuts')}</div>
             <RadioGroup
               options={[
-                'Utiliser les découpes de précision pour les élastiques de Classe II et de Classe III',
-                'Utiliser les découpes de précision pour les élastiques de Classe II uniquement',
-                'Utiliser les découpes de précision pour les élastiques de Classe III uniquement',
-                'Ne pas utiliser de découpes de précision',
+                t('preferences_cliniques.sections.fonctionnalites.elastics.options.class2_3'),
+                t('preferences_cliniques.sections.fonctionnalites.elastics.options.class2_only'),
+                t('preferences_cliniques.sections.fonctionnalites.elastics.options.class3_only'),
+                t('preferences_cliniques.sections.fonctionnalites.elastics.options.no_cuts'),
               ]}
               name="decoupes-precision"
-              defaultValue="Utiliser les découpes de précision pour les élastiques de Classe II et de Classe III"
+              defaultValue={t('preferences_cliniques.sections.fonctionnalites.elastics.options.class2_3')}
             />
           </div>
 
           <div className="mb-4">
             <div className="text-sm font-medium mb-2">
-              Pose des élastiques à partir de l&apos;étape
+              {t('preferences_cliniques.sections.fonctionnalites.elastics.start_step')}
             </div>
             <RadioGroup
               options={['1', '2', '3', '4', '5']}
@@ -129,28 +131,28 @@ export default function FonctionnalitesSection({
       {activeTab === 'rampes' && (
         <>
           <div className="mb-6">
-            <div className="text-sm font-medium mb-4">Bite Ramps</div>
+            <div className="text-sm font-medium mb-4">{t('preferences_cliniques.sections.fonctionnalites.ramps.bite_ramps')}</div>
             <RadioGroup
               options={[
-                'Poser des Bite Ramps si nécessaire',
-                'Toujours poser des Bite Ramps',
-                'Ne jamais poser de Bite Ramps',
+                t('preferences_cliniques.sections.fonctionnalites.ramps.options.ramps_needed'),
+                t('preferences_cliniques.sections.fonctionnalites.ramps.options.ramps_always'),
+                t('preferences_cliniques.sections.fonctionnalites.ramps.options.ramps_never'),
               ]}
               name="bite-ramps"
-              defaultValue="Poser des Bite Ramps si nécessaire"
+              defaultValue={t('preferences_cliniques.sections.fonctionnalites.ramps.options.ramps_needed')}
             />
           </div>
 
           <div className="mb-4">
-            <div className="text-sm font-medium mb-2">Bite Turbos</div>
+            <div className="text-sm font-medium mb-2">{t('preferences_cliniques.sections.fonctionnalites.ramps.bite_turbos')}</div>
             <RadioGroup
               options={[
-                'Poser des Bite Turbos si nécessaire',
-                'Toujours poser des Bite Turbos',
-                'Ne jamais poser de Bite Turbos',
+                t('preferences_cliniques.sections.fonctionnalites.ramps.options.turbos_needed'),
+                t('preferences_cliniques.sections.fonctionnalites.ramps.options.turbos_always'),
+                t('preferences_cliniques.sections.fonctionnalites.ramps.options.turbos_never'),
               ]}
               name="bite-turbos"
-              defaultValue="Poser des Bite Turbos si nécessaire"
+              defaultValue={t('preferences_cliniques.sections.fonctionnalites.ramps.options.turbos_needed')}
             />
           </div>
         </>
@@ -159,16 +161,16 @@ export default function FonctionnalitesSection({
       {activeTab === 'crete' && (
         <>
           <div className="mb-4">
-            <div className="text-sm font-medium mb-2">Design de la ligne de coupe</div>
+            <div className="text-sm font-medium mb-2">{t('preferences_cliniques.sections.fonctionnalites.cutline.design')}</div>
             <RadioGroup
               options={[
-                'Ligne de coupe droite juxtagingivale',
-                'Ligne de coupe droite étendue de 1 mm',
-                'Ligne festonnée',
-                'Combinaison hybride',
+                t('preferences_cliniques.sections.fonctionnalites.cutline.options.straight_juxta'),
+                t('preferences_cliniques.sections.fonctionnalites.cutline.options.straight_extended'),
+                t('preferences_cliniques.sections.fonctionnalites.cutline.options.scalloped'),
+                t('preferences_cliniques.sections.fonctionnalites.cutline.options.hybrid'),
               ]}
               name="ligne-coupe"
-              defaultValue="Ligne de coupe droite juxtagingivale"
+              defaultValue={t('preferences_cliniques.sections.fonctionnalites.cutline.options.straight_juxta')}
             />
           </div>
         </>

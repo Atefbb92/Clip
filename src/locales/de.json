@@ -609,5 +609,210 @@
             "title": "Bereich im Aufbau",
             "desc": "Der Bereich {{section}} befindet sich derzeit in der Entwicklung."
         }
+    },
+    "preferences_cliniques": {
+        "title": "Klinische Präferenzen",
+        "subtitle": "Globale Konfiguration",
+        "updated_at": "Aktualisiert am {{date}}",
+        "menu": {
+            "rip": "Interproximale Reduktion (IPR)",
+            "dents": "Fehlende Zähne",
+            "extractions": "Extraktionen",
+            "malocclusion_category": "Korrektur der Malokklusion",
+            "encombrement": "Engstand",
+            "espacement": "Lückenstand",
+            "axe": "Mittellinien",
+            "antero": "Antero-posteriore Korrektur",
+            "articule": "Posteriorer Kreuzbiss",
+            "anterieure_category": "Anteriore Korrektur",
+            "nivellement": "Offener Biss frontal",
+            "recouvrement": "Tiefbiss",
+            "fonctionnalites": "Aligner-Funktionen",
+            "surcorrection": "Überkorrektur des Lückenschlusses",
+            "aligneurs": "Aktive – Passive Aligner"
+        },
+        "sections": {
+            "common": {
+                "adult": "Erwachsener",
+                "adolescent": "Jugendlicher",
+                "upper_arch": "Oberkiefer",
+                "lower_arch": "Unterkiefer",
+                "yes": "Ja",
+                "no": "Nein",
+                "if_needed": "Falls erforderlich"
+            },
+            "rip": {
+                "anterior_limit": "Begrenzung der anterioren IPR pro Kontakt",
+                "posterior_limit": "Begrenzung der posterioren IPR pro Kontakt",
+                "programming": "IPR-Programmierung",
+                "options": {
+                    "before": "Ausrichtung vor der IPR durchführen.",
+                    "after": "Ausrichtung nach der IPR durchführen."
+                }
+            },
+            "aligneurs": {
+                "active_steps": "Wie sollen die aktiven Aligner-Schritte abgeschlossen werden?",
+                "options": {
+                    "same_finish": "Aktive Schritte gleichzeitig auf beiden Kiefern beginnen und beenden",
+                    "diff_finish": "Aktive Schritte gleichzeitig beginnen, aber zu unterschiedlichen Zeiten beenden"
+                },
+                "passive": "Passive Aligner"
+            },
+            "antero": {
+                "objective": "Behandlungsziel",
+                "distalization_protocol": "Distalisierungsprotokoll",
+                "priority": "Priorität setzen auf",
+                "priority_info": "Wenn beides nicht erreichbar ist, versucht die Software, Ihre Auswahl zu priorisieren.",
+                "tabs": {
+                    "class2": "Klasse II",
+                    "class3": "Klasse III"
+                },
+                "options": {
+                    "distalization": "Distalisierung",
+                    "no_correction": "Keine Korrektur",
+                    "mesialization": "Mesialisierung",
+                    "simulation": "Korrektursimulation",
+                    "maf": "Unterkiefervorverlagerung (MAF)",
+                    "optimized": "Optimierte halbsequenzielle Distalisierung",
+                    "standard": "Standard halbsequenzielle Distalisierung",
+                    "sequential": "Sequenzielle Distalisierung",
+                    "hybrid": "Hybridprotokoll",
+                    "molar": "Molar",
+                    "canine": "Eckzahn"
+                },
+                "objectives": {
+                    "molars_canines_class1": "Molaren und Eckzähne in Klasse I",
+                    "canines_class1": "Eckzähne in Klasse I",
+                    "molars_class1": "Molaren in Klasse I",
+                    "maintain": "Beibehalten"
+                }
+            },
+            "articule": {
+                "molars_approach": "Ansatz für Molaren",
+                "bite_turbos": "Bite Turbos platzieren",
+                "options": {
+                    "correct_pre_molars": "Prämolaren und Molaren korrigieren",
+                    "correct_pre_only": "Nur Prämolaren korrigieren",
+                    "do_not_correct": "Nicht korrigieren"
+                }
+            },
+            "axe": {
+                "approach": "Ansatz",
+                "options": {
+                    "prioritize_others": "Andere Ziele priorisieren",
+                    "improve_rip": "Mittellinie mit IPR verbessern"
+                }
+            },
+            "dents_absentes": {
+                "pontics": "Pontics-Platzierung",
+                "options": {
+                    "allow_all": "Pontics für fehlende Vorder- und Backenzähne zulassen",
+                    "allow_anterior": "Pontics nur für fehlende Vorderzähne zulassen",
+                    "allow_posterior": "Pontics nur für fehlende Backenzähne zulassen",
+                    "forbid": "Keine Pontics zulassen"
+                }
+            },
+            "encombrement": {
+                "limit_expansion": "Kiefererweiterung begrenzen",
+                "limit_vestibulo": "Proklination der Frontzähne begrenzen:",
+                "options": {
+                    "expansion_needed": "Erweiterung, falls erforderlich",
+                    "vestibulo_needed": "Proklination, falls erforderlich"
+                }
+            },
+            "espacement": {
+                "residual_space": "Bei Zahngrößendiskrepanz Restlücke lassen",
+                "options": {
+                    "distal_lateral": "Distal der seitlichen Schneidezähne",
+                    "mesial_lateral": "Mesial der seitlichen Schneidezähne",
+                    "distal_canine": "Distal der Eckzähne",
+                    "equal": "Gleichmäßig um die seitlichen Zähne",
+                    "no_space": "Keine Lücken"
+                }
+            },
+            "extractions": {
+                "consider_from": "Extraktion ab Schritt in Betracht ziehen:",
+                "pontics": "Pontics-Platzierung",
+                "options": {
+                    "open_spaces": "Pontics für offene Lücken zulassen",
+                    "anterior_only": "Pontics nur für anteriore Extraktionen zulassen",
+                    "posterior_only": "Pontics nur für posteriore Extraktionen zulassen",
+                    "forbid": "Keine Pontics zulassen"
+                }
+            },
+            "fonctionnalites": {
+                "tabs": {
+                    "attachments": "Attachments",
+                    "elastics": "Gummizüge platzieren",
+                    "ramps": "Bite Ramps",
+                    "cutline": "Schnittlinie"
+                },
+                "attachments": {
+                    "size": "Optimierte Attachment-Größe",
+                    "anterior": "Für Frontzähne",
+                    "posterior": "Für Seitenzähne",
+                    "start_step": "Attachments platzieren ab Schritt:",
+                    "delay_note": "\"Zu verzögernder Schritt\" ist bei Produkten mit begrenzten Schritten auf Schritt 1 gesetzt.",
+                    "options": {
+                        "normal": "Normal",
+                        "largest": "Größtmöglich"
+                    }
+                },
+                "elastics": {
+                    "precision_cuts": "Präzisionsausschnitte (Precision Cuts)",
+                    "start_step": "Gummizüge platzieren ab Schritt",
+                    "options": {
+                        "class2_3": "Präzisionsausschnitte für Klasse II und Klasse III Gummizüge verwenden",
+                        "class2_only": "Präzisionsausschnitte nur für Klasse II Gummizüge verwenden",
+                        "class3_only": "Präzisionsausschnitte nur für Klasse III Gummizüge verwenden",
+                        "no_cuts": "Keine Präzisionsausschnitte verwenden"
+                    }
+                },
+                "ramps": {
+                    "bite_ramps": "Bite Ramps",
+                    "bite_turbos": "Bite Turbos",
+                    "options": {
+                        "ramps_needed": "Bite Ramps platzieren, falls erforderlich",
+                        "ramps_always": "Bite Ramps immer platzieren",
+                        "ramps_never": "Bite Ramps nie platzieren",
+                        "turbos_needed": "Bite Turbos platzieren, falls erforderlich",
+                        "turbos_always": "Bite Turbos immer platzieren",
+                        "turbos_never": "Bite Turbos nie platzieren"
+                    }
+                },
+                "cutline": {
+                    "design": "Design der Schnittlinie",
+                    "options": {
+                        "straight_juxta": "Gerade Schnittlinie juxtagingivale",
+                        "straight_extended": "Gerade Schnittlinie erweitert um 1 mm",
+                        "scalloped": "Girlandenförmige Linie",
+                        "hybrid": "Hybrid-Kombination"
+                    }
+                }
+            },
+            "nivellement": {
+                "open_bite": "Ober- und Unterkiefer",
+                "bite_turbos": "Automatische Platzierung von Bite Turbos",
+                "options": {
+                    "egression_anterior": "Extrusion der Frontzähne",
+                    "egression_ant_ingression_post": "Extrusion der Frontzähne und Intrusion der Seitenzähne"
+                }
+            },
+            "recouvrement": {
+                "approach": "Ansatz",
+                "bite_ramps": "Automatische Platzierung von Bite Ramps",
+                "options": {
+                    "ingression_anterior": "Intrusion der Frontzähne",
+                    "ingression_ant_egression_post": "Intrusion der Frontzähne und Extrusion der Seitenzähne"
+                }
+            },
+            "surcorrection": {
+                "label": "Überkorrektur-Aligner",
+                "options": {
+                    "add_3": "3 Überkorrektur-Aligner hinzufügen",
+                    "no_add": "Keine Überkorrektur-Aligner hinzufügen"
+                }
+            }
+        }
     }
 }

@@ -21,28 +21,28 @@ const StatCard = ({
   // Color variants mapping
   const colorVariants = {
     gray: {
-      accent: 'border-slate-500 shadow-slate-500/15',
-      iconBg: 'bg-slate-500/10',
-      iconColor: 'text-slate-500',
-      selectedBg: 'bg-gradient-to-br from-slate-50 to-slate-100',
+      accent: 'border-gray-500 shadow-gray-500/15',
+      iconBg: 'bg-gray-500/10',
+      iconColor: 'text-gray-500',
+      selectedBg: 'bg-gradient-to-br from-gray-50 to-gray-100',
     },
     blue: {
-      accent: 'border-blue-500 shadow-blue-500/15',
-      iconBg: 'bg-blue-500/10',
-      iconColor: 'text-blue-500',
-      selectedBg: 'bg-gradient-to-br from-blue-50 to-blue-100',
+      accent: 'border-sky-500 shadow-sky-500/15',
+      iconBg: 'bg-sky-500/10',
+      iconColor: 'text-sky-500',
+      selectedBg: 'bg-gradient-to-br from-sky-50 to-sky-100',
     },
     green: {
-      accent: 'border-emerald-500 shadow-emerald-500/15',
-      iconBg: 'bg-emerald-500/10',
-      iconColor: 'text-emerald-500',
-      selectedBg: 'bg-gradient-to-br from-emerald-50 to-emerald-100',
+      accent: 'border-green-500 shadow-green-500/15',
+      iconBg: 'bg-green-500/10',
+      iconColor: 'text-green-500',
+      selectedBg: 'bg-gradient-to-br from-green-50 to-green-100',
     },
     yellow: {
-      accent: 'border-amber-500 shadow-amber-500/15',
-      iconBg: 'bg-amber-500/10',
-      iconColor: 'text-amber-500',
-      selectedBg: 'bg-gradient-to-br from-amber-50 to-amber-100',
+      accent: 'border-yellow-500 shadow-yellow-500/15',
+      iconBg: 'bg-yellow-500/10',
+      iconColor: 'text-yellow-600',
+      selectedBg: 'bg-gradient-to-br from-yellow-50 to-yellow-100',
     },
     red: {
       accent: 'border-red-500 shadow-red-500/15',
@@ -132,7 +132,7 @@ const StatCard = ({
           }`}>
           {value}
         </div>
-        <div className={`text-xs xl:text-xs lg:text-xs md:text-xs sm:text-[9px] font-semibold uppercase tracking-wider whitespace-normal break-words leading-tight ${isSelected
+        <div className={`text-xs xl:text-xs lg:text-xs md:text-xs sm:text-[9px] font-semibold uppercase tracking-wider whitespace-normal break-words leading-tight line-clamp-2 ${isSelected
           ? variant.iconColor.replace('text-', 'text-').replace('-500', '-600')
           : 'text-slate-500'
           }`}>

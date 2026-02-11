@@ -142,11 +142,10 @@ export default function BillingPage() {
   }
 
   const formatCurrency = (amount: number) => {
-    const locale = language === 'FR' ? 'fr-TN' : language === 'DE' ? 'de-DE' : 'en-US'
-    const currency = language === 'FR' ? 'TND' : language === 'DE' ? 'EUR' : 'USD'
-    return new Intl.NumberFormat(locale, {
+    // Always use TND (Tunisian Dinar) regardless of language
+    return new Intl.NumberFormat('fr-TN', {
       style: 'currency',
-      currency: currency,
+      currency: 'TND',
     }).format(amount)
   }
 

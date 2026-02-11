@@ -1,16 +1,18 @@
 import RadioGroup from '../ui/RadioGroup'
+import { useTranslation } from '@/hooks/useTranslation'
 
 export default function SurcorrectionSection() {
+  const { t } = useTranslation()
   return (
     <>
-      <div className="text-sm text-gray-700 mb-4">Aligners de surcorrection</div>
+      <div className="text-sm text-gray-700 mb-4">{t('preferences_cliniques.sections.surcorrection.label')}</div>
       <RadioGroup
         options={[
-          'Ajouter 3 aligners de surcorrection',
-          "Ne pas ajouter d'aligners de surcorrection",
+          t('preferences_cliniques.sections.surcorrection.options.add_3'),
+          t('preferences_cliniques.sections.surcorrection.options.no_add'),
         ]}
         name="surcorrection"
-        defaultValue="Ne pas ajouter d'aligners de surcorrection"
+        defaultValue={t('preferences_cliniques.sections.surcorrection.options.no_add')}
       />
     </>
   )

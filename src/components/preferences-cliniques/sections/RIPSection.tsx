@@ -5,8 +5,10 @@ import { ChevronDown } from 'lucide-react'
 import RadioGroup from '../ui/RadioGroup'
 import SquareButton from '../ui/SquareButton'
 import Image from 'next/image'
+import { useTranslation } from '@/hooks/useTranslation'
 
 export default function RIPSection() {
+  const { t } = useTranslation()
   const [ripAnterieureAdulte, setRipAnterieureAdulte] = useState('0.5')
   const [ripPosterieureAdulte, setRipPosterieureAdulte] = useState('0.5')
   const [ripAnterieureAdo, setRipAnterieureAdo] = useState('0.5')
@@ -19,7 +21,7 @@ export default function RIPSection() {
 
   return (
     <>
-      <h2 className="text-lg font-semibold mb-4">Adulte</h2>
+      <h2 className="text-lg font-semibold mb-4">{t('preferences_cliniques.sections.common.adult')}</h2>
       <div className="grid grid-cols-2 gap-8 mb-8">
         <div>
           <Image
@@ -64,14 +66,17 @@ export default function RIPSection() {
       </div>
 
       <RadioGroup
-        label="Programmation de la RIP"
-        options={["Effectuer l'alignement avant la RIP.", "Effectuer l'alignement après la RIP."]}
+        label={t('preferences_cliniques.sections.rip.programming')}
+        options={[
+          t('preferences_cliniques.sections.rip.options.before'),
+          t('preferences_cliniques.sections.rip.options.after'),
+        ]}
         name="programmation-adulte"
-        defaultValue="Effectuer l'alignement avant la RIP."
+        defaultValue={t('preferences_cliniques.sections.rip.options.before')}
       />
 
       <div className="flex items-center gap-3 mb-4 mt-8">
-        <h2 className="text-lg font-semibold">Adolescent</h2>
+        <h2 className="text-lg font-semibold">{t('preferences_cliniques.sections.common.adolescent')}</h2>
         <button
           onClick={copyToAdolescent}
           className="p-2 hover:bg-gray-100 rounded transition"
@@ -125,10 +130,13 @@ export default function RIPSection() {
       </div>
 
       <RadioGroup
-        label="Programmation de la RIP"
-        options={["Effectuer l'alignement avant la RIP.", "Effectuer l'alignement après la RIP."]}
+        label={t('preferences_cliniques.sections.rip.programming')}
+        options={[
+          t('preferences_cliniques.sections.rip.options.before'),
+          t('preferences_cliniques.sections.rip.options.after'),
+        ]}
         name="programmation-ado"
-        defaultValue="Effectuer l'alignement avant la RIP."
+        defaultValue={t('preferences_cliniques.sections.rip.options.before')}
       />
     </>
   )

@@ -279,7 +279,6 @@ const PatientDetailPage = () => {
 
   // Quote amounts (demo)
   const devisFinalTTC = 2280
-  const deviseLabel = 'DT'
 
   // Zod schema for validation form
   const validationSchema = z.object({
@@ -646,8 +645,7 @@ const PatientDetailPage = () => {
                       <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
                         <p className="text-sm text-slate-600">{t('patients.detail.tp_check.amount_to_pay')}</p>
                         <p className="font-medium text-[#0072B8]">
-                          {new Intl.NumberFormat('fr-FR').format(Math.round(devisFinalTTC * 0.4))}{' '}
-                          {deviseLabel}
+                          {new Intl.NumberFormat('fr-TN', { style: 'currency', currency: 'TND' }).format(Math.round(devisFinalTTC * 0.4))}
                         </p>
                       </div>
 
@@ -868,7 +866,7 @@ const PatientDetailPage = () => {
                       <div className="p-3 bg-gradient-to-br from-[#0072B8] to-[#00B4D8] text-white rounded-lg border-0">
                         <p className="text-sm opacity-90">{t('patients.detail.tp_check.final_quote_incl')}</p>
                         <p className="font-bold text-lg">
-                          {devisFinalTTC} {deviseLabel}
+                          {new Intl.NumberFormat('fr-TN', { style: 'currency', currency: 'TND' }).format(devisFinalTTC)}
                         </p>
                       </div>
                     </div>
@@ -1074,12 +1072,11 @@ const PatientDetailPage = () => {
                         <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
                           <p className="text-sm text-slate-600">{t('patients.detail.tp_check.amount_to_pay')}</p>
                           <p className="font-medium text-[#0072B8]">
-                            {new Intl.NumberFormat('fr-FR').format(
+                            {new Intl.NumberFormat('fr-TN', { style: 'currency', currency: 'TND' }).format(
                               form.watch('commandeType') === 'moitie'
                                 ? Math.round(devisFinalTTC * 0.6)
                                 : devisFinalTTC
-                            )}{' '}
-                            {deviseLabel}
+                            )}
                           </p>
                         </div>
 

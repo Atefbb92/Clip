@@ -609,5 +609,210 @@
             "title": "Section under construction",
             "desc": "The {{section}} section is currently under development."
         }
+    },
+    "preferences_cliniques": {
+        "title": "Clinical Preferences",
+        "subtitle": "Global Configuration",
+        "updated_at": "Updated on {{date}}",
+        "menu": {
+            "rip": "Interproximal Reduction (IPR)",
+            "dents": "Missing Teeth",
+            "extractions": "Extractions",
+            "malocclusion_category": "Malocclusion Correction",
+            "encombrement": "Crowding",
+            "espacement": "Spacing",
+            "axe": "Midlines",
+            "antero": "Antero-Posterior Correction",
+            "articule": "Posterior Crossbite",
+            "anterieure_category": "Anterior Correction",
+            "nivellement": "Anterior Open Bite",
+            "recouvrement": "Deep Bite",
+            "fonctionnalites": "Aligner Features",
+            "surcorrection": "Space Closure Overcorrection",
+            "aligneurs": "Active – Passive Aligners"
+        },
+        "sections": {
+            "common": {
+                "adult": "Adult",
+                "adolescent": "Teen",
+                "upper_arch": "Upper Arch",
+                "lower_arch": "Lower Arch",
+                "yes": "Yes",
+                "no": "No",
+                "if_needed": "If needed"
+            },
+            "rip": {
+                "anterior_limit": "Limit anterior IPR per contact",
+                "posterior_limit": "Limit posterior IPR per contact",
+                "programming": "IPR Programming",
+                "options": {
+                    "before": "Perform alignment before IPR.",
+                    "after": "Perform alignment after IPR."
+                }
+            },
+            "aligneurs": {
+                "active_steps": "How to finish active aligner stages",
+                "options": {
+                    "same_finish": "Start and finish active stages at the same time on both arches",
+                    "diff_finish": "Start active stages at the same time but finish at different times"
+                },
+                "passive": "Passive Aligners"
+            },
+            "antero": {
+                "objective": "Treatment Objective",
+                "distalization_protocol": "Distalization Protocol",
+                "priority": "Set priority on",
+                "priority_info": "If both are not achievable, the software will attempt to prioritize your selection.",
+                "tabs": {
+                    "class2": "Class II",
+                    "class3": "Class III"
+                },
+                "options": {
+                    "distalization": "Distalization",
+                    "no_correction": "No correction",
+                    "mesialization": "Mesialization",
+                    "simulation": "Correction simulation",
+                    "maf": "Mandibular Advancement (MAF)",
+                    "optimized": "Optimized semi-sequential distalization",
+                    "standard": "Standard semi-sequential distalization",
+                    "sequential": "Sequential distalization",
+                    "hybrid": "Hybrid protocol",
+                    "molar": "Molar",
+                    "canine": "Canine"
+                },
+                "objectives": {
+                    "molars_canines_class1": "Molars and canines Class I",
+                    "canines_class1": "Canines Class I",
+                    "molars_class1": "Molars Class I",
+                    "maintain": "Maintain"
+                }
+            },
+            "articule": {
+                "molars_approach": "Approach for molars",
+                "bite_turbos": "Place Bite Turbos",
+                "options": {
+                    "correct_pre_molars": "Correct premolars and molars",
+                    "correct_pre_only": "Correct premolars only",
+                    "do_not_correct": "Do not correct"
+                }
+            },
+            "axe": {
+                "approach": "Approach",
+                "options": {
+                    "prioritize_others": "Prioritize other objectives",
+                    "improve_rip": "Improve midline with IPR"
+                }
+            },
+            "dents_absentes": {
+                "pontics": "Pontics placement",
+                "options": {
+                    "allow_all": "Allow pontics for missing anterior and posterior teeth",
+                    "allow_anterior": "Allow pontics for missing anterior teeth only",
+                    "allow_posterior": "Allow pontics for missing posterior teeth only",
+                    "forbid": "Do not allow pontics"
+                }
+            },
+            "encombrement": {
+                "limit_expansion": "Limit arch expansion",
+                "limit_vestibulo": "Limit anterior proclination:",
+                "options": {
+                    "expansion_needed": "Expansion, if needed",
+                    "vestibulo_needed": "Proclination, if needed"
+                }
+            },
+            "espacement": {
+                "residual_space": "In case of tooth size discrepancy, leave residual space",
+                "options": {
+                    "distal_lateral": "Distal to lateral incisors",
+                    "mesial_lateral": "Mesial to lateral incisors",
+                    "distal_canine": "Distal to canines",
+                    "equal": "Equally around lateral teeth",
+                    "no_space": "No spaces"
+                }
+            },
+            "extractions": {
+                "consider_from": "Consider extraction from stage:",
+                "pontics": "Pontics placement",
+                "options": {
+                    "open_spaces": "Allow pontics for open spaces",
+                    "anterior_only": "Allow pontics for anterior extractions only",
+                    "posterior_only": "Allow pontics for posterior extractions only",
+                    "forbid": "Do not allow pontics"
+                }
+            },
+            "fonctionnalites": {
+                "tabs": {
+                    "attachments": "Attachments",
+                    "elastics": "Elastics placement",
+                    "ramps": "Bite Ramps",
+                    "cutline": "Trim Line"
+                },
+                "attachments": {
+                    "size": "Optimized attachment size",
+                    "anterior": "For anterior teeth",
+                    "posterior": "For posterior teeth",
+                    "start_step": "Place attachments from stage:",
+                    "delay_note": "\"Stage to delay\" is set to stage 1 for limited stage products.",
+                    "options": {
+                        "normal": "Normal",
+                        "largest": "Largest possible"
+                    }
+                },
+                "elastics": {
+                    "precision_cuts": "Precision Cuts",
+                    "start_step": "Place elastics from stage",
+                    "options": {
+                        "class2_3": "Use precision cuts for Class II and Class III elastics",
+                        "class2_only": "Use precision cuts for Class II elastics only",
+                        "class3_only": "Use precision cuts for Class III elastics only",
+                        "no_cuts": "Do not use precision cuts"
+                    }
+                },
+                "ramps": {
+                    "bite_ramps": "Bite Ramps",
+                    "bite_turbos": "Bite Turbos",
+                    "options": {
+                        "ramps_needed": "Place Bite Ramps if needed",
+                        "ramps_always": "Always place Bite Ramps",
+                        "ramps_never": "Never place Bite Ramps",
+                        "turbos_needed": "Place Bite Turbos if needed",
+                        "turbos_always": "Always place Bite Turbos",
+                        "turbos_never": "Never place Bite Turbos"
+                    }
+                },
+                "cutline": {
+                    "design": "Trim Line Design",
+                    "options": {
+                        "straight_juxta": "Straight trim line juxtagingival",
+                        "straight_extended": "Straight trim line extended 1 mm",
+                        "scalloped": "Scalloped line",
+                        "hybrid": "Hybrid combination"
+                    }
+                }
+            },
+            "nivellement": {
+                "open_bite": "Upper and lower arch",
+                "bite_turbos": "Automatic Bite Turbos placement",
+                "options": {
+                    "egression_anterior": "Extrude anterior teeth",
+                    "egression_ant_ingression_post": "Extrude anterior teeth and intrude posterior teeth"
+                }
+            },
+            "recouvrement": {
+                "approach": "Approach",
+                "bite_ramps": "Automatic Bite Ramps placement",
+                "options": {
+                    "ingression_anterior": "Intrude anterior teeth",
+                    "ingression_ant_egression_post": "Intrude anterior teeth and extrude posterior teeth"
+                }
+            },
+            "surcorrection": {
+                "label": "Overcorrection aligners",
+                "options": {
+                    "add_3": "Add 3 overcorrection aligners",
+                    "no_add": "Do not add overcorrection aligners"
+                }
+            }
+        }
     }
 }

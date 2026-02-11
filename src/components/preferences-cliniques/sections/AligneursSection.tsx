@@ -3,29 +3,31 @@
 import { useState } from 'react'
 import RadioGroup from '../ui/RadioGroup'
 import ToggleSwitch from '../ui/ToggleSwitch'
+import { useTranslation } from '@/hooks/useTranslation'
 
 export default function AligneursSection() {
+  const { t } = useTranslation()
   const [aligneursPassifs, setAligneursPassifs] = useState(true)
 
   return (
     <>
       <div className="mb-6">
         <div className="text-sm text-gray-700 mb-4">
-          Comment terminer les étapes des aligneurs actifs
+          {t('preferences_cliniques.sections.aligneurs.active_steps')}
         </div>
         <RadioGroup
           options={[
-            'Commencer et terminer les étapes actives en même temps sur les deux arcades',
-            'Commencer les étapes actives en même temps mais les terminer à des moments différents',
+            t('preferences_cliniques.sections.aligneurs.options.same_finish'),
+            t('preferences_cliniques.sections.aligneurs.options.diff_finish'),
           ]}
           name="aligneurs-actifs"
-          defaultValue="Commencer les étapes actives en même temps mais les terminer à des moments différents"
+          defaultValue={t('preferences_cliniques.sections.aligneurs.options.diff_finish')}
         />
       </div>
 
       <div>
         <ToggleSwitch
-          label="Aligneurs passifs"
+          label={t('preferences_cliniques.sections.aligneurs.passive')}
           checked={aligneursPassifs}
           onChange={() => setAligneursPassifs(!aligneursPassifs)}
         />

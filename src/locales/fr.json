@@ -596,5 +596,210 @@
             "title": "Section en construction",
             "desc": "La section {{section}} est en cours de développement."
         }
+    },
+    "preferences_cliniques": {
+        "title": "Préférences cliniques",
+        "subtitle": "Configuration globale",
+        "updated_at": "Mis à jour le {{date}}",
+        "menu": {
+            "rip": "Réduction interproximale RIP",
+            "dents": "Dents absentes",
+            "extractions": "Extractions",
+            "malocclusion_category": "Correction de la malocclusion",
+            "encombrement": "Encombrement",
+            "espacement": "Espacement",
+            "axe": "Milieux inter-incisifs",
+            "antero": "Correction antéro-postérieure",
+            "articule": "Articulé croisé postérieure",
+            "anterieure_category": "Correction antérieure",
+            "nivellement": "Béance antérieure",
+            "recouvrement": "Supraclusion",
+            "fonctionnalites": "Fonctionnalités des aligners",
+            "surcorrection": "Surcorrection de la fermeture d'espace",
+            "aligneurs": "Aligneurs actifs – passifs"
+        },
+        "sections": {
+            "common": {
+                "adult": "Adulte",
+                "adolescent": "Adolescent",
+                "upper_arch": "Arcade supérieure",
+                "lower_arch": "Arcade inférieure",
+                "yes": "Oui",
+                "no": "Non",
+                "if_needed": "Si nécessaire"
+            },
+            "rip": {
+                "anterior_limit": "Limiter la RIP antérieure par contact",
+                "posterior_limit": "Limiter la RIP postérieure par contact",
+                "programming": "Programmation de la RIP",
+                "options": {
+                    "before": "Effectuer l'alignement avant la RIP.",
+                    "after": "Effectuer l'alignement après la RIP."
+                }
+            },
+            "aligneurs": {
+                "active_steps": "Comment terminer les étapes des aligneurs actifs",
+                "options": {
+                    "same_finish": "Commencer et terminer les étapes actives en même temps sur les deux arcades",
+                    "diff_finish": "Commencer les étapes actives en même temps mais les terminer à des moments différents"
+                },
+                "passive": "Aligneurs passifs"
+            },
+            "antero": {
+                "objective": "Objectif de traitement",
+                "distalization_protocol": "Protocole de distalisation",
+                "priority": "Définir la priorité sur",
+                "priority_info": "Si les deux ne sont pas réalisables, le logiciel tentera de donner la priorité à votre sélection.",
+                "tabs": {
+                    "class2": "Classe II",
+                    "class3": "Classe III"
+                },
+                "options": {
+                    "distalization": "Distalisation",
+                    "no_correction": "Pas de correction",
+                    "mesialization": "Mésialisation",
+                    "simulation": "Simulation de la correction",
+                    "maf": "Avancee mandibulaire par MAF",
+                    "optimized": "Distalisation semi-sequentielle optimisee",
+                    "standard": "Distalisation semi-sequentielle standard",
+                    "sequential": "Distalisation sequentielle",
+                    "hybrid": "Protocole hybride",
+                    "molar": "Molaire",
+                    "canine": "Canine"
+                },
+                "objectives": {
+                    "molars_canines_class1": "Molaires et canines en Classe I",
+                    "canines_class1": "Canines en Classe I",
+                    "molars_class1": "Molaires en Classe I",
+                    "maintain": "Maintenir"
+                }
+            },
+            "articule": {
+                "molars_approach": "Approche pour les molaires",
+                "bite_turbos": "Pose des Bite Turbos",
+                "options": {
+                    "correct_pre_molars": "Corriger les prémolaires et les molaires",
+                    "correct_pre_only": "Corriger les prémolaires uniquement",
+                    "do_not_correct": "Ne pas corriger"
+                }
+            },
+            "axe": {
+                "approach": "Approche",
+                "options": {
+                    "prioritize_others": "Prioriser les autres objectifs",
+                    "improve_rip": "Améliorer le milieu inter-incisif par une RIP"
+                }
+            },
+            "dents_absentes": {
+                "pontics": "Pose de pontiques",
+                "options": {
+                    "allow_all": "Autoriser des pontiques pour les dents antérieures et postérieures absentes",
+                    "allow_anterior": "Autoriser des pontiques pour les dents antérieures absentes uniquement",
+                    "allow_posterior": "Autoriser des pontiques pour les dents postérieures absentes uniquement",
+                    "forbid": "Ne pas autoriser de pontiques"
+                }
+            },
+            "encombrement": {
+                "limit_expansion": "Limiter l'expansion d'arcade",
+                "limit_vestibulo": "Limiter la vestibulo-version des dents antérieures:",
+                "options": {
+                    "expansion_needed": "Expansion, si nécessaire",
+                    "vestibulo_needed": "Vestibulo-version, si nécessaire"
+                }
+            },
+            "espacement": {
+                "residual_space": "En cas de dysharmonie dento-dentaire, laisser l'espace résiduel",
+                "options": {
+                    "distal_lateral": "En distal des incisives latérales",
+                    "mesial_lateral": "En mésial des incisives latérales",
+                    "distal_canine": "En distal des canines",
+                    "equal": "De manière égale autour des dents latérales",
+                    "no_space": "Pas d'espaces"
+                }
+            },
+            "extractions": {
+                "consider_from": "Considérer l'extraction à partir de l'étape :",
+                "pontics": "Pose de pontiques",
+                "options": {
+                    "open_spaces": "Autoriser des pontiques pour les espaces ouverts",
+                    "anterior_only": "Autoriser des pontiques pour les extractions antérieures uniquement",
+                    "posterior_only": "Autoriser des pontiques pour les extractions postérieures uniquement",
+                    "forbid": "Ne pas autoriser de pontiques"
+                }
+            },
+            "fonctionnalites": {
+                "tabs": {
+                    "attachments": "Taquets",
+                    "elastics": "Pose des élastiques",
+                    "ramps": "Rampes d'occlusion",
+                    "cutline": "Ligne de coupe"
+                },
+                "attachments": {
+                    "size": "Taille des taquets optimisés",
+                    "anterior": "Pour les dents antérieures",
+                    "posterior": "Pour les dents postérieures",
+                    "start_step": "Pose des taquets à partir de l'étape:",
+                    "delay_note": "« Étape à retarder » est définie sur l'étape 1 pour les produits à étapes limitées.",
+                    "options": {
+                        "normal": "Normal",
+                        "largest": "Le plus grand qui convienne"
+                    }
+                },
+                "elastics": {
+                    "precision_cuts": "Découpes de précision",
+                    "start_step": "Pose des élastiques à partir de l'étape",
+                    "options": {
+                        "class2_3": "Utiliser les découpes de précision pour les élastiques de Classe II et de Classe III",
+                        "class2_only": "Utiliser les découpes de précision pour les élastiques de Classe II uniquement",
+                        "class3_only": "Utiliser les découpes de précision pour les élastiques de Classe III uniquement",
+                        "no_cuts": "Ne pas utiliser de découpes de précision"
+                    }
+                },
+                "ramps": {
+                    "bite_ramps": "Bite Ramps",
+                    "bite_turbos": "Bite Turbos",
+                    "options": {
+                        "ramps_needed": "Poser des Bite Ramps si nécessaire",
+                        "ramps_always": "Toujours poser des Bite Ramps",
+                        "ramps_never": "Ne jamais poser de Bite Ramps",
+                        "turbos_needed": "Poser des Bite Turbos si nécessaire",
+                        "turbos_always": "Toujours poser des Bite Turbos",
+                        "turbos_never": "Ne jamais poser de Bite Turbos"
+                    }
+                },
+                "cutline": {
+                    "design": "Design de la ligne de coupe",
+                    "options": {
+                        "straight_juxta": "Ligne de coupe droite juxtagingivale",
+                        "straight_extended": "Ligne de coupe droite étendue de 1 mm",
+                        "scalloped": "Ligne festonnée",
+                        "hybrid": "Combinaison hybride"
+                    }
+                }
+            },
+            "nivellement": {
+                "open_bite": "Arcade supérieure et arcade inférieure",
+                "bite_turbos": "Pose automatique des Bite Turbos",
+                "options": {
+                    "egression_anterior": "Effectuer une égression des dents antérieures",
+                    "egression_ant_ingression_post": "Effectuer une égression des dents antérieures et une ingression des dents postérieures"
+                }
+            },
+            "recouvrement": {
+                "approach": "Approche",
+                "bite_ramps": "Pose automatique des Bite Ramps",
+                "options": {
+                    "ingression_anterior": "Effectuer une ingression des dents antérieures",
+                    "ingression_ant_egression_post": "Effectuer une ingression des dents antérieures et une égression des dents postérieures"
+                }
+            },
+            "surcorrection": {
+                "label": "Aligners de surcorrection",
+                "options": {
+                    "add_3": "Ajouter 3 aligners de surcorrection",
+                    "no_add": "Ne pas ajouter d'aligners de surcorrection"
+                }
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 'use client'
 
+import { useTranslation } from '@/hooks/useTranslation'
 import React, { useState, useEffect } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import StatCard from '../StatCard/StatCard'
@@ -35,6 +36,7 @@ const StatusCard = ({ selectedStatus, onStatusSelect }) => {
     enproduction: 0,
     termine: 0,
   })
+  const { t } = useTranslation()
 
   const router = useRouter()
   const pathname = usePathname()
@@ -44,42 +46,42 @@ const StatusCard = ({ selectedStatus, onStatusSelect }) => {
     {
       icon: <FileText className="w-6 h-6" />,
       number: counts.drafts,
-      label: 'Drafts',
+      label: t('status.brouillon'),
       statusId: 0,
       color: 'gray'
     },
     {
       icon: <Calendar className="w-6 h-6" />,
       number: counts.enplanification,
-      label: 'Planning',
+      label: t('status.en-planification'),
       statusId: 1,
       color: 'blue'
     },
     {
       icon: <Clock className="w-6 h-6" />,
       number: counts.attente,
-      label: 'Pending validation',
+      label: t('status.en-attente'),
       statusId: 2,
       color: 'yellow'
     },
     {
       icon: <Cog className="w-6 h-6" />,
       number: counts.enproduction,
-      label: 'In production',
+      label: t('status.en-production'),
       statusId: 3,
       color: 'orange'
     },
     {
       icon: <Activity className="w-6 h-6" />,
       number: counts.entraitement,
-      label: 'In treatment',
+      label: t('status.en-traitement'),
       statusId: 4,
       color: 'purple'
     },
     {
       icon: <CheckCircle className="w-6 h-6" />,
       number: counts.termine,
-      label: 'Completed',
+      label: t('status.termine'),
       statusId: 5,
       color: 'green'
     },
@@ -211,11 +213,7 @@ const StatusCard = ({ selectedStatus, onStatusSelect }) => {
   return (
     <>
       <div className="
-        grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 mb-8 px-4 max-w-[1400px] mx-auto items-stretch
-        xl:grid-cols-[repeat(auto-fit,minmax(200px,1fr))] xl:gap-4
-        lg:grid-cols-[repeat(auto-fit,minmax(180px,1fr))] lg:gap-3
-        md:grid-cols-[repeat(auto-fit,minmax(150px,1fr))] md:gap-2.5 md:px-3
-        sm:grid-cols-[repeat(auto-fit,minmax(150px,1fr))] sm:gap-2.5 sm:px-3
+        flex gap-4 mb-8 px-4 max-w-[1400px] mx-auto overflow-x-auto pb-4 snap-x
       ">
         {cards.map((card, index) => (
           <StatCard
@@ -226,6 +224,7 @@ const StatusCard = ({ selectedStatus, onStatusSelect }) => {
             color={card.color}
             onClick={() => handleCardClick(card.statusId)}
             isSelected={isCardSelected(card.statusId)}
+            className="min-w-[220px] flex-1 snap-center"
           />
         ))}
       </div>

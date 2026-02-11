@@ -8,8 +8,8 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 203 99% 36%;
+    --primary-foreground: 0 0% 100%;
     --secondary: 210 40% 96%;
     --secondary-foreground: 222.2 84% 4.9%;
     --muted: 210 40% 96%;
@@ -20,20 +20,20 @@
     --destructive-foreground: 210 40% 98%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    --ring: 203 99% 36%;
     --radius: 0.5rem;
-    
+
     /* Diamond App Variables */
-    --primary-color: #1e88e5;
+    --primary-color: #0170B4;
     --text-color: #425567;
     --background-color: #f5f7fa;
-    --color-primary: #1e88e5;
+    --color-primary: #0170B4;
     --color-secondary: #333333;
     --color-white: #ffffff;
     --color-secondary-rgb: 51, 51, 51;
-    
+
     /* Profile Page Variables */
-    --primary-blue: #2E6DB4;
+    --primary-blue: #0170B4;
     --secondary-blue: #1B4B87;
     --accent-teal: #00BFA5;
     --light-gray: #F5F5F5;
@@ -70,6 +70,7 @@
   body {
     @apply bg-white text-gray-900;
   }
+
   .dark body {
     @apply bg-gray-900 text-white;
   }

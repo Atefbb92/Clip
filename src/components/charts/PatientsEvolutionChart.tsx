@@ -53,10 +53,10 @@ const PatientsEvolutionChart: React.FC<PatientsEvolutionChartProps> = ({ data })
         label: 'New patients',
         data: [12, 19, 15, 25, 22, 30],
         fill: true,
-        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-        borderColor: 'rgba(59, 130, 246, 1)',
+        backgroundColor: 'rgba(1, 112, 180, 0.1)',
+        borderColor: '#0170B4',
         borderWidth: 3,
-        pointBackgroundColor: 'rgba(59, 130, 246, 1)',
+        pointBackgroundColor: '#0170B4',
         pointBorderColor: '#fff',
         pointBorderWidth: 2,
         pointRadius: 6,
@@ -67,10 +67,10 @@ const PatientsEvolutionChart: React.FC<PatientsEvolutionChartProps> = ({ data })
         label: 'Approved cases',
         data: [8, 14, 13, 20, 18, 26],
         fill: true,
-        backgroundColor: 'rgba(34, 197, 94, 0.1)', // green-500 at 0.1
-        borderColor: 'rgba(34, 197, 94, 1)', // green-500
+        backgroundColor: 'rgba(0, 182, 174, 0.1)', // #00B6AE at 0.1
+        borderColor: '#00B6AE', // #00B6AE
         borderWidth: 3,
-        pointBackgroundColor: 'rgba(34, 197, 94, 1)',
+        pointBackgroundColor: '#00B6AE',
         pointBorderColor: '#fff',
         pointBorderWidth: 2,
         pointRadius: 6,

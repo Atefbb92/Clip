@@ -3,8 +3,10 @@
 import { useState } from 'react'
 import { ChevronDown } from 'lucide-react'
 import RadioGroup from '../ui/RadioGroup'
+import { useTranslation } from '@/hooks/useTranslation'
 
 export default function ExtractionsSection() {
+  const { t } = useTranslation()
   const [extractionStep, setExtractionStep] = useState(1)
   const [dropdownOpen, setDropdownOpen] = useState(false)
 
@@ -12,7 +14,7 @@ export default function ExtractionsSection() {
     <>
       <div className="mb-4">
         <label className="text-sm font-medium mb-2 block">
-          Considérer l&apos;extraction à partir de l&apos;étape :
+          {t('preferences_cliniques.sections.extractions.consider_from')}
         </label>
         <div className="relative">
           <button
@@ -42,16 +44,16 @@ export default function ExtractionsSection() {
       </div>
 
       <div className="mb-4">
-        <div className="text-sm font-medium mb-2">Pose de pontiques</div>
+        <div className="text-sm font-medium mb-2">{t('preferences_cliniques.sections.extractions.pontics')}</div>
         <RadioGroup
           options={[
-            'Autoriser des pontiques pour les espaces ouverts',
-            'Autoriser des pontiques pour les extractions antérieures uniquement',
-            'Autoriser des pontiques pour les extractions postérieures uniquement',
-            'Ne pas autoriser de pontiques',
+            t('preferences_cliniques.sections.extractions.options.open_spaces'),
+            t('preferences_cliniques.sections.extractions.options.anterior_only'),
+            t('preferences_cliniques.sections.extractions.options.posterior_only'),
+            t('preferences_cliniques.sections.extractions.options.forbid'),
           ]}
           name="pontiques-extractions"
-          defaultValue="Autoriser des pontiques pour les espaces ouverts"
+          defaultValue={t('preferences_cliniques.sections.extractions.options.open_spaces')}
         />
       </div>
     </>

@@ -14,7 +14,7 @@ const translations: Record<string, any> = {
 export function useTranslation() {
     const { language } = useLanguage()
 
-    const t = (path: string) => {
+    const t = (path: string, params?: Record<string, string>) => {
         const keys = path.split('.')
         let current = translations[language]
 
@@ -31,8 +31,15 @@ export function useTranslation() {
                         return path // Return key if not found at all
                     }
                 }
-                return fallback
+                current = fallback
+                break // Found fallback, exit inner loop
             }
+        }
+
+        if (typeof current === 'string' && params) {
+            Object.keys(params).forEach(key => {
+                current = current.replace(`{{${key}}}`, params[key])
+            })
         }
 
         return current

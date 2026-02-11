@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { ChevronDown } from 'lucide-react'
 import RadioGroup from '../ui/RadioGroup'
 import TabButton from '../ui/TabButton'
+import { useTranslation } from '@/hooks/useTranslation'
 
 interface AnteroSectionProps {
   activeTab: string
@@ -11,8 +12,9 @@ interface AnteroSectionProps {
 }
 
 export default function AnteroSection({ activeTab, setActiveTab }: AnteroSectionProps) {
-  const [objectifAdulte, setObjectifAdulte] = useState('Molaires et canines en Classe I')
-  const [objectifAdo, setObjectifAdo] = useState('Molaires et canines en Classe I')
+  const { t } = useTranslation()
+  const [objectifAdulte, setObjectifAdulte] = useState(t('preferences_cliniques.sections.antero.objectives.molars_canines_class1'))
+  const [objectifAdo, setObjectifAdo] = useState(t('preferences_cliniques.sections.antero.objectives.molars_canines_class1'))
   const [objectifAdulteDropdownOpen, setObjectifAdulteDropdownOpen] = useState(false)
   const [objectifAdoDropdownOpen, setObjectifAdoDropdownOpen] = useState(false)
   const [arcadeSupAdulte, setArcadeSupAdulte] = useState('Distalisation')
@@ -23,27 +25,27 @@ export default function AnteroSection({ activeTab, setActiveTab }: AnteroSection
   const [arcadeInfAdoClasse3, setArcadeInfAdoClasse3] = useState('Distalisation')
 
   const objectifOptions = [
-    'Molaires et canines en Classe I',
-    'Canines en Classe I',
-    'Molaires en Classe I',
-    'Maintenir',
+    t('preferences_cliniques.sections.antero.objectives.molars_canines_class1'),
+    t('preferences_cliniques.sections.antero.objectives.canines_class1'),
+    t('preferences_cliniques.sections.antero.objectives.molars_class1'),
+    t('preferences_cliniques.sections.antero.objectives.maintain'),
   ]
 
   return (
     <>
       <div className="flex gap-6 border-b border-gray-200 mb-6">
         <TabButton active={activeTab === 'classe2'} onClick={() => setActiveTab('classe2')}>
-          Classe II
+          {t('preferences_cliniques.sections.antero.tabs.class2')}
         </TabButton>
         <TabButton active={activeTab === 'classe3'} onClick={() => setActiveTab('classe3')}>
-          Classe III
+          {t('preferences_cliniques.sections.antero.tabs.class3')}
         </TabButton>
       </div>
 
       {activeTab === 'classe2' && (
         <>
           <div className="mb-8">
-            <h2 className="text-lg font-semibold mb-4">Adulte</h2>
+            <h2 className="text-lg font-semibold mb-4">{t('preferences_cliniques.sections.common.adult')}</h2>
 
             <div className="mb-4">
               <label className="text-sm font-medium mb-2 block">Objectif de traitement</label>
@@ -75,43 +77,44 @@ export default function AnteroSection({ activeTab, setActiveTab }: AnteroSection
             </div>
 
             <div className="mb-4">
-              <div className="text-sm font-medium mb-2">Arcade supérieure</div>
+              <div className="text-sm font-medium mb-2">{t('preferences_cliniques.sections.common.upper_arch')}</div>
               <RadioGroup
-                options={['Distalisation', 'Pas de correction']}
+                options={[t('preferences_cliniques.sections.antero.options.distalization'), t('preferences_cliniques.sections.antero.options.no_correction')]}
                 name="arcade-sup-adulte"
-                defaultValue="Distalisation"
+                defaultValue={t('preferences_cliniques.sections.antero.options.distalization')}
                 value={arcadeSupAdulte}
                 onChange={(value) => setArcadeSupAdulte(value)}
               />
             </div>
 
             <RadioGroup
-              label="Protocole de distalisation"
+              label={t('preferences_cliniques.sections.antero.distalization_protocol')}
               options={[
-                'Distalisation semi-sequentielle optimisee',
-                'Distalisation semi-sequentielle standard',
-                'Distalisation sequentielle',
-                'Protocole hybride',
+                t('preferences_cliniques.sections.antero.options.optimized'),
+                t('preferences_cliniques.sections.antero.options.standard'),
+                t('preferences_cliniques.sections.antero.options.sequential'),
+                t('preferences_cliniques.sections.antero.options.hybrid'),
               ]}
               name="protocole-adulte"
-              defaultValue="Distalisation semi-sequentielle optimisee"
-              disabled={arcadeSupAdulte === 'Pas de correction'}
+              defaultValue={t('preferences_cliniques.sections.antero.options.optimized')}
+              disabled={arcadeSupAdulte === t('preferences_cliniques.sections.antero.options.no_correction') || arcadeSupAdulte === 'Pas de correction'}
             />
 
             <RadioGroup
-              label="Définir la priorité sur"
-              options={['Molaire', 'Canine']}
+              label={t('preferences_cliniques.sections.antero.priority')}
+              options={[t('preferences_cliniques.sections.antero.options.molar'), t('preferences_cliniques.sections.antero.options.canine')]}
               name="priorite-adulte"
-              defaultValue="Canine"
+              defaultValue={t('preferences_cliniques.sections.antero.options.canine')}
               showInfo={true}
+              labelInfoText={t('preferences_cliniques.sections.antero.priority_info')}
             />
 
             <div className="mb-4">
-              <div className="text-sm font-medium mb-2">Arcade inférieure</div>
+              <div className="text-sm font-medium mb-2">{t('preferences_cliniques.sections.common.lower_arch')}</div>
               <RadioGroup
-                options={['Pas de correction', 'Mésialisation', 'Simulation de la correction']}
+                options={[t('preferences_cliniques.sections.antero.options.no_correction'), t('preferences_cliniques.sections.antero.options.mesialization'), t('preferences_cliniques.sections.antero.options.simulation')]}
                 name="arcade-inf-adulte"
-                defaultValue="Simulation de la correction"
+                defaultValue={t('preferences_cliniques.sections.antero.options.simulation')}
               />
             </div>
           </div>
@@ -149,48 +152,49 @@ export default function AnteroSection({ activeTab, setActiveTab }: AnteroSection
             </div>
 
             <div className="mb-4">
-              <div className="text-sm font-medium mb-2">Arcade supérieure</div>
+              <div className="text-sm font-medium mb-2">{t('preferences_cliniques.sections.common.upper_arch')}</div>
               <RadioGroup
-                options={['Distalisation', 'Pas de correction']}
+                options={[t('preferences_cliniques.sections.antero.options.distalization'), t('preferences_cliniques.sections.antero.options.no_correction')]}
                 name="arcade-sup-ado"
-                defaultValue="Distalisation"
+                defaultValue={t('preferences_cliniques.sections.antero.options.distalization')}
                 value={arcadeSupAdo}
                 onChange={(value) => setArcadeSupAdo(value)}
               />
             </div>
 
             <RadioGroup
-              label="Protocole de distalisation"
+              label={t('preferences_cliniques.sections.antero.distalization_protocol')}
               options={[
-                'Distalisation semi-sequentielle optimisee',
-                'Distalisation semi-sequentielle standard',
-                'Distalisation sequentielle',
-                'Protocole hybride',
+                t('preferences_cliniques.sections.antero.options.optimized'),
+                t('preferences_cliniques.sections.antero.options.standard'),
+                t('preferences_cliniques.sections.antero.options.sequential'),
+                t('preferences_cliniques.sections.antero.options.hybrid'),
               ]}
               name="protocole-ado"
-              defaultValue="Distalisation semi-sequentielle optimisee"
-              disabled={arcadeSupAdo === 'Pas de correction'}
+              defaultValue={t('preferences_cliniques.sections.antero.options.optimized')}
+              disabled={arcadeSupAdo === t('preferences_cliniques.sections.antero.options.no_correction') || arcadeSupAdo === 'Pas de correction'}
             />
 
             <RadioGroup
-              label="Définir la priorité sur"
-              options={['Molaire', 'Canine']}
+              label={t('preferences_cliniques.sections.antero.priority')}
+              options={[t('preferences_cliniques.sections.antero.options.molar'), t('preferences_cliniques.sections.antero.options.canine')]}
               name="priorite-ado"
-              defaultValue="Canine"
+              defaultValue={t('preferences_cliniques.sections.antero.options.canine')}
               showInfo={true}
+              labelInfoText={t('preferences_cliniques.sections.antero.priority_info')}
             />
 
             <div className="mb-4">
-              <div className="text-sm font-medium mb-2">Arcade inférieure</div>
+              <div className="text-sm font-medium mb-2">{t('preferences_cliniques.sections.common.lower_arch')}</div>
               <RadioGroup
                 options={[
-                  'Pas de correction',
-                  'Avancee mandibulaire par MAF',
-                  'Mésialisation',
-                  'Simulation de la correction',
+                  t('preferences_cliniques.sections.antero.options.no_correction'),
+                  t('preferences_cliniques.sections.antero.options.maf'),
+                  t('preferences_cliniques.sections.antero.options.mesialization'),
+                  t('preferences_cliniques.sections.antero.options.simulation'),
                 ]}
                 name="arcade-inf-ado"
-                defaultValue="Simulation de la correction"
+                defaultValue={t('preferences_cliniques.sections.antero.options.simulation')}
               />
             </div>
           </div>
@@ -200,10 +204,10 @@ export default function AnteroSection({ activeTab, setActiveTab }: AnteroSection
       {activeTab === 'classe3' && (
         <>
           <div className="mb-8">
-            <h2 className="text-lg font-semibold mb-4">Adulte</h2>
+            <h2 className="text-lg font-semibold mb-4">{t('preferences_cliniques.sections.common.adult')}</h2>
 
             <div className="mb-4">
-              <label className="text-sm font-medium mb-2 block">Objectif de traitement</label>
+              <label className="text-sm font-medium mb-2 block">{t('preferences_cliniques.sections.antero.objective')}</label>
               <div className="relative">
                 <button
                   onClick={() => setObjectifAdulteDropdownOpen(!objectifAdulteDropdownOpen)}
@@ -232,47 +236,47 @@ export default function AnteroSection({ activeTab, setActiveTab }: AnteroSection
             </div>
 
             <div className="mb-4">
-              <div className="text-sm font-medium mb-2">Arcade supérieure</div>
+              <div className="text-sm font-medium mb-2">{t('preferences_cliniques.sections.common.upper_arch')}</div>
               <RadioGroup
-                options={['Pas de correction', 'Mésialisation']}
+                options={[t('preferences_cliniques.sections.antero.options.no_correction'), t('preferences_cliniques.sections.antero.options.mesialization')]}
                 name="arcade-sup-adulte-classe3"
-                defaultValue="Pas de correction"
+                defaultValue={t('preferences_cliniques.sections.antero.options.no_correction')}
                 value={arcadeSupAdulteClasse3}
                 onChange={(value) => setArcadeSupAdulteClasse3(value)}
               />
             </div>
 
             <div className="mb-4">
-              <div className="text-sm font-medium mb-2">Arcade inférieure</div>
+              <div className="text-sm font-medium mb-2">{t('preferences_cliniques.sections.common.lower_arch')}</div>
               <RadioGroup
-                options={['Distalisation', 'Pas de correction']}
+                options={[t('preferences_cliniques.sections.antero.options.distalization'), t('preferences_cliniques.sections.antero.options.no_correction')]}
                 name="arcade-inf-adulte-classe3"
-                defaultValue="Distalisation"
+                defaultValue={t('preferences_cliniques.sections.antero.options.distalization')}
                 value={arcadeInfAdulteClasse3}
                 onChange={(value) => setArcadeInfAdulteClasse3(value)}
               />
             </div>
 
             <RadioGroup
-              label="Protocole de distalisation"
+              label={t('preferences_cliniques.sections.antero.distalization_protocol')}
               options={[
-                'Distalisation semi-sequentielle optimisee',
-                'Distalisation semi-sequentielle standard',
-                'Distalisation sequentielle',
-                'Protocole hybride',
+                t('preferences_cliniques.sections.antero.options.optimized'),
+                t('preferences_cliniques.sections.antero.options.standard'),
+                t('preferences_cliniques.sections.antero.options.sequential'),
+                t('preferences_cliniques.sections.antero.options.hybrid'),
               ]}
               name="protocole-adulte-classe3"
-              defaultValue="Distalisation semi-sequentielle optimisee"
-              disabled={arcadeInfAdulteClasse3 === 'Pas de correction'}
+              defaultValue={t('preferences_cliniques.sections.antero.options.optimized')}
+              disabled={arcadeInfAdulteClasse3 === t('preferences_cliniques.sections.antero.options.no_correction') || arcadeInfAdulteClasse3 === 'Pas de correction'}
             />
 
             <RadioGroup
-              label="Définir la priorité sur"
-              options={['Molaire', 'Canine']}
+              label={t('preferences_cliniques.sections.antero.priority')}
+              options={[t('preferences_cliniques.sections.antero.options.molar'), t('preferences_cliniques.sections.antero.options.canine')]}
               name="priorite-adulte-classe3"
-              defaultValue="Canine"
+              defaultValue={t('preferences_cliniques.sections.antero.options.canine')}
               showInfo={true}
-              labelInfoText="Si les deux ne sont pas réalisables, le logiciel tentera de donner la priorité à votre sélection."
+              labelInfoText={t('preferences_cliniques.sections.antero.priority_info')}
             />
           </div>
 
@@ -309,47 +313,47 @@ export default function AnteroSection({ activeTab, setActiveTab }: AnteroSection
             </div>
 
             <div className="mb-4">
-              <div className="text-sm font-medium mb-2">Arcade supérieure</div>
+              <div className="text-sm font-medium mb-2">{t('preferences_cliniques.sections.common.upper_arch')}</div>
               <RadioGroup
-                options={['Pas de correction', 'Mésialisation']}
+                options={[t('preferences_cliniques.sections.antero.options.no_correction'), t('preferences_cliniques.sections.antero.options.mesialization')]}
                 name="arcade-sup-ado-classe3"
-                defaultValue="Pas de correction"
+                defaultValue={t('preferences_cliniques.sections.antero.options.no_correction')}
                 value={arcadeSupAdoClasse3}
                 onChange={(value) => setArcadeSupAdoClasse3(value)}
               />
             </div>
 
             <div className="mb-4">
-              <div className="text-sm font-medium mb-2">Arcade inférieure</div>
+              <div className="text-sm font-medium mb-2">{t('preferences_cliniques.sections.common.lower_arch')}</div>
               <RadioGroup
-                options={['Distalisation', 'Pas de correction']}
+                options={[t('preferences_cliniques.sections.antero.options.distalization'), t('preferences_cliniques.sections.antero.options.no_correction')]}
                 name="arcade-inf-ado-classe3"
-                defaultValue="Distalisation"
+                defaultValue={t('preferences_cliniques.sections.antero.options.distalization')}
                 value={arcadeInfAdoClasse3}
                 onChange={(value) => setArcadeInfAdoClasse3(value)}
               />
             </div>
 
             <RadioGroup
-              label="Protocole de distalisation"
+              label={t('preferences_cliniques.sections.antero.distalization_protocol')}
               options={[
-                'Distalisation semi-sequentielle optimisee',
-                'Distalisation semi-sequentielle standard',
-                'Distalisation sequentielle',
-                'Protocole hybride',
+                t('preferences_cliniques.sections.antero.options.optimized'),
+                t('preferences_cliniques.sections.antero.options.standard'),
+                t('preferences_cliniques.sections.antero.options.sequential'),
+                t('preferences_cliniques.sections.antero.options.hybrid'),
               ]}
               name="protocole-ado-classe3"
-              defaultValue="Distalisation semi-sequentielle optimisee"
-              disabled={arcadeInfAdoClasse3 === 'Pas de correction'}
+              defaultValue={t('preferences_cliniques.sections.antero.options.optimized')}
+              disabled={arcadeInfAdoClasse3 === t('preferences_cliniques.sections.antero.options.no_correction') || arcadeInfAdoClasse3 === 'Pas de correction'}
             />
 
             <RadioGroup
-              label="Définir la priorité sur"
-              options={['Molaire', 'Canine']}
+              label={t('preferences_cliniques.sections.antero.priority')}
+              options={[t('preferences_cliniques.sections.antero.options.molar'), t('preferences_cliniques.sections.antero.options.canine')]}
               name="priorite-ado-classe3"
-              defaultValue="Canine"
+              defaultValue={t('preferences_cliniques.sections.antero.options.canine')}
               showInfo={true}
-              labelInfoText="Si les deux ne sont pas réalisables, le logiciel tentera de donner la priorité à votre sélection."
+              labelInfoText={t('preferences_cliniques.sections.antero.priority_info')}
             />
           </div>
         </>

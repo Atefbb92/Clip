@@ -1,18 +1,20 @@
 import RadioGroup from '../ui/RadioGroup'
+import { useTranslation } from '@/hooks/useTranslation'
 
 export default function DentsAbsentesSection() {
+  const { t } = useTranslation()
   return (
     <>
-      <div className="text-sm font-medium mb-4">Pose de pontiques</div>
+      <div className="text-sm font-medium mb-4">{t('preferences_cliniques.sections.dents_absentes.pontics')}</div>
       <RadioGroup
         options={[
-          'Autoriser des pontiques pour les dents antérieures et postérieures absentes',
-          'Autoriser des pontiques pour les dents antérieures absentes uniquement',
-          'Autoriser des pontiques pour les dents postérieures absentes uniquement',
-          'Ne pas autoriser de pontiques',
+          t('preferences_cliniques.sections.dents_absentes.options.allow_all'),
+          t('preferences_cliniques.sections.dents_absentes.options.allow_anterior'),
+          t('preferences_cliniques.sections.dents_absentes.options.allow_posterior'),
+          t('preferences_cliniques.sections.dents_absentes.options.forbid'),
         ]}
         name="pontiques-dents-absentes"
-        defaultValue="Autoriser des pontiques pour les dents antérieures et postérieures absentes"
+        defaultValue={t('preferences_cliniques.sections.dents_absentes.options.allow_all')}
       />
     </>
   )
