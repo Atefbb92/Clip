@@ -1,8 +1,7 @@
 {
-  "/(dashboard)/store/page": "app/(dashboard)/store/page.js",
   "/(dashboard)/diamond-purity/page": "app/(dashboard)/diamond-purity/page.js",
   "/(dashboard)/patients/page": "app/(dashboard)/patients/page.js",
-  "/(dashboard)/patients/new/page": "app/(dashboard)/patients/new/page.js",
   "/(dashboard)/patients/[id]/page": "app/(dashboard)/patients/[id]/page.js",
+  "/(dashboard)/patients/new/page": "app/(dashboard)/patients/new/page.js",
   "/(dashboard)/dashboard/page": "app/(dashboard)/dashboard/page.js"
 }

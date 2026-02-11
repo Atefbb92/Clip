@@ -30,19 +30,19 @@ const StatCard = ({
       accent: 'border-blue-500 shadow-blue-500/15',
       iconBg: 'bg-blue-500/10',
       iconColor: 'text-blue-500',
-      selectedBg: 'bg-gradient-to-br from-blue-100 to-blue-200',
+      selectedBg: 'bg-gradient-to-br from-blue-50 to-blue-100',
     },
     green: {
       accent: 'border-emerald-500 shadow-emerald-500/15',
       iconBg: 'bg-emerald-500/10',
       iconColor: 'text-emerald-500',
-      selectedBg: 'bg-gradient-to-br from-emerald-100 to-emerald-200',
+      selectedBg: 'bg-gradient-to-br from-emerald-50 to-emerald-100',
     },
     yellow: {
       accent: 'border-amber-500 shadow-amber-500/15',
       iconBg: 'bg-amber-500/10',
       iconColor: 'text-amber-500',
-      selectedBg: 'bg-gradient-to-br from-amber-100 to-amber-200',
+      selectedBg: 'bg-gradient-to-br from-amber-50 to-amber-100',
     },
     red: {
       accent: 'border-red-500 shadow-red-500/15',
