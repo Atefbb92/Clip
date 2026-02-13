@@ -69,7 +69,7 @@ export default function FonctionnalitesSection({
             <div className="relative">
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="w-full px-4 py-3 bg-gray-50 rounded text-left flex justify-between items-center hover:bg-gray-100 transition border border-[#0B9FD7]"
+                className="w-full px-4 py-3 bg-gray-50 rounded text-left flex justify-between items-center hover:bg-gray-100 transition border border-[#0072B8]"
               >
                 <span className="text-sm">{taquetsStep}</span>
                 <ChevronDown className="w-5 h-5" />

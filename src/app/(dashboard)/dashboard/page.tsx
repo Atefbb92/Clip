@@ -221,7 +221,7 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="flex flex-col gap-8 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+    <div className="flex flex-col gap-8 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen p-8">
       {/* En-tête */}
       <div className="flex justify-between items-start mb-2">
         <HeadingTitle

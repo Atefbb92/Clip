@@ -70,10 +70,11 @@
     "status": {
         "brouillon": "Draft",
         "en-attente": "Pending",
-        "en-planification": "In planning",
+        "planning": "In planning",
         "en-production": "In production",
         "en-traitement": "In treatment",
-        "termine": "Completed"
+        "termine": "Completed",
+        "rejete": "Rejected"
     },
     "statistics": {
         "title": "Statistics & KPI",
@@ -181,9 +182,10 @@
         "detail": {
             "actions": {
                 "back": "Back",
-                "request_correction": "Request Correction",
-                "finish": "Finish Treatment",
-                "order_eterna": "Order ETERNA®"
+                "request_correction": "Correction",
+                "view_tp_check": "TP Check",
+                "finish": "Finish",
+                "order_eterna": "ETERNA®"
             },
             "status": {
                 "active": "Active"
@@ -230,6 +232,17 @@
                 "order_option_error": "Please choose an option",
                 "trim_line_error": "Please choose a trim line",
                 "rhythm_error": "Please choose a rhythm"
+            },
+            "eterna_order": {
+                "title": "Order ETERNA®",
+                "desc": "Please provide the maxillary and mandibular scans to finalize your order.",
+                "upload_scans": "Submit files",
+                "upper_scan": "Upper Arch",
+                "lower_scan": "Lower Arch",
+                "or": "or",
+                "use_link": "Use a sharing link",
+                "scan_link": "Scan Link",
+                "confirm": "Confirm Order"
             },
             "new": {
                 "title": "New Patient",
@@ -280,7 +293,7 @@
                     "choose_pack": "Choose this pack",
                     "packs": {
                         "light": {
-                            "name": "Diamond Light",
+                            "name": "Lite",
                             "desc": "Light alignment correction",
                             "features": [
                                 "Up to 7 aligners",
@@ -289,7 +302,7 @@
                             ]
                         },
                         "medium": {
-                            "name": "Diamond Medium",
+                            "name": "Essential",
                             "desc": "Moderate arch correction",
                             "features": [
                                 "Up to 12 aligners",
@@ -298,7 +311,7 @@
                             ]
                         },
                         "full": {
-                            "name": "Diamond Full",
+                            "name": "Smart",
                             "desc": "Complex full treatment",
                             "features": [
                                 "Up to 24 aligners",
@@ -400,6 +413,9 @@
                     "next": "Next",
                     "submit_case": "Submit Case",
                     "complete_all": "Complete all steps"
+                },
+                "form": {
+                    "cancel": "Cancel"
                 },
                 "dialogs": {
                     "cancel_title": "Cancel patient creation?",
@@ -559,6 +575,32 @@
             "already_paid": "Amount already paid",
             "remaining": "Balance due"
         }
+    },
+    "gallery": {
+        "title": "Clinical Gallery",
+        "subtitle": "Explore the art of digital orthodontics"
+    },
+    "store": {
+        "title": "Diamond Store",
+        "subtitle": "All your equipment and consumables in one place"
+    },
+    "academy": {
+        "title": "Diamond Academy",
+        "subtitle": "Your center of excellence and continuing education",
+        "my_learning_subtitle": "Track your progress and achievements"
+    },
+    "events": {
+        "title": "Events",
+        "subtitle": "Stay informed about upcoming Diamond congresses, training and webinars",
+        "propose_event": "Propose an event",
+        "hero_badge": "Featured event",
+        "learn_more": "Learn more",
+        "search_placeholder": "Search for an event, a location...",
+        "empty_title": "No events match your criteria",
+        "empty_subtitle": "Try adjusting your filters or search.",
+        "contact_title": "Have an event to suggest?",
+        "contact_subtitle": "Are you organizing an event or want to see a specific topic covered in a training? Contact our academic team.",
+        "contact_button": "Contact the team"
     },
     "settings": {
         "title": "Settings & Preferences",

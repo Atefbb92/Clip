@@ -64,7 +64,7 @@ export default function Sidebar({ activeSection, setActiveSection }: SidebarProp
                 <button
                   onClick={() => setActiveSection(item.id)}
                   className={`w-full text-left px-4 py-2.5 rounded-lg mb-1 transition-all duration-200 ${activeSection === item.id
-                    ? 'bg-[#0B9FD7]/10 font-medium text-[#0B9FD7] shadow-sm ring-1 ring-[#0B9FD7]/20'
+                    ? 'bg-[#0072B8]/10 font-medium text-[#0072B8] shadow-sm ring-1 ring-[#0072B8]/20'
                     : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                     }`}
                 >

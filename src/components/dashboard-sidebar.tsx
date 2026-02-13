@@ -17,6 +17,14 @@ import {
   SidebarSeparator,
 } from './ui/sidebar'
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { useLanguage } from '@/contexts/LanguageContext'
+import {
   LayoutDashboard,
   Users,
   BarChart3,
@@ -44,9 +52,28 @@ interface DashboardSidebarProps {
   userRole?: string
 }
 
+const languageOptions = [
+  {
+    value: 'FR',
+    label: 'FR',
+    logo: '/flags/FR.svg',
+  },
+  {
+    value: 'EN',
+    label: 'EN',
+    logo: '/flags/EN.svg',
+  },
+  {
+    value: 'DE',
+    label: 'DE',
+    logo: '/flags/DE.svg',
+  },
+]
+
 const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ userRole }) => {
   const pathname = usePathname()
   const router = useRouter()
+  const { language, setLanguage } = useLanguage()
 
   const handleLogout = async () => {
     try {
@@ -102,24 +129,24 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ userRole }) => {
 
   return (
     <Sidebar
-      variant="inset"
+      variant="sidebar"
       className={`bg-gradient-to-b from-slate-900 to-slate-800 border-r border-slate-700/50 overflow-x-hidden ${styles.dashboardSidebar}`}
     >
-      <SidebarHeader className="border-b border-green-500/30 bg-slate-800/50">
-        <div className={`flex items-center gap-2 px-4 py-3 ${styles.logoContainer}`}>
+      <SidebarHeader className="border-b border-green-500/30 bg-slate-800/50 py-2">
+        <div className={`flex items-center gap-2 px-4 py-1 ${styles.logoContainer}`}>
           <Image
             src={userRole === 'orthodontiste' ? logoPro : logo}
             alt={userRole === 'orthodontiste' ? 'Diamond Pro Logo' : 'Diamond Logo'}
-            width={120}
-            height={40}
-            className="h-8 w-auto"
+            width={156}
+            height={52}
+            className="h-[42px] w-auto"
           />
         </div>
       </SidebarHeader>
 
-      <SidebarContent className="bg-transparent overflow-y-auto overflow-x-hidden">
-        <SidebarGroup>
-          <SidebarGroupLabel className="text-slate-300 font-medium px-4 py-2">
+      <SidebarContent className="bg-transparent overflow-hidden pt-2">
+        <SidebarGroup className="py-1">
+          <SidebarGroupLabel className="text-slate-300 font-medium px-4 py-1 h-6">
             Main Navigation
           </SidebarGroupLabel>
           <SidebarGroupContent>
@@ -147,8 +174,8 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ userRole }) => {
         </SidebarGroup>
 
         <SidebarSeparator className="bg-green-500/30 my-2" />
-        <SidebarGroup>
-          <SidebarGroupLabel className="text-slate-300 font-medium px-4 py-2">
+        <SidebarGroup className="py-1">
+          <SidebarGroupLabel className="text-slate-300 font-medium px-4 py-1 h-6">
             System
           </SidebarGroupLabel>
           <SidebarGroupContent className="flex flex-col h-full">
@@ -247,11 +274,34 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ userRole }) => {
               alt="Badge"
               width={686}
               height={880}
-              className="w-[45%] mx-auto h-auto transition-opacity duration-200 hover:opacity-70 cursor-pointer"
+              className="w-[42%] mx-auto h-auto transition-opacity duration-200 hover:opacity-70 cursor-pointer"
             />
           </Link>
         </div>
         <SidebarMenu className="mt-2 border-t border-green-500/30 pt-4">
+          <SidebarMenuItem>
+            <div className="flex justify-start px-2 py-2">
+              <Select
+                value={language}
+                onValueChange={(val) => setLanguage(val as any)}
+              >
+                <SelectTrigger className="w-[70px] bg-slate-800 border-slate-700 text-slate-200">
+                  <SelectValue placeholder={t('common.language')} />
+                </SelectTrigger>
+
+                <SelectContent className="bg-slate-800 border-slate-700 text-slate-200 w-[70px]">
+                  {languageOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value} className="focus:bg-slate-700 focus:text-slate-100">
+                      <div className="flex items-center gap-2">
+                        <Image src={option.logo} alt={option.label} width={16} height={16} />
+                        {option.label}
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton onClick={handleLogout} className={styles.sidebarMenuButton}>
               <User className={`h-4 w-4 ${styles.sidebarIcon}`} />

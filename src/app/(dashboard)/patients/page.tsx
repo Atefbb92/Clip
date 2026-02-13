@@ -3,13 +3,13 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { auth, db } from '@/firebase/firebase'
-import { collection, query, where, getDocs, Timestamp } from 'firebase/firestore'
+import { collection, query, where, getDocs, Timestamp, doc, updateDoc, deleteDoc } from 'firebase/firestore'
 import { onAuthStateChanged } from 'firebase/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Search, Plus, MoreHorizontal, Eye, Edit, Trash2, ArrowUpDown, ChevronUp, ChevronDown } from 'lucide-react'
+import { Search, Plus, MoreHorizontal, Eye, Edit, Trash2, ArrowUpDown, ChevronUp, ChevronDown, Package } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -215,6 +215,7 @@ const PatientsPage = () => {
       3: { label: t('status.en-production'), color: 'bg-orange-100 text-orange-800' },
       4: { label: t('status.en-traitement'), color: 'bg-purple-100 text-purple-800' },
       5: { label: t('status.termine'), color: 'bg-green-100 text-green-800' },
+      6: { label: t('status.rejete'), color: 'bg-red-100 text-red-800' },
     }[status] || { label: t('patients.categories.unknown'), color: 'bg-gray-100 text-gray-800' }
 
     return (
@@ -246,7 +247,7 @@ const PatientsPage = () => {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen p-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <HeadingTitle title={t('patients.title')} subtitle={t('patients.subtitle')} />
@@ -266,8 +267,11 @@ const PatientsPage = () => {
         <div className="border-b border-gray-200">
           <nav className="flex space-x-8 px-6">
             <button
-              onClick={() => setActiveTab('all')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'all'
+              onClick={() => {
+                setActiveTab('all')
+                setStatusFilter(null)
+              }}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'all' && statusFilter === null
                 ? 'border-blue-500 text-blue-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
@@ -275,8 +279,11 @@ const PatientsPage = () => {
               {t('patients.tabs.all')}
             </button>
             <button
-              onClick={() => setActiveTab('actions')}
-              className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${activeTab === 'actions'
+              onClick={() => {
+                setActiveTab('actions')
+                setStatusFilter(null)
+              }}
+              className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${activeTab === 'actions' && statusFilter === null
                 ? 'border-blue-500 text-blue-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
@@ -291,7 +298,10 @@ const PatientsPage = () => {
               </span>
             </button>
             <button
-              onClick={() => setActiveTab('archived')}
+              onClick={() => {
+                setActiveTab('archived')
+                setStatusFilter(null)
+              }}
               className={`py-4 px-1 border-b-2 font-medium text-sm ${activeTab === 'archived'
                 ? 'border-blue-500 text-blue-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -442,7 +452,11 @@ const PatientsPage = () => {
                           return (
                             <div className="flex flex-wrap items-center gap-2">
                               {conditions.slice(0, maxDisplay).map((condition, index) => (
-                                <Badge variant="default" key={index}>
+                                <Badge
+                                  key={index}
+                                  style={{ backgroundColor: '#0072B8', color: 'white' }}
+                                  className="border-none"
+                                >
                                   {condition}
                                 </Badge>
                               ))}
@@ -451,7 +465,10 @@ const PatientsPage = () => {
                                 <TooltipProvider>
                                   <Tooltip>
                                     <TooltipTrigger asChild>
-                                      <Badge variant="secondary" className="cursor-pointer">
+                                      <Badge
+                                        variant="secondary"
+                                        className="cursor-pointer bg-blue-50 text-[#0072B8] hover:bg-blue-100 border-none"
+                                      >
                                         +{remainingConditions.length}
                                       </Badge>
                                     </TooltipTrigger>
@@ -473,13 +490,13 @@ const PatientsPage = () => {
                         <Button
                           size="icon"
                           variant="ghost"
-                          className="h-9 w-9 text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-full"
+                          className="h-9 w-9 text-[#0072B8] hover:text-[#00619c] hover:bg-blue-50 rounded-full"
                           onClick={(e) => {
                             e.stopPropagation()
                             setViewerPatient(patient)
                           }}
                         >
-                          <PlayCircle className="h-6 w-6 fill-blue-600/10" />
+                          <PlayCircle className="h-6 w-6 fill-[#0072B8]/10" />
                         </Button>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -491,28 +508,44 @@ const PatientsPage = () => {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="bg-white shadow-xl border border-gray-200">
                             <DropdownMenuItem
-                              onClick={(e) => {
+                              onClick={async (e) => {
                                 e.stopPropagation()
-                                router.push(`/patients/${patient.id}`)
+                                if (confirm(t('patients.actions.confirm_archive'))) {
+                                  try {
+                                    await updateDoc(doc(db, 'patients', patient.id), {
+                                      archived: patient.archived === 1 ? 0 : 1
+                                    })
+                                    // Refresh text or state
+                                    setPatients(prev => prev.map(p => p.id === patient.id ? { ...p, archived: p.archived === 1 ? 0 : 1 } : p))
+                                  } catch (error) {
+                                    console.error("Error archiving patient:", error)
+                                  }
+                                }
                               }}
                             >
-                              <Eye className="w-4 h-4 mr-2" />
-                              {t('patients.actions.view')}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                router.push(`/patients/${patient.id}/edit`)
-                              }}
-                            >
-                              <Edit className="w-4 h-4 mr-2" />
-                              {t('patients.actions.edit')}
+                              <div className="flex items-center w-full">
+                                <div className="w-4 h-4 mr-2 flex items-center justify-center">
+                                  {patient.archived === 1 ? (
+                                    <RotateCw className="w-4 h-4" />
+                                  ) : (
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-archive"><rect width="20" height="5" x="2" y="3" rx="1" /><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8" /><path d="M10 12h4" /></svg>
+                                  )}
+                                </div>
+                                {patient.archived === 1 ? t('patients.actions.unarchive') : t('patients.actions.archive')}
+                              </div>
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="text-red-600"
-                              onClick={(e) => {
+                              onClick={async (e) => {
                                 e.stopPropagation()
-                                // Handle delete
+                                if (confirm(t('patients.actions.confirm_delete'))) {
+                                  try {
+                                    await deleteDoc(doc(db, 'patients', patient.id))
+                                    setPatients(prev => prev.filter(p => p.id !== patient.id))
+                                  } catch (error) {
+                                    console.error("Error deleting patient:", error)
+                                  }
+                                }
                               }}
                             >
                               <Trash2 className="w-4 h-4 mr-2" />
@@ -530,11 +563,11 @@ const PatientsPage = () => {
         </div>
       </div>
       <Dialog open={!!viewerPatient} onOpenChange={(open) => !open && setViewerPatient(null)}>
-        <DialogContent className="!max-w-[90vw] !w-[90vw] h-[85vh] p-0 overflow-hidden bg-white border-none rounded-lg flex flex-col [&>button]:hidden">
-          <div className="flex items-center justify-between p-6 border-b border-slate-200 bg-white shrink-0">
+        <DialogContent className="!max-w-[95%] !w-[95%] h-[95%] p-0 overflow-hidden bg-white border-none rounded-lg flex flex-col [&>button]:hidden shadow-2xl">
+          <div className="flex items-center justify-between p-4 border-b border-slate-200 bg-white shrink-0">
             <h2 className="text-xl font-semibold text-slate-800 flex items-center">
-              <RotateCw className="h-6 w-6 mr-2 text-[#0072B8]" />
-              {t('patients.viewer.title')} : {viewerPatient?.name} {viewerPatient?.surname}
+              <Package className="h-6 w-6 mr-2 text-[#0072B8]" />
+              Visualiseur 3D - Plan de traitement : {viewerPatient?.name} {viewerPatient?.surname}
             </h2>
             <Button
               onClick={() => setViewerPatient(null)}
@@ -545,7 +578,7 @@ const PatientsPage = () => {
               <X className="h-4 w-4" />
             </Button>
           </div>
-          <div className="flex-1 min-h-0 p-6 bg-slate-50">
+          <div className="flex-1 min-h-0 bg-slate-50">
             {viewerPatient && (
               <TreatmentPlanViewer3D patientName={`${viewerPatient.name} ${viewerPatient.surname}`} />
             )}

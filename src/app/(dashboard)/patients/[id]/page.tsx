@@ -3,9 +3,10 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { auth, db } from '@/firebase/firebase'
-import { doc, getDoc } from 'firebase/firestore'
+import { doc, getDoc, updateDoc } from 'firebase/firestore'
 import { onAuthStateChanged } from 'firebase/auth'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import {
   Dialog,
   DialogContent,
@@ -59,10 +60,14 @@ import {
   AlertCircle,
   Smartphone,
   Camera,
+  Play,
+  Scan,
 } from 'lucide-react'
 import { useTranslation } from '@/hooks/useTranslation'
 import clipLogo from '@/assets/img/CliP blanc- logo.png'
+import TreatmentPlanViewer3D from '@/components/TreatmentPlanViewer3D'
 import { Card, CardContent } from '@/components/ui/card'
+import { ScanViewer } from '@/components/3d/ScanViewer'
 
 interface Patient {
   id: string
@@ -101,6 +106,63 @@ const PatientDetailPage = () => {
   // Lien simulé inséré depuis le back office pour l'analyse céphalométrique
   const cephalometricUrl = 'https://example.com/cephalometric-analysis-frame'
   const messageInputRef = useRef<HTMLTextAreaElement>(null)
+
+  // Eterna Scan Dialog states
+  const [showEternaScanDialog, setShowEternaScanDialog] = useState(false)
+  const [eternaScans, setEternaScans] = useState<{ upper: File | null; lower: File | null }>({
+    upper: null,
+    lower: null
+  })
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [eternaUploadTarget, setEternaUploadTarget] = useState<'upper' | 'lower' | null>(null)
+  const [eternaScanMode, setEternaScanMode] = useState<'scanner' | 'link'>('scanner')
+  const [eternaScanLink, setEternaScanLink] = useState('')
+  const [previewFile, setPreviewFile] = useState<{ file: File | string, title: string } | null>(null)
+
+  const handleEternaUploadClick = (target: 'upper' | 'lower') => {
+    setEternaUploadTarget(target)
+    if (fileInputRef.current) {
+      fileInputRef.current.accept = '.stl,.ply,.obj'
+      fileInputRef.current.click()
+    }
+  }
+
+  const handleEternaFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    const ext = file.name.split('.').pop()?.toLowerCase()
+    if (!['stl', 'ply', 'obj'].includes(ext || '')) {
+      alert("Format de fichier non supporté. Utilisez .stl, .ply ou .obj")
+      event.target.value = ''
+      return
+    }
+
+    if (eternaUploadTarget) {
+      setEternaScans((prev) => ({
+        ...prev,
+        [eternaUploadTarget]: file,
+      }))
+    }
+
+    event.target.value = ''
+    setEternaUploadTarget(null)
+  }
+
+  const handleReject = async () => {
+    if (!patientId) return
+    try {
+      const patientDocRef = doc(db, 'patients', patientId)
+      await updateDoc(patientDocRef, {
+        status: 6,
+        updatedAt: new Date()
+      })
+      router.push('/patients')
+    } catch (error) {
+      console.error('Error rejecting patient:', error)
+      alert('Erreur lors du rejet du patient.')
+    }
+  }
 
   const weeks = [
     {
@@ -608,22 +670,39 @@ const PatientDetailPage = () => {
                   </DiamondCardTitle>
                 </DiamondCardHeader>
                 <DiamondCardContent>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <Button className="w-full bg-amber-100 text-amber-700 border border-amber-200 hover:bg-amber-200">
-                      <AlertCircle className="h-4 w-4 mr-2" />
-                      {t('patients.detail.actions.request_correction')}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <Button
+                      onClick={() => setShow3DModal(true)}
+                      className="w-full bg-blue-100 text-[#0072B8] border border-blue-200 hover:bg-blue-200 px-2"
+                    >
+                      <Play className="h-4 w-4 mr-2 fill-current flex-shrink-0" />
+                      <span className="truncate">{t('patients.detail.actions.view_tp_check')}</span>
                     </Button>
-                    <Button className="w-full bg-emerald-100 text-emerald-700 border border-emerald-200 hover:bg-emerald-200">
-                      <Check className="h-4 w-4 mr-2" />
-                      {t('patients.detail.actions.finish')}
+                    <Button className="w-full bg-amber-100 text-amber-700 border border-amber-200 hover:bg-amber-200 px-2">
+                      <AlertCircle className="h-4 w-4 mr-2 flex-shrink-0" />
+                      <span className="truncate">{t('patients.detail.actions.request_correction')}</span>
                     </Button>
-                    <Button className="w-full bg-sky-100 text-sky-700 border border-sky-200 hover:bg-sky-200">
-                      <Moon className="h-4 w-4 mr-2" />
-                      {t('patients.detail.actions.order_eterna')}
+                    <Button className="w-full bg-emerald-100 text-emerald-700 border border-emerald-200 hover:bg-emerald-200 px-2">
+                      <Check className="h-4 w-4 mr-2 flex-shrink-0" />
+                      <span className="truncate">{t('patients.detail.actions.finish')}</span>
+                    </Button>
+                    <Button
+                      onClick={() => setShowEternaScanDialog(true)}
+                      className="w-full bg-sky-100 text-sky-700 border border-sky-200 hover:bg-sky-200 px-2"
+                    >
+                      <Moon className="h-4 w-4 mr-2 flex-shrink-0" />
+                      <span className="truncate">{t('patients.detail.actions.order_eterna')}</span>
                     </Button>
                   </div>
                 </DiamondCardContent>
               </DiamondCard>
+
+              <input
+                type="file"
+                ref={fileInputRef}
+                className="hidden"
+                onChange={handleEternaFileChange}
+              />
 
               {/* Dialog Commander le reste du pack */}
               <Dialog open={openRestPackDialog} onOpenChange={setOpenRestPackDialog}>
@@ -659,9 +738,9 @@ const PatientDetailPage = () => {
                         </Button>
                         <Button
                           type="submit"
-                          className="bg-green-600 hover:bg-green-700 text-white"
+                          className="bg-[#0072B8] hover:bg-[#005fa3] text-white"
                         >
-                          {t('common.confirm')}
+                          Confirmer
                         </Button>
                       </DialogFooter>
                     </form>
@@ -906,8 +985,11 @@ const PatientDetailPage = () => {
                     <AlertCircle className="h-4 w-4 mr-2" />
                     Request Correction
                   </Button>
-                  <Button className="w-full flex-1 bg-red-100 text-red-700 border border-red-200 hover:bg-red-200">
-                    <X className="h-4 w-4 mr-2" />
+                  <Button
+                    onClick={handleReject}
+                    className="w-full flex-1 bg-red-100 text-red-700 border border-red-200 hover:bg-red-200"
+                  >
+                    <XCircle className="h-4 w-4 mr-2" />
                     {t('patients.detail.tp_check.reject')}
                   </Button>
                 </div>
@@ -1090,9 +1172,9 @@ const PatientDetailPage = () => {
                           </Button>
                           <Button
                             type="submit"
-                            className="bg-green-600 hover:bg-green-700 text-white"
+                            className="bg-[#0072B8] hover:bg-[#005fa3] text-white"
                           >
-                            {t('common.confirm')}
+                            Confirmer
                           </Button>
                         </DialogFooter>
                       </form>
@@ -1482,39 +1564,32 @@ const PatientDetailPage = () => {
         )}
       </div>
 
-      {/* Modal 3D plein écran */}
       {show3DModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg w-full h-full max-w-7xl max-h-[90vh] flex flex-col">
-            <div className="flex items-center justify-between p-6 border-b border-slate-200">
-              <h2 className="text-xl font-semibold text-slate-800 flex items-center">
-                <Package className="h-6 w-6 mr-2 text-[#0072B8]" />
-                Visualiseur 3D - Plan de traitement
-              </h2>
-              <Button
-                onClick={() => setShow3DModal(false)}
-                variant="outline"
-                className="border-slate-300 text-slate-700 hover:bg-slate-50"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-            <div className="flex-1 p-6">
-              <div className="bg-slate-50 rounded-lg border border-slate-200 h-full flex items-center justify-center">
-                <div className="text-center">
-                  <Package className="h-24 w-24 text-slate-400 mx-auto mb-6" />
-                  <p className="text-slate-600 font-medium text-lg mb-2">
-                    3D Treatment Plan Viewer
-                  </p>
-                  <p className="text-slate-500">{t('patients.detail.tp_check.view_3d_desc')}</p>
-                  <p className="text-sm text-slate-400 mt-4">• 360° rotation</p>
-                  <p className="text-sm text-slate-400">• Zoom and navigation</p>
-                  <p className="text-sm text-slate-400">• Step-by-step visualization</p>
-                </div>
+        <>
+          <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center" onClick={() => setShow3DModal(false)}>
+            <div
+              className="bg-white rounded-lg w-[95%] h-[95%] flex flex-col overflow-hidden shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between p-4 border-b border-slate-200">
+                <h2 className="text-xl font-semibold text-slate-800 flex items-center">
+                  <Package className="h-6 w-6 mr-2 text-[#0072B8]" />
+                  Visualiseur 3D - Plan de traitement
+                </h2>
+                <Button
+                  onClick={() => setShow3DModal(false)}
+                  variant="outline"
+                  className="border-slate-300 text-slate-700 hover:bg-slate-50"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="flex-1 bg-slate-50">
+                <TreatmentPlanViewer3D patientName={`${patientData.prenom} ${patientData.nom}`} />
               </div>
             </div>
           </div>
-        </div>
+        </>
       )}
 
       {/* Modal Analyse Céphalométrique (iframe) */}
@@ -1599,6 +1674,119 @@ const PatientDetailPage = () => {
         </div>
       )}
 
+      {/* Eterna Order Dialog */}
+      <Dialog open={showEternaScanDialog} onOpenChange={setShowEternaScanDialog}>
+        <DialogContent className="bg-white sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{t('patients.detail.eterna_order.title')}</DialogTitle>
+            <DialogDescription>{t('patients.detail.eterna_order.desc')}</DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-6 py-4">
+            {eternaScanMode === 'scanner' ? (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Upper Scan */}
+                  <div className="space-y-2 border-0 bg-gray-50 rounded-lg p-4 text-center">
+                    <div
+                      className="w-full h-32 bg-gray-100 rounded mb-2 flex items-center justify-center overflow-hidden relative cursor-pointer"
+                      onClick={() => {
+                        if (eternaScans.upper) {
+                          setPreviewFile({ file: eternaScans.upper, title: t('patients.detail.eterna_order.upper_scan') })
+                        } else {
+                          handleEternaUploadClick('upper')
+                        }
+                      }}
+                    >
+                      {eternaScans.upper ? (
+                        <div className="w-full h-full">
+                          <ScanViewer file={eternaScans.upper} autoRotate={true} />
+                        </div>
+                      ) : (
+                        <Scan className="w-8 h-8 text-gray-400" />
+                      )}
+                    </div>
+                    <p className="text-xs font-medium text-gray-700">{t('patients.detail.eterna_order.upper_scan')}</p>
+                    <Button variant="outline" size="sm" className="w-full" onClick={() => handleEternaUploadClick('upper')}>
+                      {eternaScans.upper ? t('patients.new.photos.modify') : t('patients.new.photos.select_plus')}
+                    </Button>
+                  </div>
+
+                  {/* Lower Scan */}
+                  <div className="space-y-2 border-0 bg-gray-50 rounded-lg p-4 text-center">
+                    <div
+                      className="w-full h-32 bg-gray-100 rounded mb-2 flex items-center justify-center overflow-hidden relative cursor-pointer"
+                      onClick={() => {
+                        if (eternaScans.lower) {
+                          setPreviewFile({ file: eternaScans.lower, title: t('patients.detail.eterna_order.lower_scan') })
+                        } else {
+                          handleEternaUploadClick('lower')
+                        }
+                      }}
+                    >
+                      {eternaScans.lower ? (
+                        <div className="w-full h-full">
+                          <ScanViewer file={eternaScans.lower} autoRotate={true} />
+                        </div>
+                      ) : (
+                        <Scan className="w-8 h-8 text-gray-400" />
+                      )}
+                    </div>
+                    <p className="text-xs font-medium text-gray-700">{t('patients.detail.eterna_order.lower_scan')}</p>
+                    <Button variant="outline" size="sm" className="w-full" onClick={() => handleEternaUploadClick('lower')}>
+                      {eternaScans.lower ? t('patients.new.photos.modify') : t('patients.new.photos.select_plus')}
+                    </Button>
+                  </div>
+                </div>
+                <div className="text-center">
+                  <button
+                    onClick={() => setEternaScanMode('link')}
+                    className="text-sm text-[#0072B8] hover:underline font-medium"
+                  >
+                    {t('patients.detail.eterna_order.use_link')}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">{t('patients.detail.eterna_order.scan_link')}</label>
+                  <Input
+                    value={eternaScanLink}
+                    onChange={(e) => setEternaScanLink(e.target.value)}
+                    placeholder="https://..."
+                  />
+                </div>
+                <div className="text-center">
+                  <button
+                    onClick={() => setEternaScanMode('scanner')}
+                    className="text-sm text-[#0072B8] hover:underline font-medium"
+                  >
+                    {t('patients.detail.eterna_order.upload_scans')}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowEternaScanDialog(false)}>
+              {t('patients.detail.tp_check.reject')}
+            </Button>
+            <Button
+              className="bg-[#0072B8] text-white hover:bg-[#005a91]"
+              disabled={eternaScanMode === 'scanner' ? (!eternaScans.upper || !eternaScans.lower) : !eternaScanLink}
+              onClick={() => {
+                console.log('Ordering Eterna with:', { mode: eternaScanMode, scans: eternaScans, link: eternaScanLink });
+                setShowEternaScanDialog(false);
+              }}
+            >
+              {t('patients.detail.eterna_order.confirm')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Viewer Galerie Générique */}
       {showGalleryModal && galleryPhotos.length > 0 && (
         <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
@@ -1670,6 +1858,35 @@ const PatientDetailPage = () => {
           </div>
         </div>
       )}
+      {/* Dialog: Preview 3D */}
+      <Dialog open={!!previewFile} onOpenChange={(open) => !open && setPreviewFile(null)}>
+        <DialogContent className="w-[min(90vw,90vh)] h-[min(90vw,90vh)] !max-w-none flex flex-col p-0 overflow-hidden bg-slate-50">
+          <DialogHeader className="p-4 bg-white border-b shrink-0">
+            <DialogTitle>{previewFile?.title}</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 min-h-0 relative bg-slate-100">
+            {previewFile && (
+              <>
+                {previewFile.file instanceof File && (previewFile.file.type.startsWith('image/') || previewFile.file.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)) ? (
+                  <div className="w-full h-full flex items-center justify-center p-4">
+                    <img
+                      src={URL.createObjectURL(previewFile.file)}
+                      alt={previewFile.title}
+                      className="max-w-full max-h-full object-contain"
+                    />
+                  </div>
+                ) : (
+                  <ScanViewer
+                    file={previewFile.file}
+                    className="w-full h-full"
+                    autoRotate={false}
+                  />
+                )}
+              </>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

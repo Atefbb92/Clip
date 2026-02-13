@@ -11,6 +11,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { HeadingTitle } from '@/components/HeadingTitle'
+import { useTranslation } from '@/hooks/useTranslation'
 import { Input } from '@/components/ui/input'
 import {
     Search,
@@ -99,6 +100,7 @@ const products = [
 ]
 
 export default function StorePage() {
+    const { t } = useTranslation()
     const [activeTab, setActiveTab] = useState('all')
     const [searchTerm, setSearchTerm] = useState('')
 
@@ -110,12 +112,11 @@ export default function StorePage() {
     )
 
     return (
-        <div className="min-h-screen space-y-8 animate-in fade-in duration-500 pb-12">
+        <div className="min-h-screen space-y-8 animate-in fade-in duration-500 pb-12 p-8">
             {/* 1. Header Section */}
             <HeadingTitle
-                title="Diamond Store"
-                subtitle="Tout votre matériel et vos consommables au même endroit"
-                titleClassName="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-900 to-blue-600"
+                title={t('store.title')}
+                subtitle={t('store.subtitle')}
             >
                 <div className="flex gap-3">
                     <Button variant="outline" className="gap-2 border-slate-200">

@@ -11,6 +11,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { HeadingTitle } from '@/components/HeadingTitle'
+import { useTranslation } from '@/hooks/useTranslation'
 import { Input } from '@/components/ui/input'
 import {
     Calendar,
@@ -98,6 +99,7 @@ const events = [
 ]
 
 export default function EventsPage() {
+    const { t } = useTranslation()
     const [activeTab, setActiveTab] = useState('all')
     const [searchTerm, setSearchTerm] = useState('')
 
@@ -112,16 +114,15 @@ export default function EventsPage() {
     const featuredEvent = events.find((e) => e.featured)
 
     return (
-        <div className="min-h-screen space-y-8 animate-in fade-in duration-500">
+        <div className="min-h-screen space-y-8 animate-in fade-in duration-500 p-8">
             {/* 1. Header Section */}
             <HeadingTitle
-                title="Événements"
-                subtitle="Restez informé des prochains congrès, formations et webinaires Diamond"
-                titleClassName="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-900 to-blue-600"
+                title={t('events.title')}
+                subtitle={t('events.subtitle')}
             >
                 <div className="flex gap-3">
                     <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-200 gap-2">
-                        <Plus className="w-4 h-4" /> Proposer un événement
+                        <Plus className="w-4 h-4" /> {t('events.propose_event')}
                     </Button>
                 </div>
             </HeadingTitle>
@@ -140,7 +141,7 @@ export default function EventsPage() {
 
                     <div className="relative z-10 p-8 md:p-12 h-full flex flex-col justify-center max-w-2xl gap-4">
                         <Badge className="bg-amber-500 text-white border-none w-fit px-3 py-1 text-sm font-semibold flex items-center gap-1">
-                            <Star className="w-3 h-3 fill-current" /> Événement à la une
+                            <Star className="w-3 h-3 fill-current" /> {t('events.hero_badge')}
                         </Badge>
                         <h2 className="text-3xl md:text-4xl font-bold leading-tight">
                             {featuredEvent.title}
@@ -160,7 +161,7 @@ export default function EventsPage() {
                         </p>
                         <div className="mt-4">
                             <Button size="lg" className="bg-white text-slate-900 hover:bg-slate-100 font-bold">
-                                En savoir plus <ArrowRight className="w-4 h-4 ml-2" />
+                                {t('events.learn_more')} <ArrowRight className="w-4 h-4 ml-2" />
                             </Button>
                         </div>
                     </div>
@@ -194,7 +195,7 @@ export default function EventsPage() {
                 <div className="relative w-full md:w-80">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
                     <Input
-                        placeholder="Rechercher un événement, un lieu..."
+                        placeholder={t('events.search_placeholder')}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="pl-9 bg-white border-slate-200 focus:ring-blue-500"
@@ -263,8 +264,8 @@ export default function EventsPage() {
                     <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300 shadow-sm">
                         <Calendar className="w-8 h-8" />
                     </div>
-                    <h3 className="text-lg font-semibold text-slate-900">Aucun événement ne correspond</h3>
-                    <p className="text-slate-500">Essayez de modifier vos filtres ou votre recherche.</p>
+                    <h3 className="text-lg font-semibold text-slate-900">{t('events.empty_title')}</h3>
+                    <p className="text-slate-500">{t('events.empty_subtitle')}</p>
                 </div>
             )}
 
@@ -275,13 +276,13 @@ export default function EventsPage() {
 
                 <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
                     <div className="max-w-xl text-center md:text-left space-y-4">
-                        <h2 className="text-3xl font-bold">Un événement à suggérer ?</h2>
+                        <h2 className="text-3xl font-bold">{t('events.contact_title')}</h2>
                         <p className="text-blue-100 text-lg">
-                            Vous organisez un événement ou souhaitez voir un sujet spécifique abordé lors d'une formation ? Contactez notre équipe académique.
+                            {t('events.contact_subtitle')}
                         </p>
                     </div>
                     <Button size="lg" className="bg-white text-blue-900 hover:bg-blue-50 font-bold px-8 h-14">
-                        Contacter l'équipe
+                        {t('events.contact_button')}
                     </Button>
                 </div>
             </div>

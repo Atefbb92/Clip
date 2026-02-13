@@ -8,7 +8,7 @@ import * as z from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, X, User, FileText, Camera, Scan, Stethoscope, CheckCircle } from 'lucide-react'
+import { ArrowLeft, X, User, FileText, Camera, Scan, Stethoscope, CheckCircle, Maximize2, ClipboardCheck } from 'lucide-react'
 import { HeadingTitle } from '@/components/HeadingTitle'
 import {
   DiamondCard,
@@ -48,6 +48,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { useTranslation } from '@/hooks/useTranslation'
 // @ts-ignore
 import Prescription from '@/components/prescription/prescription'
+import { ScanViewer } from '@/components/3d/ScanViewer'
 
 // Types
 type CbctFormValues = {
@@ -109,7 +110,7 @@ const getSteps = (t: any) => [
   },
   {
     label: t('patients.new.steps.submit.label'),
-    icon: CheckCircle,
+    icon: ClipboardCheck,
     description: t('patients.new.steps.submit.desc'),
   },
 ]
@@ -148,6 +149,56 @@ export default function AjouterPatient() {
   const [ageError, setAgeError] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [uploadTarget, setUploadTarget] = useState<{ type: 'photos' | 'radiographies' | 'scans'; key: string } | null>(null)
+  const [previewFile, setPreviewFile] = useState<{ file: File | string, title: string } | null>(null)
+
+  const handleUploadClick = (type: 'photos' | 'radiographies' | 'scans', key: string) => {
+    setUploadTarget({ type, key })
+    if (fileInputRef.current) {
+      fileInputRef.current.accept = type === 'scans' ? '.stl,.ply,.obj' : 'image/*'
+      fileInputRef.current.click()
+    }
+  }
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    // 15MB limit for photos/radiographies
+    if (uploadTarget?.type === 'photos' || uploadTarget?.type === 'radiographies') {
+      if (file.size > 15 * 1024 * 1024) {
+        alert("Le fichier dépasse la limite de 15 Mo.")
+        event.target.value = ''
+        return
+      }
+    }
+
+    // Validation for scans
+    if (uploadTarget?.type === 'scans') {
+      const ext = file.name.split('.').pop()?.toLowerCase()
+      if (!['stl', 'ply', 'obj'].includes(ext || '')) {
+        alert("Format de fichier non supporté. Utilisez .stl, .ply ou .obj")
+        event.target.value = ''
+        return
+      }
+    }
+
+    if (uploadTarget) {
+      setPatientData((prev) => ({
+        ...prev,
+        [uploadTarget.type]: {
+          ...prev[uploadTarget.type],
+          [uploadTarget.key]: file,
+        },
+      }))
+    }
+
+    // Reset
+    event.target.value = ''
+    setUploadTarget(null)
+    if (fileInputRef.current) fileInputRef.current.accept = 'image/*'
+  }
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set())
   const [openCbctDialog, setOpenCbctDialog] = useState(false)
   const [openScanDialog, setOpenScanDialog] = useState(false)
@@ -343,16 +394,25 @@ export default function AjouterPatient() {
           patientData.birthDate.year !== ''
         )
       case 2: // Photos/Radiographies
-        return (
-          Object.keys(patientData.photos).length > 0 ||
-          Object.keys(patientData.radiographies).length > 0
-        )
+        const requiredPhotos = ['image1', 'image2', 'image3', 'image4', 'image6', 'image7', 'image8', 'image9']
+        const hasAllPhotos = requiredPhotos.every(key => patientData.photos && patientData.photos[key])
+        const hasPanoramic = patientData.radiographies && patientData.radiographies['panoramic']
+        return hasAllPhotos && !!hasPanoramic
+
       case 3: // Scans
-        return Object.keys(patientData.scans).length > 0
+        if (patientData.scanMode === 'link') {
+          return !!patientData.scanLink
+        }
+        // If scanner mode (default), require both upper and lower
+        return (
+          patientData.scans &&
+          !!patientData.scans['upper'] &&
+          !!patientData.scans['lower']
+        )
       case 4: // Prescription
         return patientData.prescription !== undefined && patientData.prescription !== null
       case 5: // Vérifier et soumettre
-        return true // Always accessible once other steps are completed
+        return areAllStepsCompleted()
       default:
         return false
     }
@@ -472,7 +532,7 @@ export default function AjouterPatient() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-blue-600 hover:text-blue-800 hover:bg-blue-50"
+                className="text-[#0170B4] hover:text-[#005f99] hover:bg-[#0170B4]/10"
                 onClick={() => handleEditPrescription(item.id)}
               >
                 {t('patients.new.verify.modify')}
@@ -507,29 +567,29 @@ export default function AjouterPatient() {
                     description: t('patients.new.product.adult_desc'),
                     image: '/images/adult.png',
                     color: 'blue',
-                    gradient: 'from-blue-500 to-blue-600',
+                    gradient: 'from-[#0170B4] to-[#005f99]',
                   },
                   {
                     label: t('patients.new.product.teen_title'),
                     type: 'Adolescent' as const,
                     description: t('patients.new.product.teen_desc'),
                     image: '/images/adol.png',
-                    color: 'slate',
-                    gradient: 'from-slate-700 to-slate-800',
+                    color: 'teal',
+                    gradient: 'from-[#00B6AE] to-[#008C86]',
                   },
                 ].map(({ label, type, description, image, color, gradient }) => (
                   <DiamondCard
                     key={type}
                     className={`cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden group ${selectedPatientType === type
-                      ? `ring-2 ring-offset-2 ${color === 'blue' ? 'ring-blue-500' : 'ring-slate-500'}`
-                      : 'hover:border-blue-200'
+                      ? `ring-2 ring-offset-2 ${color === 'blue' ? 'ring-[#0170B4]' : 'ring-[#00B6AE]'}`
+                      : 'hover:border-[#0170B4]/30'
                       }`}
                     onClick={() => handlePatientTypeSelect(type)}
                   >
                     <div className="relative">
                       {/* Check icon */}
                       <div className={`absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center z-10 transition-all duration-300 ${selectedPatientType === type
-                        ? 'bg-green-500 scale-100 shadow-lg'
+                        ? 'bg-[#00B6AE] scale-100 shadow-lg'
                         : 'bg-gray-100 scale-0 opacity-0'
                         }`}>
                         <CheckCircle className="w-5 h-5 text-white" />
@@ -546,7 +606,7 @@ export default function AjouterPatient() {
                       <DiamondCardContent className="p-6">
                         {/* Image container */}
                         <div className="flex justify-center mb-6 relative">
-                          <div className="absolute inset-0 bg-blue-100/50 rounded-full blur-2xl transform scale-75 group-hover:scale-100 transition-transform duration-500"></div>
+                          <div className="absolute inset-0 bg-[#0170B4]/10 rounded-full blur-2xl transform scale-75 group-hover:scale-100 transition-transform duration-500"></div>
                           <div className="w-full h-48 relative z-10 transition-transform duration-500 group-hover:scale-105">
                             <img src={image} alt={label} className="w-full h-full object-contain drop-shadow-md" />
                           </div>
@@ -560,8 +620,8 @@ export default function AjouterPatient() {
                         {/* Select button */}
                         <Button
                           className={`w-full font-bold shadow-md transition-all duration-300 ${selectedPatientType === type
-                            ? `${color === 'blue' ? 'bg-blue-600 hover:bg-blue-700' : 'bg-slate-700 hover:bg-slate-800'} text-white`
-                            : 'bg-white text-slate-700 border-2 border-slate-100 hover:border-blue-200 hover:bg-blue-50'
+                            ? `${color === 'blue' ? 'bg-[#0170B4] hover:bg-[#005f99]' : 'bg-[#00B6AE] hover:bg-[#008C86]'} text-white`
+                            : 'bg-white text-slate-700 border-2 border-slate-100 hover:border-[#0170B4]/30 hover:bg-[#0170B4]/10'
                             }`}
                         >
                           {selectedPatientType === type ? t('patients.new.product.selected') : t('patients.new.product.choose')}
@@ -580,8 +640,8 @@ export default function AjouterPatient() {
                   <DiamondCard
                     key={pack.id}
                     className={`relative text-center overflow-visible flex flex-col min-h-[550px] transition-all duration-300 group ${selectedPack === pack.id
-                      ? 'ring-2 ring-teal-500 shadow-xl scale-[1.02]'
-                      : 'hover:shadow-xl hover:-translate-y-1 hover:border-teal-200'
+                      ? 'ring-2 ring-[#00B6AE] shadow-xl scale-[1.02]'
+                      : 'hover:shadow-xl hover:-translate-y-1 hover:border-[#00B6AE]/30'
                       }`}
                     onClick={(e) => {
                       e.stopPropagation()
@@ -594,26 +654,26 @@ export default function AjouterPatient() {
                     </div>
 
                     {selectedPack === pack.id && (
-                      <div className="absolute -top-3 -right-3 bg-gradient-to-r from-teal-500 to-teal-400 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg z-20 animate-in zoom-in duration-300">
+                      <div className="absolute -top-3 -right-3 bg-[#00B6AE] text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg z-20 animate-in zoom-in duration-300">
                         <CheckCircle className="w-6 h-6 stroke-[2.5]" />
                       </div>
                     )}
 
                     <DiamondCardContent className="flex-1 flex flex-col p-6 z-10">
                       <div className="relative z-10">
-                        <div className="w-20 h-20 mx-auto mb-4 bg-teal-50 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <div className="w-20 h-20 mx-auto mb-4 bg-[#00B6AE]/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                           <img
                             src="/images/pack1.png"
                             alt={pack.name}
                             className="w-12 h-12 object-contain"
                           />
                         </div>
-                        <h2 className="text-2xl font-bold mt-1.5 mb-2 text-slate-800 relative z-10 text-center group-hover:text-teal-600 transition-colors">
+                        <h2 className="text-2xl font-bold mt-1.5 mb-2 text-slate-800 relative z-10 text-center group-hover:text-[#00B6AE] transition-colors">
                           {pack.name.replace('Pack ', '')}
                         </h2>
                       </div>
 
-                      <div className="w-16 h-1 mx-auto bg-gradient-to-r from-teal-500 to-blue-500 rounded-full my-6 opacity-30 group-hover:opacity-100 transition-opacity"></div>
+                      <div className="w-16 h-1 mx-auto bg-gradient-to-r from-[#00B6AE] to-[#0170B4] rounded-full my-6 opacity-30 group-hover:opacity-100 transition-opacity"></div>
 
                       <div className="flex-1 space-y-6">
                         <div className="bg-slate-50 rounded-lg p-3 group-hover:bg-white group-hover:shadow-sm transition-all border border-transparent group-hover:border-slate-100">
@@ -643,19 +703,19 @@ export default function AjouterPatient() {
                         <div className="w-full h-px bg-slate-100 my-4"></div>
 
                         <div className="flex justify-between gap-4">
-                          <div className="flex-1 text-center p-3 rounded-lg border border-teal-100 bg-teal-50/50">
-                            <p className="text-lg font-bold text-teal-600">
+                          <div className="flex-1 text-center p-3 rounded-lg border border-[#00B6AE]/20 bg-[#00B6AE]/10">
+                            <p className="text-lg font-bold text-[#00B6AE]">
                               {pack.id === '1' ? '850' : pack.id === '2' ? '1150' : '2100'} <span className="text-xs align-top">TND</span>
                             </p>
-                            <p className="text-[10px] font-bold text-teal-600/70 uppercase">
+                            <p className="text-[10px] font-bold text-[#00B6AE]/70 uppercase whitespace-nowrap">
                               {t('patients.new.product.one_arch')}
                             </p>
                           </div>
-                          <div className="flex-1 text-center p-3 rounded-lg border border-blue-100 bg-blue-50/50">
-                            <p className="text-lg font-bold text-blue-600">
+                          <div className="flex-1 text-center p-3 rounded-lg border border-[#0170B4]/20 bg-[#0170B4]/10">
+                            <p className="text-lg font-bold text-[#0170B4]">
                               {pack.price} <span className="text-xs align-top">TND</span>
                             </p>
-                            <p className="text-[10px] font-bold text-blue-600/70 uppercase">
+                            <p className="text-[10px] font-bold text-[#0170B4]/70 uppercase whitespace-nowrap">
                               {t('patients.new.product.two_arches')}
                             </p>
                           </div>
@@ -664,8 +724,8 @@ export default function AjouterPatient() {
 
                       <Button
                         className={`w-full mt-6 py-6 text-lg font-bold shadow-md transition-all duration-300 ${selectedPack === pack.id
-                          ? 'bg-teal-500 hover:bg-teal-600 text-white'
-                          : 'bg-white text-slate-600 border-2 border-slate-100 hover:border-teal-500 hover:text-teal-600'
+                          ? 'bg-[#00B6AE] hover:bg-[#00a099] text-white'
+                          : 'bg-white text-slate-600 border-2 border-slate-100 hover:border-[#00B6AE] hover:text-[#00B6AE]'
                           }`}
                         onClick={(e) => {
                           e.stopPropagation()
@@ -758,7 +818,7 @@ export default function AjouterPatient() {
                   className="w-24"
                 />
               </div>
-              {age && <p className="text-sm text-gray-600">{t('patients.new.details.age_display').replace('{age}', String(age))}</p>}
+              {age !== null && <p className="text-sm text-gray-600 font-medium mt-1">{t('patients.new.details.age_display').replace('{age}', String(age))}</p>}
               {ageError && error && <p className="text-sm text-red-600">{error}</p>}
             </div>
 
@@ -794,8 +854,8 @@ export default function AjouterPatient() {
                   <div
                     key={condition}
                     className={`p-2 text-xs border-0 rounded cursor-pointer transition-colors ${selectedConditions.includes(condition)
-                      ? 'bg-blue-50 border border-blue-500 text-blue-700'
-                      : 'hover:bg-gray-50 bg-gray-50'
+                      ? 'bg-[#0170B4]/10 border border-[#0170B4] text-[#0170B4] font-medium'
+                      : 'hover:bg-gray-100 bg-gray-50 text-gray-600'
                       }`}
                     onClick={() => handleConditionClick(condition)}
                   >
@@ -830,15 +890,47 @@ export default function AjouterPatient() {
                     { key: 'image8', label: t('patients.new.photos.labels.intra_face'), required: true },
                     { key: 'image9', label: t('patients.new.photos.labels.intra_left'), required: true },
                   ].map((photo) => (
-                    <div key={photo.key} className="border-0 bg-gray-50 rounded-lg p-4 text-center">
-                      <div className="w-full h-32 bg-gray-100 rounded mb-2 flex items-center justify-center">
-                        <Camera className="w-8 h-8 text-gray-400" />
+                    <div key={photo.key} className="border-0 bg-gray-50 rounded-lg p-4 text-center transition-colors relative group">
+                      <div
+                        className="w-full h-32 bg-gray-100 rounded mb-2 flex items-center justify-center overflow-hidden relative cursor-pointer"
+                        onClick={() => {
+                          if (patientData.photos && patientData.photos[photo.key] instanceof File) {
+                            setPreviewFile({ file: patientData.photos[photo.key] as File, title: photo.label })
+                          } else {
+                            handleUploadClick('photos', photo.key)
+                          }
+                        }}
+                      >
+                        {patientData.photos && patientData.photos[photo.key] instanceof File ? (
+                          <>
+                            <img
+                              src={URL.createObjectURL(patientData.photos[photo.key] as File)}
+                              alt={photo.label}
+                              className="w-full h-full object-contain"
+                            />
+                            <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                              <Button size="icon" variant="secondary" className="h-6 w-6 bg-white/80 backdrop-blur-sm hover:bg-white" onClick={(e) => {
+                                e.stopPropagation();
+                                setPreviewFile({ file: patientData.photos[photo.key] as File, title: photo.label });
+                              }}>
+                                <Maximize2 className="h-3 w-3 text-gray-700" />
+                              </Button>
+                            </div>
+                          </>
+                        ) : (
+                          <Camera className="w-8 h-8 text-gray-400" />
+                        )}
                       </div>
                       <p className="text-xs text-gray-600 mb-2">
                         {photo.label} {photo.required && <span className="text-red-500">*</span>}
                       </p>
-                      <Button variant="outline" size="sm" className="w-full hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all duration-300">
-                        {t('patients.new.photos.select_plus')}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full hover:bg-[#0170B4]/10 hover:text-[#0170B4] hover:border-[#0170B4]/30 transition-all duration-300"
+                        onClick={() => handleUploadClick('photos', photo.key)}
+                      >
+                        {patientData.photos && patientData.photos[photo.key] ? t('patients.new.photos.modify') : t('patients.new.photos.select_plus')}
                       </Button>
                     </div>
                   ))}
@@ -848,24 +940,88 @@ export default function AjouterPatient() {
               <div>
                 <h4 className="font-medium mb-3">{t('patients.new.photos.xrays')}</h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="border-0 bg-gray-50 rounded-lg p-4 text-center">
-                    <div className="w-full h-32 bg-gray-100 rounded mb-2 flex items-center justify-center">
-                      <FileText className="w-8 h-8 text-gray-400" />
+                  <div className="border-0 bg-gray-50 rounded-lg p-4 text-center transition-colors relative group">
+                    <div
+                      className="w-full h-32 bg-gray-100 rounded mb-2 flex items-center justify-center overflow-hidden relative cursor-pointer"
+                      onClick={() => {
+                        if (patientData.radiographies && patientData.radiographies['panoramic'] instanceof File) {
+                          setPreviewFile({ file: patientData.radiographies['panoramic'] as File, title: t('patients.new.photos.panoramic') })
+                        } else {
+                          handleUploadClick('radiographies', 'panoramic')
+                        }
+                      }}
+                    >
+                      {patientData.radiographies && patientData.radiographies['panoramic'] instanceof File ? (
+                        <>
+                          <img
+                            src={URL.createObjectURL(patientData.radiographies['panoramic'] as File)}
+                            alt={t('patients.new.photos.panoramic')}
+                            className="w-full h-full object-contain"
+                          />
+                          <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                            <Button size="icon" variant="secondary" className="h-6 w-6 bg-white/80 backdrop-blur-sm hover:bg-white" onClick={(e) => {
+                              e.stopPropagation();
+                              setPreviewFile({ file: patientData.radiographies['panoramic'] as File, title: t('patients.new.photos.panoramic') });
+                            }}>
+                              <Maximize2 className="h-3 w-3 text-gray-700" />
+                            </Button>
+                          </div>
+                        </>
+                      ) : (
+                        <FileText className="w-8 h-8 text-gray-400" />
+                      )}
                     </div>
                     <p className="text-xs text-gray-600 mb-2">
                       {t('patients.new.photos.panoramic')} <span className="text-red-500">*</span>
                     </p>
-                    <Button variant="outline" size="sm" className="w-full hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all duration-300">
-                      {t('patients.new.photos.select_plus')}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full hover:bg-[#0170B4]/10 hover:text-[#0170B4] hover:border-[#0170B4]/30 transition-all duration-300"
+                      onClick={() => handleUploadClick('radiographies', 'panoramic')}
+                    >
+                      {patientData.radiographies && patientData.radiographies['panoramic'] ? t('patients.new.photos.modify') : t('patients.new.photos.select_plus')}
                     </Button>
                   </div>
-                  <div className="border-0 bg-gray-50 rounded-lg p-4 text-center">
-                    <div className="w-full h-32 bg-gray-100 rounded mb-2 flex items-center justify-center">
-                      <FileText className="w-8 h-8 text-gray-400" />
+                  <div className="border-0 bg-gray-50 rounded-lg p-4 text-center transition-colors relative group">
+                    <div
+                      className="w-full h-32 bg-gray-100 rounded mb-2 flex items-center justify-center overflow-hidden relative cursor-pointer"
+                      onClick={() => {
+                        if (patientData.radiographies && patientData.radiographies['xray_profile'] instanceof File) {
+                          setPreviewFile({ file: patientData.radiographies['xray_profile'] as File, title: t('patients.new.photos.xray_profile') })
+                        } else {
+                          handleUploadClick('radiographies', 'xray_profile')
+                        }
+                      }}
+                    >
+                      {patientData.radiographies && patientData.radiographies['xray_profile'] instanceof File ? (
+                        <>
+                          <img
+                            src={URL.createObjectURL(patientData.radiographies['xray_profile'] as File)}
+                            alt={t('patients.new.photos.xray_profile')}
+                            className="w-full h-full object-contain"
+                          />
+                          <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                            <Button size="icon" variant="secondary" className="h-6 w-6 bg-white/80 backdrop-blur-sm hover:bg-white" onClick={(e) => {
+                              e.stopPropagation();
+                              setPreviewFile({ file: patientData.radiographies['xray_profile'] as File, title: t('patients.new.photos.xray_profile') });
+                            }}>
+                              <Maximize2 className="h-3 w-3 text-gray-700" />
+                            </Button>
+                          </div>
+                        </>
+                      ) : (
+                        <FileText className="w-8 h-8 text-gray-400" />
+                      )}
                     </div>
                     <p className="text-xs text-gray-600 mb-2">{t('patients.new.photos.xray_profile')}</p>
-                    <Button variant="outline" size="sm" className="w-full hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all duration-300">
-                      {t('patients.new.photos.select_plus')}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full hover:bg-[#0170B4]/10 hover:text-[#0170B4] hover:border-[#0170B4]/30 transition-all duration-300"
+                      onClick={() => handleUploadClick('radiographies', 'xray_profile')}
+                    >
+                      {patientData.radiographies && patientData.radiographies['xray_profile'] ? t('patients.new.photos.modify') : t('patients.new.photos.select_plus')}
                     </Button>
                   </div>
                   {/* CBCT via URL */}
@@ -877,12 +1033,12 @@ export default function AjouterPatient() {
                     {patientData.cbctUrl ? (
                       <div className="space-y-2">
                         <p className="text-xs text-gray-500 break-all">{patientData.cbctUrl}</p>
-                        <Button variant="outline" size="sm" className="w-full hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all duration-300" onClick={() => setOpenCbctDialog(true)}>
+                        <Button variant="outline" size="sm" className="w-full hover:bg-[#0170B4]/10 hover:text-[#0170B4] hover:border-[#0170B4]/30 transition-all duration-300" onClick={() => setOpenCbctDialog(true)}>
                           {t('patients.new.photos.modify')}
                         </Button>
                       </div>
                     ) : (
-                      <Button variant="outline" size="sm" className="w-full hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all duration-300" onClick={() => setOpenCbctDialog(true)}>
+                      <Button variant="outline" size="sm" className="w-full hover:bg-[#0170B4]/10 hover:text-[#0170B4] hover:border-[#0170B4]/30 transition-all duration-300" onClick={() => setOpenCbctDialog(true)}>
                         {t('patients.new.photos.add_cbct')}
                       </Button>
                     )}
@@ -920,10 +1076,10 @@ export default function AjouterPatient() {
                         />
 
                         <DialogFooter>
-                          <Button type="button" variant="outline" onClick={() => setOpenCbctDialog(false)}>
+                          <Button type="button" variant="outline" className="hover:bg-[#0170B4]/10 hover:text-[#0170B4] hover:border-[#0170B4]/30 transition-colors" onClick={() => setOpenCbctDialog(false)}>
                             {t('patients.new.form.cancel')}
                           </Button>
-                          <Button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white">
+                          <Button type="submit" className="bg-[#0170B4] hover:bg-[#005f99] text-white">
                             {t('patients.new.dialogs.confirm')}
                           </Button>
                         </DialogFooter>
@@ -943,26 +1099,88 @@ export default function AjouterPatient() {
               {t('patients.new.scans.desc')}
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="border-0 bg-gray-50 rounded-lg p-4 text-center">
-                <div className="w-full h-32 bg-gray-100 rounded mb-2 flex items-center justify-center">
-                  <Scan className="w-8 h-8 text-gray-400" />
+              <div className="border-0 bg-gray-50 rounded-lg p-4 text-center transition-colors relative group">
+                <div className="w-full h-40 bg-gray-100 rounded mb-2 flex items-center justify-center overflow-hidden relative" onClick={() => {
+                  if (patientData.scans && patientData.scans['upper']) {
+                    setPreviewFile({ file: patientData.scans['upper'] as File, title: t('patients.new.scans.upper') })
+                  } else {
+                    handleUploadClick('scans', 'upper')
+                  }
+                }}>
+                  {patientData.scans && patientData.scans['upper'] ? (
+                    <>
+                      <div className="w-full h-full cursor-pointer">
+                        <ScanViewer
+                          file={patientData.scans['upper'] as File}
+                          autoRotate={true}
+                          onClick={() => setPreviewFile({ file: patientData.scans['upper'] as File, title: t('patients.new.scans.upper') })}
+                        />
+                      </div>
+                      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                        <Button size="icon" variant="secondary" className="h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white" onClick={(e) => {
+                          e.stopPropagation();
+                          setPreviewFile({ file: patientData.scans['upper'] as File, title: t('patients.new.scans.upper') });
+                        }}>
+                          <Maximize2 className="h-4 w-4 text-gray-700" />
+                        </Button>
+                      </div>
+                    </>
+                  ) : (
+                    <Scan className="w-8 h-8 text-gray-400 cursor-pointer" />
+                  )}
                 </div>
                 <p className="text-xs text-gray-600 mb-2">
                   {t('patients.new.scans.upper')} <span className="text-red-500">*</span>
                 </p>
-                <Button variant="outline" size="sm" className="w-full">
-                  {t('patients.new.photos.select_plus')}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full hover:bg-[#0170B4]/10 hover:text-[#0170B4] hover:border-[#0170B4]/30 transition-all duration-300"
+                  onClick={() => handleUploadClick('scans', 'upper')}
+                >
+                  {patientData.scans && patientData.scans['upper'] ? t('patients.new.photos.modify') : t('patients.new.photos.select_plus')}
                 </Button>
               </div>
-              <div className="border-0 bg-gray-50 rounded-lg p-4 text-center">
-                <div className="w-full h-32 bg-gray-100 rounded mb-2 flex items-center justify-center">
-                  <Scan className="w-8 h-8 text-gray-400" />
+              <div className="border-0 bg-gray-50 rounded-lg p-4 text-center transition-colors relative group">
+                <div className="w-full h-40 bg-gray-100 rounded mb-2 flex items-center justify-center overflow-hidden relative" onClick={() => {
+                  if (patientData.scans && patientData.scans['lower']) {
+                    setPreviewFile({ file: patientData.scans['lower'] as File, title: t('patients.new.scans.lower') })
+                  } else {
+                    handleUploadClick('scans', 'lower')
+                  }
+                }}>
+                  {patientData.scans && patientData.scans['lower'] ? (
+                    <>
+                      <div className="w-full h-full cursor-pointer">
+                        <ScanViewer
+                          file={patientData.scans['lower'] as File}
+                          autoRotate={true}
+                          onClick={() => setPreviewFile({ file: patientData.scans['lower'] as File, title: t('patients.new.scans.lower') })}
+                        />
+                      </div>
+                      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                        <Button size="icon" variant="secondary" className="h-8 w-8 bg-white/80 backdrop-blur-sm hover:bg-white" onClick={(e) => {
+                          e.stopPropagation();
+                          setPreviewFile({ file: patientData.scans['lower'] as File, title: t('patients.new.scans.lower') });
+                        }}>
+                          <Maximize2 className="h-4 w-4 text-gray-700" />
+                        </Button>
+                      </div>
+                    </>
+                  ) : (
+                    <Scan className="w-8 h-8 text-gray-400 cursor-pointer" />
+                  )}
                 </div>
                 <p className="text-xs text-gray-600 mb-2">
                   {t('patients.new.scans.lower')} <span className="text-red-500">*</span>
                 </p>
-                <Button variant="outline" size="sm" className="w-full">
-                  {t('patients.new.photos.select_plus')}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full hover:bg-[#0170B4]/10 hover:text-[#0170B4] hover:border-[#0170B4]/30 transition-all duration-300"
+                  onClick={() => handleUploadClick('scans', 'lower')}
+                >
+                  {patientData.scans && patientData.scans['lower'] ? t('patients.new.photos.modify') : t('patients.new.photos.select_plus')}
                 </Button>
               </div>
             </div>
@@ -975,7 +1193,7 @@ export default function AjouterPatient() {
             </div>
             <div className="flex justify-center">
               <Button
-                className="bg-[#0072B8] hover:bg-[#005b93] text-white"
+                className="bg-[#0170B4] hover:bg-[#005f99] text-white"
                 onClick={() => setOpenScanDialog(true)}
               >
                 {t('patients.new.scans.send_via_scanner')}
@@ -1014,12 +1232,12 @@ export default function AjouterPatient() {
                               onValueChange={field.onChange}
                               className="grid grid-cols-1 md:grid-cols-2 gap-3"
                             >
-                              <div className={`flex items-center gap-2 p-3 border rounded-md ${field.value === 'link' ? 'border-[#0072B8] bg-[#00B4D8]/10' : 'border-slate-200'}`}>
-                                <RadioGroupItem className="data-[state=checked]:border-[#0072B8]" value="link" id="mode-link" />
+                              <div className={`flex items-center gap-2 p-3 border rounded-md ${field.value === 'link' ? 'border-[#0170B4] bg-[#0170B4]/10' : 'border-slate-200'}`}>
+                                <RadioGroupItem className="data-[state=checked]:border-[#0170B4] text-[#0170B4]" value="link" id="mode-link" />
                                 <label htmlFor="mode-link" className="cursor-pointer text-sm">{t('patients.new.dialogs.add_scan_link')}</label>
                               </div>
-                              <div className={`flex items-center gap-2 p-3 border rounded-md ${field.value === 'scanner' ? 'border-[#0072B8] bg-[#00B4D8]/10' : 'border-slate-200'}`}>
-                                <RadioGroupItem className="data-[state=checked]:border-[#0072B8]" value="scanner" id="mode-scanner" />
+                              <div className={`flex items-center gap-2 p-3 border rounded-md ${field.value === 'scanner' ? 'border-[#0170B4] bg-[#0170B4]/10' : 'border-slate-200'}`}>
+                                <RadioGroupItem className="data-[state=checked]:border-[#0170B4] text-[#0170B4]" value="scanner" id="mode-scanner" />
                                 <label htmlFor="mode-scanner" className="cursor-pointer text-sm">{t('patients.new.dialogs.send_from_scanner')}</label>
                               </div>
                             </RadioGroup>
@@ -1047,10 +1265,10 @@ export default function AjouterPatient() {
                     )}
 
                     <DialogFooter>
-                      <Button type="button" variant="outline" onClick={() => setOpenScanDialog(false)}>
+                      <Button type="button" variant="outline" className="hover:bg-[#0170B4]/10 hover:text-[#0170B4] hover:border-[#0170B4]/30 transition-colors" onClick={() => setOpenScanDialog(false)}>
                         {t('patients.new.form.cancel')}
                       </Button>
-                      <Button type="submit" className="bg-[#0072B8] hover:bg-[#005b93] text-white">
+                      <Button type="submit" className="bg-[#0170B4] hover:bg-[#005f99] text-white">
                         {t('patients.new.dialogs.continue')}
                       </Button>
                     </DialogFooter>
@@ -1105,15 +1323,15 @@ export default function AjouterPatient() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       {/* Header */}
-      <div className="z-50 sticky top-0 bg-gray-50/95 backdrop-blur-sm border-b border-gray-200 supports-[backdrop-filter]:bg-gray-50/60">
-        <div className="flex items-center justify-between px-6 py-4">
+      <div className="z-50 sticky top-0 bg-white/80 backdrop-blur-sm border-b border-gray-200 supports-[backdrop-filter]:bg-white/60">
+        <div className="flex items-center justify-between px-6 py-4 max-w-[1600px] mx-auto w-full">
           <HeadingTitle
             title={t('patients.new.title')}
             subtitle={t('patients.new.subtitle').replace('{current}', String(currentStep + 1)).replace('{total}', String(steps.length))}
-            titleClassName="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-900 to-blue-600"
-            subtitleClassName="text-sm font-medium text-blue-600 mt-1"
+            titleClassName="text-3xl font-bold text-gray-900"
+            subtitleClassName="text-sm font-medium text-gray-500 mt-1"
           >
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
@@ -1138,14 +1356,14 @@ export default function AjouterPatient() {
               </div>
 
               <div className="flex items-center gap-3">
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-md shadow-blue-200 transition-all hover:translate-y-[-1px]">
+                <Button className="bg-[#0170B4] hover:bg-[#005f99] text-white shadow-md transition-all hover:translate-y-[-1px]">
                   {t('patients.new.buttons.save_close')}
                 </Button>
 
                 {currentStep < steps.length - 1 ? (
                   <Button
                     onClick={handleNext}
-                    className="bg-slate-900 text-white hover:bg-slate-800 shadow-lg shadow-slate-200 transition-all hover:translate-y-[-1px]"
+                    className="bg-[#00B6AE] text-white hover:bg-[#00a099] shadow-lg transition-all hover:translate-y-[-1px]"
                   >
                     {t('patients.new.buttons.next')}
                   </Button>
@@ -1154,8 +1372,8 @@ export default function AjouterPatient() {
                     onClick={handleSubmit}
                     disabled={!areAllStepsCompleted()}
                     className={`shadow-lg transition-all hover:translate-y-[-1px] ${areAllStepsCompleted()
-                      ? 'bg-gradient-to-r from-blue-600 to-teal-500 hover:from-blue-700 hover:to-teal-600 text-white border-0'
-                      : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                      ? 'bg-gradient-to-r from-[#0170B4] to-[#00B6AE] hover:from-[#005f99] hover:to-[#00a099] text-white border-0'
+                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                       }`}
                   >
                     {areAllStepsCompleted() ? t('patients.new.buttons.submit_case') : t('patients.new.buttons.complete_all')}
@@ -1170,7 +1388,7 @@ export default function AjouterPatient() {
       {/* Main content with flex layout */}
       <div className="flex flex-1 min-h-[calc(100vh-140px)] animate-in fade-in slide-in-from-bottom-4 duration-700">
         {/* Sidebar - 1/3 width */}
-        <div className="w-1/3 border-r-0 p-6 sticky top-0 h-screen overflow-y-auto">
+        <div className="w-1/3 border-r-0 p-6 sticky top-24 max-h-[calc(100vh-6rem)] overflow-y-auto">
           <DiamondCard variant="outlined" className="h-auto py-10">
             <DiamondCardContent>
               <nav className="space-y-2">
@@ -1179,23 +1397,33 @@ export default function AjouterPatient() {
                   const isActive = index === currentStep
                   const isCompleted = isStepCompleted(index)
 
+                  const isLastStep = index === steps.length - 1
+
                   return (
                     <div
                       key={index}
                       className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-300 cursor-pointer border ${isActive
-                        ? 'bg-gradient-to-r from-blue-50 to-white border-blue-200 shadow-sm border-l-4 border-l-blue-600'
+                        ? isLastStep
+                          ? 'bg-gradient-to-r from-[#0170B4]/10 to-[#00B6AE]/10 border-[#0170B4]/20 shadow-sm border-l-4 border-l-[#0170B4]'
+                          : 'bg-[#0170B4]/10 border-[#0170B4]/20 shadow-sm border-l-4 border-l-[#0170B4]'
                         : isCompleted
-                          ? 'bg-teal-50/50 border-teal-100 border-l-4 border-l-teal-500'
-                          : 'border-transparent hover:bg-slate-50 hover:border-slate-100'
+                          ? isLastStep
+                            ? 'bg-gradient-to-r from-[#0170B4]/20 to-[#00B6AE]/20 border-[#00B6AE]/30 border-l-4 border-l-[#00B6AE] shadow-md'
+                            : 'bg-[#00B6AE]/10 border-[#00B6AE]/20 border-l-4 border-l-[#00B6AE]'
+                          : 'border-transparent hover:bg-gray-100 hover:border-gray-200'
                         }`}
                       onClick={() => handleStepClick(index)}
                     >
                       <div
                         className={`flex items-center justify-center w-8 h-8 rounded-full transition-colors duration-300 ${isActive
-                          ? 'bg-blue-600 text-white shadow-md shadow-blue-200'
+                          ? isLastStep
+                            ? 'bg-gradient-to-r from-[#0170B4] to-[#00B6AE] text-white shadow-md'
+                            : 'bg-[#0170B4] text-white shadow-md'
                           : isCompleted
-                            ? 'bg-teal-500 text-white shadow-md shadow-teal-200'
-                            : 'bg-slate-100 text-slate-400'
+                            ? isLastStep
+                              ? 'bg-gradient-to-r from-[#0170B4] to-[#00B6AE] text-white shadow-md ring-2 ring-offset-2 ring-[#00B6AE]/30'
+                              : 'bg-[#00B6AE] text-white shadow-md'
+                            : 'bg-gray-100 text-gray-400'
                           }`}
                       >
                         {isCompleted && !isActive ? (
@@ -1207,15 +1435,15 @@ export default function AjouterPatient() {
                       <div className="flex-1">
                         <div
                           className={`font-medium transition-colors duration-300 ${isActive
-                            ? 'text-blue-900'
+                            ? 'text-[#0170B4]'
                             : isCompleted
-                              ? 'text-teal-900'
-                              : 'text-slate-500'
+                              ? 'text-[#00B6AE]'
+                              : 'text-gray-500'
                             }`}
                         >
                           {step.label}
                         </div>
-                        <div className={`text-xs transition-colors duration-300 ${isActive ? 'text-blue-600' : 'text-slate-400'}`}>{step.description}</div>
+                        <div className={`text-xs transition-colors duration-300 ${isActive ? 'text-[#0170B4]/80' : 'text-gray-400'}`}>{step.description}</div>
                       </div>
                     </div>
                   )
@@ -1252,6 +1480,43 @@ export default function AjouterPatient() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <input
+        type="file"
+        ref={fileInputRef}
+        className="hidden"
+        accept="image/*"
+        onChange={handleFileChange}
+      />
+      {/* Dialog: Preview 3D */}
+      <Dialog open={!!previewFile} onOpenChange={(open) => !open && setPreviewFile(null)}>
+        <DialogContent className="w-[min(90vw,90vh)] h-[min(90vw,90vh)] !max-w-none flex flex-col p-0 overflow-hidden bg-slate-50">
+          <DialogHeader className="p-4 bg-white border-b shrink-0">
+            <DialogTitle>{previewFile?.title}</DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 min-h-0 relative bg-slate-100">
+            {previewFile && (
+              <>
+                {previewFile.file instanceof File && (previewFile.file.type.startsWith('image/') || previewFile.file.name.match(/\.(jpg|jpeg|png|gif|webp)$/i)) ? (
+                  <div className="w-full h-full flex items-center justify-center p-4">
+                    <img
+                      src={URL.createObjectURL(previewFile.file)}
+                      alt={previewFile.title}
+                      className="max-w-full max-h-full object-contain"
+                    />
+                  </div>
+                ) : (
+                  <ScanViewer
+                    file={previewFile.file}
+                    className="w-full h-full"
+                    autoRotate={false}
+                  />
+                )}
+              </>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { onAuthStateChanged } from 'firebase/auth'
 import { auth, db } from '@/firebase/firebase'
 import { collection, query, where, getDocs } from 'firebase/firestore'
@@ -45,6 +45,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const { t } = useTranslation()
 
   const router = useRouter()
+  const pathname = usePathname()
+  const isNewPatientPage = pathname === '/patients/new'
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -90,33 +92,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <div className="flex min-h-screen w-full">
         <DashboardSidebar userRole={userRole || undefined} />
 
-        <SidebarInset className="flex-1 bg-gray-50">
-          <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-2">
-            {/* <SidebarTrigger className="hover:bg-accent/60 transition-colors duration-200 rounded-md" /> */}
-            <div className="ml-auto flex items-center gap-2">
-              <Select
-                value={language}
-                onValueChange={(val) => setLanguage(val as any)}
-              >
-                <SelectTrigger className="w-[70px]">
-                  <SelectValue placeholder={t('common.language')} />
-                </SelectTrigger>
-
-                <SelectContent className="bg-white w-[70px]">
-                  {/* TODO voir le width */}
-                  {languageOptions.map((option) => (
-                    <SelectItem key={option.value} value={option.value} textValue={option.label}>
-                      <div className="flex items-center gap-2">
-                        <Image src={option.logo} alt={option.label} width={16} height={16} />
-                        {option.label}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </header>
-          <main className="flex-1 px-6 py-10 min-h-screen bg-gray-50">{children}</main>
+        <SidebarInset className="flex-1 bg-gray-50 relative">
+          <main className="flex-1 min-h-screen bg-gray-50">{children}</main>
         </SidebarInset>
       </div>
     </SidebarProvider>

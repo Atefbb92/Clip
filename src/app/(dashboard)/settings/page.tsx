@@ -152,7 +152,7 @@ const SettingsPage: React.FC = () => {
   })
 
   return (
-    <div className="min-h-screen space-y-8">
+    <div className="min-h-screen space-y-8 p-8">
       {/* En-tête */}
       <HeadingTitle
         title={t('settings.title')}

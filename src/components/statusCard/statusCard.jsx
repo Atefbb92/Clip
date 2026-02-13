@@ -212,9 +212,7 @@ const StatusCard = ({ selectedStatus, onStatusSelect }) => {
 
   return (
     <>
-      <div className="
-        flex gap-4 mb-8 px-4 max-w-[1400px] mx-auto overflow-x-auto pb-4 snap-x
-      ">
+      <div className="flex flex-nowrap gap-4 mb-8 px-4 max-w-full overflow-x-auto pb-4 snap-x scrollbar-hide">
         {cards.map((card, index) => (
           <StatCard
             key={index}

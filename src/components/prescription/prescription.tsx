@@ -17,6 +17,13 @@ import DentalChart from "../../components/dental-chart";
 import { Button } from "../../components/ui/button";
 import html2canvas from "html2canvas";
 import "./dental-dialog.css";
+import {
+  DiamondCard,
+  DiamondCardHeader,
+  DiamondCardTitle,
+  DiamondCardContent,
+} from "@/components/ui/diamond-card";
+import { Badge } from "@/components/ui/badge";
 
 interface PrescriptionProps {
   initialSection?: string;
@@ -753,160 +760,169 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
 
       <div className={`${styles.sectionHeader} ${styles.sub}`}>
         <div className={styles.subsectionHeader}>
-          <img src={prescription3} alt="" />
+          <img src={prescription3.src} alt="" />
           <h2>Prescription</h2>
         </div>
         <h2 className={styles.patientType}>Type de patient : {patientDetails.category || 'Non spécifié'}</h2>
       </div>
 
       <div className={styles.scrollableContent}>
-        <div className={styles.prescriptionSection}>
-          <h2>Anamnèse</h2>
-          <div className={styles.dentalChartContainer}>
-            <img
-              className={styles.perimg}
-              src={anamnese}
-              alt="Anamnèse"
-              onClick={() => setShowDentalChart(true)}
-              style={{ cursor: 'pointer' }}
-              title="Cliquez pour ouvrir le tableau dentaire"
-            />
-            {showChartPreview && chartImage && (
-              <div className={styles.chartPreview}>
-                <img
-                  src={chartImage}
-                  alt="Tableau dentaire"
-                  className={styles.previewImage}
-                  onClick={() => setShowDentalChart(true)}
-                />
-              </div>
-            )}
-          </div>
-
-          {/* Modal popup for dental chart */}
-          {showDentalChart && (
-            <div className={styles.modalOverlay}>
-              <div className={styles.modalContainer} id="custom-dental-modal">
-                <button
-                  className={styles.closeButton}
-                  onClick={() => setShowDentalChart(false)}
-                >
-                  ✕
-                </button>
-                <div className={styles.modalHeader}>
-                  <h2 className={styles.modalTitle}>
-                    Tableau dentaire
-                  </h2>
-                  <p className={styles.modalSubtitle}>
-                    Cliquez sur une dent pour afficher les options
-                  </p>
-                </div>
-                <div
-                  className={styles.chartContainer}
-                  ref={chartContainerRef}
-                  id="dental-chart-container"
-                >
-                  <DentalChart
-                    ref={dentalChartRef}
-                    initialStates={savedTeethStates}
-                    onSave={(mods, states) => {
-                      setModifications(mods);
-                      setSavedTeethStates(states);
-                    }}
+        <DiamondCard className="mb-6">
+          <DiamondCardHeader>
+            <DiamondCardTitle>Anamnèse</DiamondCardTitle>
+          </DiamondCardHeader>
+          <DiamondCardContent>
+            <div className={styles.dentalChartContainer}>
+              <img
+                className={styles.perimg}
+                // @ts-ignore
+                src={anamnese}
+                alt="Anamnèse"
+                onClick={() => setShowDentalChart(true)}
+                style={{ cursor: 'pointer' }}
+                title="Cliquez pour ouvrir le tableau dentaire"
+              />
+              {showChartPreview && chartImage && (
+                <div className={styles.chartPreview}>
+                  <img
+                    src={chartImage}
+                    alt="Tableau dentaire"
+                    className={styles.previewImage}
+                    onClick={() => setShowDentalChart(true)}
                   />
                 </div>
-                <div className={styles.modalFooter}>
-                  <div className={styles.footerContent}>
-                    <div className={styles.footerButtons}>
-                      <Button
-                        onClick={async () => {
-                          // Appeler la fonction handleSave à travers la référence
-                          if (
-                            dentalChartRef.current &&
-                            dentalChartRef.current.handleSave
-                          ) {
-                            dentalChartRef.current.handleSave();
+              )}
+            </div>
+          </DiamondCardContent>
+        </DiamondCard>
+
+        {/* Modal popup for dental chart */}
+        {showDentalChart && (
+          <div className={styles.modalOverlay}>
+            <div className={styles.modalContainer} id="custom-dental-modal">
+              <button
+                className={styles.closeButton}
+                onClick={() => setShowDentalChart(false)}
+              >
+                ✕
+              </button>
+              <div className={styles.modalHeader}>
+                <h2 className={styles.modalTitle}>
+                  Tableau dentaire
+                </h2>
+                <p className={styles.modalSubtitle}>
+                  Cliquez sur une dent pour afficher les options
+                </p>
+              </div>
+              <div
+                className={styles.chartContainer}
+                ref={chartContainerRef}
+                id="dental-chart-container"
+              >
+                <DentalChart
+                  ref={dentalChartRef}
+                  initialStates={savedTeethStates}
+                  onSave={(mods, states) => {
+                    setModifications(mods);
+                    setSavedTeethStates(states);
+                  }}
+                />
+              </div>
+              <div className={styles.modalFooter}>
+                <div className={styles.footerContent}>
+                  <div className={styles.footerButtons}>
+                    <Button
+                      onClick={async () => {
+                        // Appeler la fonction handleSave à travers la référence
+                        if (
+                          dentalChartRef.current &&
+                          dentalChartRef.current.handleSave
+                        ) {
+                          dentalChartRef.current.handleSave();
+                        }
+
+                        // Capturer le tableau dentaire en image avant de fermer le dialogue
+                        try {
+                          const dentalChartElement = document.getElementById('dental-chart-container');
+                          if (dentalChartElement) {
+                            /*console.log("Génération de la capture d'écran...");*/
+                            // Créer une copie de l'élément pour la capture et 
+                            // remplacer les couleurs oklch par des couleurs RGB
+                            const clonedElement = dentalChartElement.cloneNode(true) as HTMLElement;
+                            document.body.appendChild(clonedElement);
+                            clonedElement.style.position = 'absolute';
+                            clonedElement.style.left = '-9999px';
+                            clonedElement.style.backgroundColor = '#ffffff';
+
+                            // Convertir toutes les couleurs oklch en RGB
+                            const oklchElements = clonedElement.querySelectorAll('[style*="oklch"]');
+                            oklchElements.forEach((el) => {
+                              // Remplacer les couleurs oklch par des couleurs standard
+                              const element = el as HTMLElement;
+                              element.style.backgroundColor = '#3B82F6'; // blue-500
+                              element.style.color = '#1E3A8A'; // blue-900
+                            });
+
+                            // Remplacer les classes de couleur Tailwind
+                            const blueElements = clonedElement.querySelectorAll('[class*="blue-"]');
+                            blueElements.forEach((el) => {
+                              const element = el as HTMLElement;
+                              element.style.backgroundColor = '#EFF6FF'; // blue-50
+                              element.style.color = '#1E3A8A'; // blue-900
+                            });
+
+                            const canvas = await html2canvas(clonedElement, {
+                              backgroundColor: '#ffffff',
+                              scale: 2, // Pour une meilleure qualité
+                              logging: true,
+                              useCORS: true,
+                              allowTaint: true,
+                              onclone: (doc, element) => {
+                                // Fonction supplémentaire pour traiter le clone
+                                /*console.log("Document cloné pour capture");*/
+                              }
+                            });
+
+                            // Nettoyer l'élément cloné
+                            document.body.removeChild(clonedElement);
+
+                            // Convertir en URL de données PNG
+                            const dataUrl = canvas.toDataURL('image/png');
+                            setChartImage(dataUrl);
+                            /*console.log("Capture d'écran générée avec succès!");*/
+
+                            // Télécharger automatiquement l'image
+                            const link = document.createElement('a');
+                            link.download = `tableau-dentaire-${new Date().toISOString().split('T')[0]}.png`;
+                            link.href = dataUrl;
+                            link.click();
                           }
+                        } catch (error) {
+                          console.error("Erreur lors de la capture d'écran:", error);
+                        }
 
-                          // Capturer le tableau dentaire en image avant de fermer le dialogue
-                          try {
-                            const dentalChartElement = document.getElementById('dental-chart-container');
-                            if (dentalChartElement) {
-                              /*console.log("Génération de la capture d'écran...");*/
-                              // Créer une copie de l'élément pour la capture et 
-                              // remplacer les couleurs oklch par des couleurs RGB
-                              const clonedElement = dentalChartElement.cloneNode(true) as HTMLElement;
-                              document.body.appendChild(clonedElement);
-                              clonedElement.style.position = 'absolute';
-                              clonedElement.style.left = '-9999px';
-                              clonedElement.style.backgroundColor = '#ffffff';
-
-                              // Convertir toutes les couleurs oklch en RGB
-                              const oklchElements = clonedElement.querySelectorAll('[style*="oklch"]');
-                              oklchElements.forEach((el) => {
-                                // Remplacer les couleurs oklch par des couleurs standard
-                                const element = el as HTMLElement;
-                                element.style.backgroundColor = '#3B82F6'; // blue-500
-                                element.style.color = '#1E3A8A'; // blue-900
-                              });
-
-                              // Remplacer les classes de couleur Tailwind
-                              const blueElements = clonedElement.querySelectorAll('[class*="blue-"]');
-                              blueElements.forEach((el) => {
-                                const element = el as HTMLElement;
-                                element.style.backgroundColor = '#EFF6FF'; // blue-50
-                                element.style.color = '#1E3A8A'; // blue-900
-                              });
-
-                              const canvas = await html2canvas(clonedElement, {
-                                backgroundColor: '#ffffff',
-                                scale: 2, // Pour une meilleure qualité
-                                logging: true,
-                                useCORS: true,
-                                allowTaint: true,
-                                onclone: (doc, element) => {
-                                  // Fonction supplémentaire pour traiter le clone
-                                  /*console.log("Document cloné pour capture");*/
-                                }
-                              });
-
-                              // Nettoyer l'élément cloné
-                              document.body.removeChild(clonedElement);
-
-                              // Convertir en URL de données PNG
-                              const dataUrl = canvas.toDataURL('image/png');
-                              setChartImage(dataUrl);
-                              /*console.log("Capture d'écran générée avec succès!");*/
-
-                              // Télécharger automatiquement l'image
-                              const link = document.createElement('a');
-                              link.download = `tableau-dentaire-${new Date().toISOString().split('T')[0]}.png`;
-                              link.href = dataUrl;
-                              link.click();
-                            }
-                          } catch (error) {
-                            console.error("Erreur lors de la capture d'écran:", error);
-                          }
-
-                          // Fermer le dialogue et afficher la grille textuelle
-                          setShowDentalChart(false);
-                          setShowTextualGrid(true);
-                          setShowChartPreview(true);
-                        }}
-                        className={styles.submitButton}
-                        size="lg"
-                      >
-                        Valider les modifications
-                      </Button>
-                    </div>
+                        // Fermer le dialogue et afficher la grille textuelle
+                        setShowDentalChart(false);
+                        setShowTextualGrid(true);
+                        setShowChartPreview(true);
+                      }}
+                      className={styles.submitButton}
+                      size="lg"
+                    >
+                      Valider les modifications
+                    </Button>
                   </div>
                 </div>
               </div>
-            </div>)}
-        </div>
-        <div className={styles.prescriptionForm}>
-          <div id="arcade" className={`${styles.section} ${activeSection === 'arcade' ? styles.active : ''}`}>
-            <h3>1. Arcade(s) à traiter</h3>
+            </div>
+          </div>)}
+      </div>
+      <div className={styles.prescriptionForm}>
+        <DiamondCard id="arcade" className={`mb-6 ${activeSection === 'arcade' ? 'ring-2 ring-blue-500' : ''}`}>
+          <DiamondCardHeader>
+            <DiamondCardTitle>1. Arcade(s) à traiter</DiamondCardTitle>
+          </DiamondCardHeader>
+          <DiamondCardContent>
             <div className={`${styles.radioGroup} ${styles.arcadeRadioGroup}`}>
               <label className={styles.radioOption}>
                 <input
@@ -939,10 +955,14 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
                 <span>Mandibulaire</span>
               </label>
             </div>
-          </div>
+          </DiamondCardContent>
+        </DiamondCard>
 
-          <div id="restrictions" className={`${styles.section} ${activeSection === 'restrictions' ? styles.active : ''}`}>
-            <h3>2. Restrictions des mouvements dentaires (ex. bridges, dents ankylosées, implants, etc.)</h3>
+        <DiamondCard id="restrictions" className={`mb-6 ${activeSection === 'restrictions' ? 'ring-2 ring-blue-500' : ''}`}>
+          <DiamondCardHeader>
+            <DiamondCardTitle>2. Restrictions des mouvements dentaires (ex. bridges, dents ankylosées, implants, etc.)</DiamondCardTitle>
+          </DiamondCardHeader>
+          <DiamondCardContent>
             <div className={styles.radioGroup}>
               <label className={styles.radioOption}>
                 <input
@@ -1017,10 +1037,13 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
                 </div>
               </div>
             </div>
-          </div>
-          <div id="taquets" className={`${styles.section} ${activeSection === 'taquets' ? styles.active : ''}`}>
-            <h3>3. Taquets (Spécifier les taquets, voir les Préférences Cliniques)</h3>
-
+          </DiamondCardContent>
+        </DiamondCard>
+        <DiamondCard id="taquets" className={`mb-6 ${activeSection === 'taquets' ? 'ring-2 ring-blue-500' : ''}`}>
+          <DiamondCardHeader>
+            <DiamondCardTitle>3. Taquets (Spécifier les taquets, voir les Préférences Cliniques)</DiamondCardTitle>
+          </DiamondCardHeader>
+          <DiamondCardContent>
             <div className={styles.radioGroup}>
               <label className={styles.radioOption}>
                 <input
@@ -1107,11 +1130,15 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
                 </div>
               </div>
             </div>
-          </div>
-          {userRole === 'orthodontiste' && (
-            <>
-              <div id="rapportAP" className={`${styles.section} ${activeSection === 'rapportAP' ? styles.active : ''}`}>
-                <h3>4. Rapport antéro-postérieur</h3>
+          </DiamondCardContent>
+        </DiamondCard>
+        {userRole === 'orthodontiste' && (
+          <>
+            <DiamondCard id="rapportAP" className={`mb-6 ${activeSection === 'rapportAP' ? 'ring-2 ring-blue-500' : ''}`}>
+              <DiamondCardHeader>
+                <DiamondCardTitle>4. Rapport antéro-postérieur</DiamondCardTitle>
+              </DiamondCardHeader>
+              <DiamondCardContent>
                 <table className={styles.apTable}>
                   <tr>
                     <th></th>
@@ -1320,24 +1347,15 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
                       />
                       <span>Avancée mandibulaire (AM) (L'utilisation de préférences cliniques sera limitée pendant les étapes d'AM)</span>
                     </label>
-
-
-                    {/* <label className={styles.radioOption}>
-                  <input 
-                    type="radio"       
-                    name="rapportAP_options"
-                    value="chirurgie"
-                    checked={formState.rapportAP.options === 'chirurgie'}
-                    onChange={() => handleRapportAPRadioChange('chirurgie')}
-                  />
-                  <span>Simulation de Chirurgie Orthognathique</span>
-                </label>
-                <p>Spécifier les extractions pour la correction A-P dans la grille des extractions, sous Espacement et Encombrement.</p> */}
                   </div>
                 </div>
-              </div>
-              <div id="overjet" className={`${styles.section} ${activeSection === 'overjet' ? styles.active : ''}`}>
-                <h3>5. Overjet</h3>
+              </DiamondCardContent>
+            </DiamondCard>
+            <DiamondCard id="overjet" className={`mb-6 ${activeSection === 'overjet' ? 'ring-2 ring-blue-500' : ''}`}>
+              <DiamondCardHeader>
+                <DiamondCardTitle>5. Overjet</DiamondCardTitle>
+              </DiamondCardHeader>
+              <DiamondCardContent>
                 <div className={styles.radioGroup}>
                   <label className={styles.radioOption}>
                     <input
@@ -1367,9 +1385,13 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
                     <span>Améliorer le surplomb créé par IPR</span>
                   </label>
                 </div>
-              </div>
-              <div id="overbite" className={`${styles.section} ${activeSection === 'overbite' ? styles.active : ''}`}>
-                <h3>6. Overbite</h3>
+              </DiamondCardContent>
+            </DiamondCard>
+            <DiamondCard id="overbite" className={`mb-6 ${activeSection === 'overbite' ? 'ring-2 ring-blue-500' : ''}`}>
+              <DiamondCardHeader>
+                <DiamondCardTitle>6. Overbite</DiamondCardTitle>
+              </DiamondCardHeader>
+              <DiamondCardContent>
                 <div className={styles.radioGroup}>
                   <label className={styles.radioOption}>
                     <input
@@ -1468,87 +1490,92 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
                       </label>
                     </div>
                   </div>
-                </div>
-                <label className={styles.radioOption}>
-                  <input
-                    type="radio"
-                    name="Overbite"
-                    value="corriger_supraclusion"
-                    checked={formState.overbite === 'corriger_supraclusion'}
-                    onChange={(e) => handleRadioChange('overbite', e.target.value)}
-                  />
-                  <span>Corriger la supraclusion</span>
-                </label>
-                <div className={styles.subOptions}>
-                  <label className={styles.checkboxOption}>
-                    <input
-                      type="checkbox"
-                      name="maxillaireSupraclusion"
-                      checked={formState.maxillaireSupraclusion?.selected}
-                      onChange={() => handleCheckboxChange('maxillaireSupraclusion', 'selected')}
-                      disabled={formState.overbite !== 'corriger_supraclusion'}
-                    />
-                    <span>Maxillaire</span>
-                  </label>
-                  <div className={styles.nestedOptions}>
-                    <label className={styles.checkboxOption}>
-                      <input
-                        type="checkbox"
-                        name="egressionAnterieureSupraclusion"
-                        checked={formState.maxillaireSupraclusion?.egressionAnterieure}
-                        onChange={() => handleNestedCheckboxChange('maxillaireSupraclusion', 'egressionAnterieure')}
-                        disabled={!formState.maxillaireSupraclusion?.selected || formState.overbite !== 'corriger_supraclusion'}
-                      />
-                      <span>Égression des dents antérieures</span>
-                    </label>
-                    <label className={styles.checkboxOption}>
-                      <input
-                        type="checkbox"
-                        name="ingressionPosterieureSupraclusion"
-                        checked={formState.maxillaireSupraclusion?.ingressionPosterieure}
-                        onChange={() => handleNestedCheckboxChange('maxillaireSupraclusion', 'ingressionPosterieure')}
-                        disabled={!formState.maxillaireSupraclusion?.selected || formState.overbite !== 'corriger_supraclusion'}
-                      />
-                      <span>Ingression des dents postérieures</span>
-                    </label>
-                  </div>
 
-                  <label className={styles.checkboxOption}>
+                  <label className={styles.radioOption}>
                     <input
-                      type="checkbox"
-                      name="mandibulaireSupraclusion"
-                      checked={formState.mandibulaireSupraclusion?.selected}
-                      onChange={() => handleCheckboxChange('mandibulaireSupraclusion', 'selected')}
-                      disabled={formState.overbite !== 'corriger_supraclusion'}
+                      type="radio"
+                      name="Overbite"
+                      value="corriger_supraclusion"
+                      checked={formState.overbite === 'corriger_supraclusion'}
+                      onChange={(e) => handleRadioChange('overbite', e.target.value)}
                     />
-                    <span>Mandibulaire</span>
+                    <span>Corriger la supraclusion</span>
                   </label>
-                  <div className={styles.nestedOptions}>
+                  <div className={styles.subOptions}>
                     <label className={styles.checkboxOption}>
                       <input
                         type="checkbox"
-                        name="egressionAnterieureSupraclusion"
-                        checked={formState.mandibulaireSupraclusion?.egressionAnterieure}
-                        onChange={() => handleNestedCheckboxChange('mandibulaireSupraclusion', 'egressionAnterieure')}
-                        disabled={!formState.mandibulaireSupraclusion?.selected || formState.overbite !== 'corriger_supraclusion'}
+                        name="maxillaireSupraclusion"
+                        checked={formState.maxillaireSupraclusion?.selected}
+                        onChange={() => handleCheckboxChange('maxillaireSupraclusion', 'selected')}
+                        disabled={formState.overbite !== 'corriger_supraclusion'}
                       />
-                      <span>Égression des dents antérieures</span>
+                      <span>Maxillaire</span>
                     </label>
+                    <div className={styles.nestedOptions}>
+                      <label className={styles.checkboxOption}>
+                        <input
+                          type="checkbox"
+                          name="egressionAnterieureSupraclusion"
+                          checked={formState.maxillaireSupraclusion?.egressionAnterieure}
+                          onChange={() => handleNestedCheckboxChange('maxillaireSupraclusion', 'egressionAnterieure')}
+                          disabled={!formState.maxillaireSupraclusion?.selected || formState.overbite !== 'corriger_supraclusion'}
+                        />
+                        <span>Égression des dents antérieures</span>
+                      </label>
+                      <label className={styles.checkboxOption}>
+                        <input
+                          type="checkbox"
+                          name="ingressionPosterieureSupraclusion"
+                          checked={formState.maxillaireSupraclusion?.ingressionPosterieure}
+                          onChange={() => handleNestedCheckboxChange('maxillaireSupraclusion', 'ingressionPosterieure')}
+                          disabled={!formState.maxillaireSupraclusion?.selected || formState.overbite !== 'corriger_supraclusion'}
+                        />
+                        <span>Ingression des dents postérieures</span>
+                      </label>
+                    </div>
+
                     <label className={styles.checkboxOption}>
                       <input
                         type="checkbox"
-                        name="ingressionPosterieureSupraclusion"
-                        checked={formState.mandibulaireSupraclusion?.ingressionPosterieure}
-                        onChange={() => handleNestedCheckboxChange('mandibulaireSupraclusion', 'ingressionPosterieure')}
-                        disabled={!formState.mandibulaireSupraclusion?.selected || formState.overbite !== 'corriger_supraclusion'}
+                        name="mandibulaireSupraclusion"
+                        checked={formState.mandibulaireSupraclusion?.selected}
+                        onChange={() => handleCheckboxChange('mandibulaireSupraclusion', 'selected')}
+                        disabled={formState.overbite !== 'corriger_supraclusion'}
                       />
-                      <span>Ingression des dents postérieures</span>
+                      <span>Mandibulaire</span>
                     </label>
+                    <div className={styles.nestedOptions}>
+                      <label className={styles.checkboxOption}>
+                        <input
+                          type="checkbox"
+                          name="egressionAnterieureSupraclusion"
+                          checked={formState.mandibulaireSupraclusion?.egressionAnterieure}
+                          onChange={() => handleNestedCheckboxChange('mandibulaireSupraclusion', 'egressionAnterieure')}
+                          disabled={!formState.mandibulaireSupraclusion?.selected || formState.overbite !== 'corriger_supraclusion'}
+                        />
+                        <span>Égression des dents antérieures</span>
+                      </label>
+                      <label className={styles.checkboxOption}>
+                        <input
+                          type="checkbox"
+                          name="ingressionPosterieureSupraclusion"
+                          checked={formState.mandibulaireSupraclusion?.ingressionPosterieure}
+                          onChange={() => handleNestedCheckboxChange('mandibulaireSupraclusion', 'ingressionPosterieure')}
+                          disabled={!formState.mandibulaireSupraclusion?.selected || formState.overbite !== 'corriger_supraclusion'}
+                        />
+                        <span>Ingression des dents postérieures</span>
+                      </label>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div id="biteRamps" className={`${styles.section} ${activeSection === 'biteRamps' ? styles.active : ''}`}>
-                <h3>7. Bite ramps</h3>
+              </DiamondCardContent>
+            </DiamondCard>
+            <DiamondCard id="biteRamps" className={`mb-6 ${activeSection === 'biteRamps' ? 'ring-2 ring-blue-500' : ''}`}>
+              <DiamondCardHeader>
+                <DiamondCardTitle>7. Bite ramps</DiamondCardTitle>
+              </DiamondCardHeader>
+              <DiamondCardContent>
                 <div className={styles.radioGroup}>
                   <label className={styles.radioOption}>
                     <input
@@ -1627,11 +1654,16 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
                   <p>Remarque : dans certains cas, le positionnement des rampes d'occlusion peut s'avérer impossible en raison
                     d'un surplomb excessif.</p>
                 </div>
-              </div>
-            </>
-          )}
-          <div id="milieux" className={`${styles.section} ${activeSection === 'milieux' ? styles.active : ''}`}>
-            <h3>{userRole === 'orthodontiste' ? '8.' : '4.'} Milieux inter-incisifs</h3>
+              </DiamondCardContent>
+            </DiamondCard>
+          </>
+        )}
+
+        <DiamondCard id="milieux" className={`mb-6 ${activeSection === 'milieux' ? 'ring-2 ring-blue-500' : ''}`}>
+          <DiamondCardHeader>
+            <DiamondCardTitle>{userRole === 'orthodontiste' ? '8.' : '4.'} Milieux inter-incisifs</DiamondCardTitle>
+          </DiamondCardHeader>
+          <DiamondCardContent>
             <div className={`${styles.radioGroup} ${styles.milieuxRadioGroup}`}>
               <label className={styles.radioOption}>
                 <input
@@ -1736,10 +1768,14 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
                 </label>
               </div>
             </div>
-          </div>
-          {userRole === 'orthodontiste' && (
-            <div id="extractions" className={`${styles.section} ${activeSection === 'extractions' ? styles.active : ''}`}>
-              <h3>9. Articulé croisé postérieur (si présent)</h3>
+          </DiamondCardContent>
+        </DiamondCard>
+        {userRole === 'orthodontiste' && (
+          <DiamondCard id="extractions" className={`mb-6 ${activeSection === 'extractions' ? 'ring-2 ring-blue-500' : ''}`}>
+            <DiamondCardHeader>
+              <DiamondCardTitle>9. Articulé croisé postérieur (si présent)</DiamondCardTitle>
+            </DiamondCardHeader>
+            <DiamondCardContent>
               <div className={styles.radioGroup}>
                 <label className={styles.radioOption}>
                   <input type="radio" name="Articule" value="none"
@@ -1757,10 +1793,14 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
                   <span>Corriger</span>
                 </label>
               </div>
-            </div>
-          )}
-          <div id="Espacement" className={`${styles.section} ${activeSection === 'specialInstructions' ? styles.active : ''}`}>
-            <h3>{userRole === 'orthodontiste' ? '10.' : '5.'}Espacement et Encombrement (DDM)</h3>
+            </DiamondCardContent>
+          </DiamondCard>
+        )}
+        <DiamondCard id="Espacement" className={`mb-6 ${activeSection === 'specialInstructions' ? 'ring-2 ring-blue-500' : ''}`}>
+          <DiamondCardHeader>
+            <DiamondCardTitle>{userRole === 'orthodontiste' ? '10.' : '5.'}Espacement et Encombrement (DDM)</DiamondCardTitle>
+          </DiamondCardHeader>
+          <DiamondCardContent>
             <div className={styles.resolutionIndented}>
               <h3>Espacement</h3>
               <div className={styles.radioGroup} style={{ marginBottom: '20px' }}>
@@ -2205,7 +2245,7 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
                   </tr>
                 </table>
               </div>
-              {userRole === 'orthodontiste' && (<>
+              {userRole === 'orthodontiste' && (<div>
                 <h3>Extractions</h3>
                 <div className={styles.radioGroup}>
                   <label className={styles.radioOption}>
@@ -2273,23 +2313,40 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
                 <p>
                   Pour les auxiliaires (par exemple, Power Arm), spécifier dans les Instructions Spéciales.
                 </p>
-              </>
+              </div>
               )}
             </div>
-          </div>
-          <div id="specialInstructions" className={`${styles.section} ${activeSection === 'specialInstructions' ? styles.active : ''}`}>
-            <h3>{userRole === 'orthodontiste' ? '11.' : '6.'} Instructions Spéciales</h3>
-            <textarea
-              name="instructions"
-              className={styles.instructions}
-              value={formState.specialInstructions}
-              onChange={(e) => handleSpecialInstructionsChange(e.target.value)}
-
-            ></textarea>
-          </div>
-        </div>
+          </DiamondCardContent>
+        </DiamondCard>
+        <DiamondCard id="specialInstructions" className={`mb-6 ${activeSection === 'specialInstructions' ? 'ring-2 ring-blue-500' : ''}`}>
+          <DiamondCardHeader>
+            <DiamondCardTitle>{userRole === 'orthodontiste' ? '11.' : '6.'} Instructions Spéciales</DiamondCardTitle>
+          </DiamondCardHeader>
+          <DiamondCardContent>
+            <div className="space-y-4">
+              <textarea
+                name="instructions"
+                className={`${styles.instructions} w-full min-h-[150px] p-3 border rounded-md`}
+                value={formState.specialInstructions}
+                onChange={(e) => handleSpecialInstructionsChange(e.target.value)}
+                placeholder="Ajoutez vos instructions spéciales ici..."
+              />
+              <div className="flex justify-end">
+                <Button
+                  className="bg-[#0170B4] hover:bg-[#005f99] text-white"
+                  onClick={() => console.log('Instructions saved:', formState.specialInstructions)}
+                >
+                  Enregistrer
+                </Button>
+              </div>
+            </div>
+          </DiamondCardContent>
+        </DiamondCard>
       </div>
+
     </div>
+
+
   )
 })
 

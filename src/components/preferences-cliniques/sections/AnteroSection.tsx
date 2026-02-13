@@ -52,7 +52,7 @@ export default function AnteroSection({ activeTab, setActiveTab }: AnteroSection
               <div className="relative">
                 <button
                   onClick={() => setObjectifAdulteDropdownOpen(!objectifAdulteDropdownOpen)}
-                  className="w-auto min-w-[280px] px-4 py-3 bg-gray-50 rounded text-left flex justify-between items-center hover:bg-gray-100 transition border border-[#0B9FD7]"
+                  className="w-auto min-w-[280px] px-4 py-3 bg-gray-50 rounded text-left flex justify-between items-center hover:bg-gray-100 transition border border-[#0072B8]"
                 >
                   <span className="text-sm">{objectifAdulte}</span>
                   <ChevronDown className="w-5 h-5 ml-2" />
@@ -127,7 +127,7 @@ export default function AnteroSection({ activeTab, setActiveTab }: AnteroSection
               <div className="relative">
                 <button
                   onClick={() => setObjectifAdoDropdownOpen(!objectifAdoDropdownOpen)}
-                  className="w-auto min-w-[280px] px-4 py-3 bg-gray-50 rounded text-left flex justify-between items-center hover:bg-gray-100 transition border border-[#0B9FD7]"
+                  className="w-auto min-w-[280px] px-4 py-3 bg-gray-50 rounded text-left flex justify-between items-center hover:bg-gray-100 transition border border-[#0072B8]"
                 >
                   <span className="text-sm">{objectifAdo}</span>
                   <ChevronDown className="w-5 h-5 ml-2" />
@@ -211,7 +211,7 @@ export default function AnteroSection({ activeTab, setActiveTab }: AnteroSection
               <div className="relative">
                 <button
                   onClick={() => setObjectifAdulteDropdownOpen(!objectifAdulteDropdownOpen)}
-                  className="w-auto min-w-[280px] px-4 py-3 bg-gray-50 rounded text-left flex justify-between items-center hover:bg-gray-100 transition border border-[#0B9FD7]"
+                  className="w-auto min-w-[280px] px-4 py-3 bg-gray-50 rounded text-left flex justify-between items-center hover:bg-gray-100 transition border border-[#0072B8]"
                 >
                   <span className="text-sm">{objectifAdulte}</span>
                   <ChevronDown className="w-5 h-5 ml-2" />
@@ -288,7 +288,7 @@ export default function AnteroSection({ activeTab, setActiveTab }: AnteroSection
               <div className="relative">
                 <button
                   onClick={() => setObjectifAdoDropdownOpen(!objectifAdoDropdownOpen)}
-                  className="w-auto min-w-[280px] px-4 py-3 bg-gray-50 rounded text-left flex justify-between items-center hover:bg-gray-100 transition border border-[#0B9FD7]"
+                  className="w-auto min-w-[280px] px-4 py-3 bg-gray-50 rounded text-left flex justify-between items-center hover:bg-gray-100 transition border border-[#0072B8]"
                 >
                   <span className="text-sm">{objectifAdo}</span>
                   <ChevronDown className="w-5 h-5 ml-2" />

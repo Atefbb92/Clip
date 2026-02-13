@@ -11,6 +11,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { HeadingTitle } from '@/components/HeadingTitle'
+import { useTranslation } from '@/hooks/useTranslation'
 import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
 import {
@@ -151,6 +152,7 @@ const myLearning = {
 }
 
 export default function AcademyPage() {
+    const { t } = useTranslation()
     const [activeTab, setActiveTab] = useState('tutorials')
     const [searchTerm, setSearchTerm] = useState('')
     const [showMyLearning, setShowMyLearning] = useState(false)
@@ -163,13 +165,12 @@ export default function AcademyPage() {
     )
 
     return (
-        <div className="min-h-screen space-y-8 animate-in fade-in duration-500">
+        <div className="min-h-screen space-y-8 animate-in fade-in duration-500 p-8">
 
             {/* 1. Header Section */}
             <HeadingTitle
-                title="Diamond Academy"
-                subtitle={showMyLearning ? "Suivez votre progression et vos accomplissements" : "Votre centre d'excellence et de formation continue"}
-                titleClassName="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-900 to-blue-600"
+                title={t('academy.title')}
+                subtitle={showMyLearning ? t('academy.my_learning_subtitle') : t('academy.subtitle')}
             >
                 <div className="flex gap-3">
                     <Button

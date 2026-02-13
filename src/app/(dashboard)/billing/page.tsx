@@ -13,6 +13,7 @@ import {
   Clock,
   AlertCircle,
   TrendingUp,
+  X,
 } from 'lucide-react'
 import {
   DropdownMenu,
@@ -373,30 +374,25 @@ export default function BillingPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 w-8 p-0 text-gray-400 hover:text-blue-600"
-                            >
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-48 bg-white shadow-xl border border-gray-200">
-                            <DropdownMenuItem
-                              className="cursor-pointer"
-                              onClick={() => setSelectedBill(bill)}
-                            >
-                              <Eye className="w-4 h-4 mr-2" />
-                              {t('billing.actions.details')}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem className="cursor-pointer">
-                              <Download className="w-4 h-4 mr-2" />
-                              {t('billing.actions.download')}
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 text-[#0072B8] hover:text-[#00619c] hover:bg-blue-50"
+                            onClick={() => setSelectedBill(bill)}
+                            title={t('billing.actions.details')}
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-8 w-8 p-0 text-[#0072B8] hover:text-[#00619c] hover:bg-blue-50"
+                            title={t('billing.actions.download')}
+                          >
+                            <Download className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   )
@@ -431,81 +427,110 @@ export default function BillingPage() {
 
       {/* Invoice Details Popup */}
       <Dialog open={!!selectedBill} onOpenChange={(open) => !open && setSelectedBill(null)}>
-        <DialogContent className="max-w-2xl bg-white p-0 overflow-hidden border-none rounded-xl">
-          <DialogHeader className="bg-slate-900 text-white p-6">
-            <div className="flex justify-between items-center">
-              <DialogTitle className="text-xl font-bold">{t('billing.popup.title')}</DialogTitle>
-              <Badge className="bg-blue-600 text-white border-none">
+        <DialogContent className="max-w-2xl bg-white p-0 gap-0 overflow-hidden border-2 border-slate-200 rounded-none shadow-2xl [&>button]:hidden">
+          <DialogHeader className="bg-[#0072B8] text-white p-6 shrink-0 rounded-none relative">
+            <div className="flex justify-between items-center pr-8">
+              <DialogTitle className="text-lg font-bold tracking-tight uppercase">{t('billing.popup.title')}</DialogTitle>
+              <Badge className="bg-white/20 text-white hover:bg-white/30 border-none px-3 py-1 text-[10px] font-bold tracking-widest uppercase backdrop-blur-sm">
                 {selectedBill && getStatusBadge(selectedBill.status)}
               </Badge>
             </div>
+            <p className="text-blue-100 mt-1 text-xs opacity-80">{t('billing.subtitle')}</p>
+            <button
+              onClick={() => setSelectedBill(null)}
+              className="absolute right-4 top-4 p-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white transition-all duration-200 group"
+              aria-label="Close"
+            >
+              <X className="h-4 w-4 transform group-hover:rotate-90 transition-transform duration-200" />
+            </button>
           </DialogHeader>
 
           {selectedBill && (
-            <div className="p-8 space-y-8">
+            <div className="p-8 space-y-8 overflow-y-auto max-h-[85vh]">
               {/* Header Info */}
-              <div className="flex justify-between items-start border-b border-gray-100 pb-6">
-                <div className="space-y-1">
-                  <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">{t('billing.popup.patient_info')}</p>
-                  <h3 className="text-2xl font-bold text-slate-900">{selectedBill.patientName}</h3>
-                  <p className="text-sm text-gray-500">{t('billing.popup.invoice_num')}{selectedBill.id.toString().padStart(5, '0')}</p>
+              <div className="flex flex-col sm:flex-row justify-between items-start gap-6 pb-8 border-b border-slate-100">
+                <div className="space-y-3">
+                  <div className="space-y-1">
+                    <p className="text-[10px] text-[#0072B8] uppercase font-black tracking-[0.2em]">{t('billing.popup.patient_info')}</p>
+                    <h3 className="text-3xl font-black text-slate-900 leading-tight">{selectedBill.patientName}</h3>
+                  </div>
+                  <div className="flex items-center gap-2 text-slate-400 bg-slate-50 px-3 py-1.5 rounded-sm inline-flex">
+                    <FileText className="w-3.5 h-3.5" />
+                    <p className="text-xs font-bold uppercase tracking-wider">Facture #{selectedBill.id.toString().padStart(5, '0')}</p>
+                  </div>
                 </div>
-                <div className="text-right space-y-1">
-                  <p className="text-xs text-gray-500 uppercase font-bold tracking-wider">{t('billing.popup.submission_date')}</p>
-                  <p className="text-sm font-medium text-slate-900">{formatDate(selectedBill.submitDate)}</p>
-                  <p className="text-xs text-gray-500 mt-2 uppercase font-bold tracking-wider">{t('billing.popup.due_date')}</p>
-                  <p className="text-sm font-medium text-slate-900">{formatDate(selectedBill.validationDate)}</p>
+                <div className="grid grid-cols-1 sm:grid-cols-1 gap-4 text-left sm:text-right">
+                  <div>
+                    <p className="text-[10px] text-slate-400 uppercase font-black tracking-[0.2em] mb-1">{t('billing.popup.submission_date')}</p>
+                    <p className="text-sm font-bold text-slate-800">
+                      {formatDate(selectedBill.submitDate)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-slate-400 uppercase font-black tracking-[0.2em] mb-1">{t('billing.popup.due_date')}</p>
+                    <p className="text-sm font-bold text-slate-800">
+                      {formatDate(selectedBill.validationDate)}
+                    </p>
+                  </div>
                 </div>
               </div>
 
               {/* Summary Table */}
-              <div className="space-y-4">
-                <div className="bg-gray-50 rounded-lg p-4 grid grid-cols-2 gap-4">
-                  <div className="space-y-4">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">{t('billing.popup.amount_ht')}</span>
-                      <span className="font-medium">{formatCurrency(selectedBill.priceHT)}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">{t('billing.popup.discount')} ({selectedBill.remise}%)</span>
-                      <span className="text-red-600">-{formatCurrency((selectedBill.priceHT * selectedBill.remise) / 100)}</span>
-                    </div>
+              <div className="space-y-6">
+                <div className="border border-slate-100 p-0 overflow-hidden">
+                  <div className="bg-slate-50 px-6 py-3 border-b border-slate-100 flex items-center gap-2">
+                    <div className="w-1 h-3 bg-[#0072B8]"></div>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">Détails de la facturation</span>
                   </div>
-                  <div className="space-y-4">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-500">{t('billing.popup.tva')} ({selectedBill.tva}%)</span>
-                      <span className="font-medium">{formatCurrency((calculatePriceAfterRemise(selectedBill.priceHT, selectedBill.remise) * selectedBill.tva) / 100)}</span>
+                  <div className="p-6 space-y-4">
+                    <div className="flex justify-between items-center gap-4">
+                      <span className="text-sm text-slate-500">{t('billing.popup.amount_ht')}</span>
+                      <span className="text-sm font-bold text-slate-900">{formatCurrency(selectedBill.priceHT)}</span>
                     </div>
-                    <div className="flex justify-between text-sm pt-2 border-t border-gray-200">
-                      <span className="font-bold text-slate-900">{t('billing.popup.total_ttc')}</span>
-                      <span className="font-bold text-blue-600">{formatCurrency(calculatePrixTTC(selectedBill.priceHT, selectedBill.remise, selectedBill.tva))}</span>
+                    <div className="flex justify-between items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-slate-500">{t('billing.popup.discount')}</span>
+                        <span className="text-[10px] bg-red-50 text-red-600 px-2 py-0.5 font-bold">-{selectedBill.remise}%</span>
+                      </div>
+                      <span className="text-sm font-bold text-red-600">-{formatCurrency((selectedBill.priceHT * selectedBill.remise) / 100)}</span>
+                    </div>
+                    <div className="flex justify-between items-center gap-4">
+                      <span className="text-sm text-slate-500">{t('billing.popup.tva')} ({selectedBill.tva}%)</span>
+                      <span className="text-sm font-bold text-slate-900">{formatCurrency((calculatePriceAfterRemise(selectedBill.priceHT, selectedBill.remise) * selectedBill.tva) / 100)}</span>
+                    </div>
+                    <div className="pt-4 border-t-2 border-slate-100 flex justify-between items-center">
+                      <span className="text-sm font-black text-slate-900 uppercase tracking-tighter">{t('billing.popup.total_ttc')}</span>
+                      <span className="text-2xl font-black text-[#0072B8]">{formatCurrency(calculatePrixTTC(selectedBill.priceHT, selectedBill.remise, selectedBill.tva))}</span>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Payment Info */}
-              <div className="bg-slate-900 rounded-xl p-6 text-white flex justify-between items-center shadow-lg">
-                <div>
-                  <p className="text-blue-300 text-xs font-bold uppercase tracking-wider mb-1">{t('billing.popup.already_paid')}</p>
-                  <p className="text-2xl font-bold">{formatCurrency(selectedBill.paid)}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-red-300 text-xs font-bold uppercase tracking-wider mb-1">{t('billing.popup.remaining')}</p>
-                  <p className="text-2xl font-bold text-red-400">
-                    {formatCurrency(calculateRemaining(selectedBill.priceHT, selectedBill.remise, selectedBill.tva, selectedBill.paid))}
-                  </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-[#00B6AE] p-6 shadow-lg">
+                    <p className="text-white/80 text-[10px] font-black uppercase tracking-[0.2em] mb-2">{t('billing.popup.already_paid')}</p>
+                    <div className="flex items-center justify-between">
+                      <p className="text-2xl font-black text-white">{formatCurrency(selectedBill.paid)}</p>
+                      <CheckCircle className="w-5 h-5 text-white/90" />
+                    </div>
+                  </div>
+
+                  <div className="border-2 border-slate-100 p-6">
+                    <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-2">{t('billing.popup.remaining')}</p>
+                    <p className={`text-2xl font-black ${calculateRemaining(selectedBill.priceHT, selectedBill.remise, selectedBill.tva, selectedBill.paid) > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                      {formatCurrency(calculateRemaining(selectedBill.priceHT, selectedBill.remise, selectedBill.tva, selectedBill.paid))}
+                    </p>
+                  </div>
                 </div>
               </div>
 
               {/* Footer Actions */}
-              <div className="flex gap-4 pt-4">
-                <Button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white h-12 gap-2 shadow-lg shadow-blue-100">
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                <Button className="flex-1 bg-[#0072B8] hover:bg-[#00619c] text-white h-12 rounded-none gap-2 font-bold uppercase tracking-widest text-xs transition-colors shadow-none">
                   <Download className="w-4 h-4" /> {t('billing.actions.download_full')}
                 </Button>
                 <Button
                   variant="outline"
-                  className="flex-1 h-12 border-gray-200"
+                  className="flex-1 h-12 rounded-none border-slate-200 hover:bg-slate-50 text-slate-600 font-bold uppercase tracking-widest text-xs shadow-none"
                   onClick={() => setSelectedBill(null)}
                 >
                   {t('billing.actions.close')}

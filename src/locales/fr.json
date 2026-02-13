@@ -70,10 +70,11 @@
     "status": {
         "brouillon": "Brouillon",
         "en-attente": "En attente",
-        "en-planification": "En planification",
+        "planning": "En planification",
         "en-production": "En production",
         "en-traitement": "En traitement",
-        "termine": "Terminé"
+        "termine": "Terminé",
+        "rejete": "Rejeté"
     },
     "statistics": {
         "title": "Statistiques & KPI",
@@ -173,7 +174,11 @@
         "actions": {
             "view": "Voir",
             "edit": "Modifier",
-            "delete": "Supprimer"
+            "delete": "Supprimer",
+            "archive": "Archiver",
+            "unarchive": "Désarchiver",
+            "confirm_archive": "Êtes-vous sûr de vouloir archiver/désarchiver ce patient ?",
+            "confirm_delete": "Êtes-vous sûr de vouloir supprimer ce patient ? Cette action est irréversible."
         },
         "viewer": {
             "title": "Visualiseur de plan de traitement 3D"
@@ -181,9 +186,10 @@
         "detail": {
             "actions": {
                 "back": "Retour",
-                "request_correction": "Demander une correction",
-                "finish": "Terminer le traitement",
-                "order_eterna": "Commander ETERNA®"
+                "request_correction": "Correction",
+                "view_tp_check": "TP Check",
+                "finish": "Terminer",
+                "order_eterna": "ETERNA®"
             },
             "status": {
                 "active": "Actif"
@@ -230,6 +236,17 @@
                 "order_option_error": "Veuillez choisir une option",
                 "trim_line_error": "Veuillez choisir une ligne de coupe",
                 "rhythm_error": "Veuillez choisir un rythme"
+            },
+            "eterna_order": {
+                "title": "Commander ETERNA®",
+                "desc": "Veuillez fournir les scans maxillaire et mandibulaire pour finaliser votre commande.",
+                "upload_scans": "Soumettre les fichiers",
+                "upper_scan": "Maxillaire",
+                "lower_scan": "Mandibulaire",
+                "or": "ou",
+                "use_link": "Utiliser un lien de partage",
+                "scan_link": "Lien des scans",
+                "confirm": "Confirmer la commande"
             },
             "photos": {
                 "initial_photos": "Photos initiales",
@@ -311,7 +328,7 @@
                 "teen_title": "Adolescent",
                 "teen_desc": "Patient de 12 à 17 ans",
                 "selected": "Sélectionné",
-                "choose": "Choisir ce profil",
+                "choose": "Choisir",
                 "pack_title": "Sélectionnez un pack",
                 "steps_per_arch": "Étapes par arcade",
                 "step_count": "{count} étapes",
@@ -323,7 +340,7 @@
                 "choose_pack": "Choisir ce pack",
                 "packs": {
                     "light": {
-                        "name": "Diamond Light",
+                        "name": "Lite",
                         "desc": "Correction légère des alignements",
                         "features": [
                             "Jusqu'à 7 gouttières",
@@ -332,7 +349,7 @@
                         ]
                     },
                     "medium": {
-                        "name": "Diamond Medium",
+                        "name": "Essential",
                         "desc": "Correction modérée des arcades",
                         "features": [
                             "Jusqu'à 12 gouttières",
@@ -341,7 +358,7 @@
                         ]
                     },
                     "full": {
-                        "name": "Diamond Full",
+                        "name": "Smart",
                         "desc": "Traitement complet complexe",
                         "features": [
                             "Jusqu'à 24 gouttières",
@@ -359,7 +376,7 @@
                 "day": "JJ",
                 "month": "MM",
                 "year": "AAAA",
-                "age_display": "Âge: {age} ans",
+                "age_display": "Age: {age} ans",
                 "gender": "Genre",
                 "male": "Homme",
                 "female": "Femme",
@@ -455,6 +472,9 @@
                 "submit_case": "Soumettre le cas",
                 "complete_all": "Complétez toutes les étapes"
             },
+            "form": {
+                "cancel": "Annuler"
+            },
             "dialogs": {
                 "cancel_title": "Annuler la création du patient ?",
                 "cancel_desc": "Toutes les données saisies seront perdues. Cette action ne peut pas être annulée.",
@@ -546,6 +566,32 @@
             "already_paid": "Montant déjà payé",
             "remaining": "Reste à payer"
         }
+    },
+    "gallery": {
+        "title": "Galerie Clinique",
+        "subtitle": "Explorez l'art de l'orthodontie numérique"
+    },
+    "store": {
+        "title": "Diamond Store",
+        "subtitle": "Tout votre matériel et vos consommables au même endroit"
+    },
+    "academy": {
+        "title": "Diamond Academy",
+        "subtitle": "Votre centre d'excellence et de formation continue",
+        "my_learning_subtitle": "Suivez votre progression et vos accomplissements"
+    },
+    "events": {
+        "title": "Événements",
+        "subtitle": "Restez informé des prochains congrès, formations et webinaires Diamond",
+        "propose_event": "Proposer un événement",
+        "hero_badge": "Événement à la une",
+        "learn_more": "En savoir plus",
+        "search_placeholder": "Rechercher un événement, un lieu...",
+        "empty_title": "Aucun événement ne correspond",
+        "empty_subtitle": "Essayez de modifier vos filtres ou votre recherche.",
+        "contact_title": "Un événement à suggérer ?",
+        "contact_subtitle": "Vous organisez un événement ou souhaitez voir un sujet spécifique abordé lors d'une formation ? Contactez notre équipe académique.",
+        "contact_button": "Contacter l'équipe"
     },
     "settings": {
         "title": "Paramètres & Préférences",

@@ -2,6 +2,7 @@
 
 @layer base {
   :root {
+    zoom: 0.8;
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
@@ -43,6 +44,16 @@
     --timeline-line: #E5E7EB;
   }
 
+  /* Support for Firefox which doesn't support zoom */
+  @supports not (zoom: 1) {
+    :root {
+      transform: scale(0.8);
+      transform-origin: 0 0;
+      width: 125%;
+      height: 125%;
+    }
+  }
+
   .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
@@ -64,11 +75,9 @@
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 94.1%;
   }
-}
 
-@layer base {
   body {
-    @apply bg-white text-gray-900;
+    @apply bg-white text-gray-900 min-h-full;
   }
 
   .dark body {

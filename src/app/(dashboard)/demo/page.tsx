@@ -26,6 +26,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { HeadingTitle } from '@/components/HeadingTitle'
+import { useTranslation } from '@/hooks/useTranslation'
 import { Input } from '@/components/ui/input'
 import {
   Activity,
@@ -58,6 +59,7 @@ interface CaseItem {
 }
 
 const DemoPage = () => {
+  const { t } = useTranslation()
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [show3D, setShow3D] = useState<boolean>(false)
   const [searchTerm, setSearchTerm] = useState('')
@@ -233,13 +235,13 @@ const DemoPage = () => {
 
 
   return (
-    <div className="min-h-screen space-y-8 animate-in fade-in duration-500 pb-12">
+    <div className="min-h-screen space-y-8 animate-in fade-in duration-500 pb-12 p-8">
 
       {/* 1. Header & Hero Combined */}
       <div className="space-y-6">
         <HeadingTitle
-          title="Galerie Clinique"
-          subtitle="Explorez l'art de l'orthodontie numérique"
+          title={t('gallery.title')}
+          subtitle={t('gallery.subtitle')}
         />
 
         {/* Compact Hero Stats */}

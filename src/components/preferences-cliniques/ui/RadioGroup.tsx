@@ -76,22 +76,22 @@ export default function RadioGroup({
             key={idx}
             className={`flex items-center w-xl gap-3 mb-3 px-4 py-3 rounded-lg transition-all cursor-pointer border ${disabled ? 'opacity-50 cursor-not-allowed bg-gray-50' : ''
               } ${isChecked
-                ? 'shadow-sm bg-[#0B9FD7]/5 border-[#0B9FD7]/20 ring-1 ring-[#0B9FD7]/20'
+                ? 'shadow-sm bg-[#0072B8]/5 border-[#0072B8]/20 ring-1 ring-[#0072B8]/20'
                 : 'bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300'
               }`}
             onClick={() => handleSelect(option)}
           >
             <div className="relative flex items-center">
               <div
-                className={`w-4 h-4 rounded-full border-2 transition-all flex items-center justify-center ${isChecked ? 'border-[#0B9FD7]' : 'border-gray-300'
+                className={`w-4 h-4 rounded-full border-2 transition-all flex items-center justify-center ${isChecked ? 'border-[#0072B8]' : 'border-gray-300'
                   }`}
               >
                 {isChecked && (
-                  <div className="w-2 h-2 rounded-full bg-[#0B9FD7]" />
+                  <div className="w-2 h-2 rounded-full bg-[#0072B8]" />
                 )}
               </div>
             </div>
-            <span className={`text-sm flex-1 ${isChecked ? 'font-medium text-[#0B9FD7]' : 'text-gray-700'}`}>
+            <span className={`text-sm flex-1 ${isChecked ? 'font-medium text-[#0072B8]' : 'text-gray-700'}`}>
               {option}
             </span>
             {hasInfo && (

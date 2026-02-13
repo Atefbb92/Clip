@@ -231,7 +231,7 @@ const SupportPage: React.FC = () => {
   })
 
   return (
-    <div className="flex flex-col gap-8 min-h-screen">
+    <div className="flex flex-col gap-8 min-h-screen p-8">
       {/* En-tête avec HeadingTitle */}
       <div className="flex justify-between items-start">
         <HeadingTitle
@@ -280,8 +280,8 @@ const SupportPage: React.FC = () => {
             <button
               onClick={() => setActiveTab('documentation')}
               className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${activeTab === 'documentation'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
             >
               <Book className="w-4 h-4" />
@@ -290,8 +290,8 @@ const SupportPage: React.FC = () => {
             <button
               onClick={() => setActiveTab('faq')}
               className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${activeTab === 'faq'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
             >
               <MessageSquare className="w-4 h-4" />
@@ -300,8 +300,8 @@ const SupportPage: React.FC = () => {
             <button
               onClick={() => setActiveTab('tutorials')}
               className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${activeTab === 'tutorials'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
             >
               <Video className="w-4 h-4" />
@@ -310,8 +310,8 @@ const SupportPage: React.FC = () => {
             <button
               onClick={() => setActiveTab('contact')}
               className={`py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${activeTab === 'contact'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
             >
               <Mail className="w-4 h-4" />
@@ -375,16 +375,16 @@ const SupportPage: React.FC = () => {
                         size="default"
                         onClick={() => setSelectedCategory(category.id)}
                         className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${selectedCategory === category.id
-                            ? 'bg-blue-600 text-white hover:bg-blue-700'
-                            : 'bg-white hover:bg-slate-50 border-slate-200 hover:border-blue-300 hover:text-blue-600'
+                          ? 'bg-blue-600 text-white hover:bg-blue-700'
+                          : 'bg-white hover:bg-slate-50 border-slate-200 hover:border-blue-300 hover:text-blue-600'
                           }`}
                       >
                         {category.label}
                         <Badge
                           variant="secondary"
                           className={`ml-1 ${selectedCategory === category.id
-                              ? 'bg-white/20 text-white'
-                              : 'bg-blue-100 text-blue-700'
+                            ? 'bg-white/20 text-white'
+                            : 'bg-blue-100 text-blue-700'
                             }`}
                         >
                           {category.count}

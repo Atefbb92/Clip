@@ -70,10 +70,11 @@
     "status": {
         "brouillon": "Entwurf",
         "en-attente": "Ausstehend",
-        "en-planification": "In Planung",
+        "planning": "In Planung",
         "en-production": "In Produktion",
         "en-traitement": "In Behandlung",
-        "termine": "Abgeschlossen"
+        "termine": "Abgeschlossen",
+        "rejete": "Abgelehnt"
     },
     "statistics": {
         "title": "Statistiken & KPI",
@@ -181,9 +182,10 @@
         "detail": {
             "actions": {
                 "back": "Zurück",
-                "request_correction": "Korrektur anfordern",
-                "finish": "Behandlung beenden",
-                "order_eterna": "ETERNA® bestellen"
+                "request_correction": "Korrektur",
+                "view_tp_check": "TP-Check",
+                "finish": "Beenden",
+                "order_eterna": "ETERNA®"
             },
             "status": {
                 "active": "Aktiv"
@@ -230,6 +232,17 @@
                 "order_option_error": "Bitte wählen Sie eine Option",
                 "trim_line_error": "Bitte wählen Sie eine Schnittlinie",
                 "rhythm_error": "Bitte wählen Sie einen Rhythmus"
+            },
+            "eterna_order": {
+                "title": "ETERNA® bestellen",
+                "desc": "Bitte geben Sie die Ober- und Unterkieferscans an, um Ihre Bestellung abzuschließen.",
+                "upload_scans": "Dateien einreichen",
+                "upper_scan": "Oberkiefer",
+                "lower_scan": "Unterkiefer",
+                "or": "oder",
+                "use_link": "Einen Freigabelink verwenden",
+                "scan_link": "Scan-Link",
+                "confirm": "Bestellung bestätigen"
             },
             "new": {
                 "title": "Neuer Patient",
@@ -280,7 +293,7 @@
                     "choose_pack": "Paket wählen",
                     "packs": {
                         "light": {
-                            "name": "Diamond Light",
+                            "name": "Lite",
                             "desc": "Leichte Korrektur der Ausrichtung",
                             "features": [
                                 "Bis zu 7 Schienen",
@@ -289,7 +302,7 @@
                             ]
                         },
                         "medium": {
-                            "name": "Diamond Medium",
+                            "name": "Essential",
                             "desc": "Moderate Korrektur der Kieferbögen",
                             "features": [
                                 "Bis zu 12 Schienen",
@@ -298,7 +311,7 @@
                             ]
                         },
                         "full": {
-                            "name": "Diamond Full",
+                            "name": "Smart",
                             "desc": "Komplexe Vollbehandlung",
                             "features": [
                                 "Bis zu 24 Schienen",
@@ -400,6 +413,9 @@
                     "next": "Weiter",
                     "submit_case": "Fall absenden",
                     "complete_all": "Alle Schritte ausfüllen"
+                },
+                "form": {
+                    "cancel": "Abbrechen"
                 },
                 "dialogs": {
                     "cancel_title": "Patientenerstellung abbrechen?",
@@ -559,6 +575,32 @@
             "already_paid": "Bereits gezahlter Betrag",
             "remaining": "Restbetrag"
         }
+    },
+    "gallery": {
+        "title": "Klinische Galerie",
+        "subtitle": "Entdecken Sie die Kunst der digitalen Kieferorthopädie"
+    },
+    "store": {
+        "title": "Diamond Store",
+        "subtitle": "Ihre gesamte Ausrüstung und Verbrauchsmaterialien an einem Ort"
+    },
+    "academy": {
+        "title": "Diamond Academy",
+        "subtitle": "Ihr Zentrum für Exzellenz und Weiterbildung",
+        "my_learning_subtitle": "Verfolgen Sie Ihre Fortschritte und Erfolge"
+    },
+    "events": {
+        "title": "Veranstaltungen",
+        "subtitle": "Bleiben Sie informiert über kommende Diamond-Kongresse, Schulungen und Webinare",
+        "propose_event": "Veranstaltung vorschlagen",
+        "hero_badge": "Top-Event",
+        "learn_more": "Mehr erfahren",
+        "search_placeholder": "Nach Veranstaltung oder Ort suchen...",
+        "empty_title": "Keine passenden Veranstaltungen gefunden",
+        "empty_subtitle": "Versuchen Sie, Ihre Filter oder Suche anzupassen.",
+        "contact_title": "Haben Sie einen Vorschlag?",
+        "contact_subtitle": "Organisieren Sie eine Veranstaltung oder möchten Sie ein bestimmtes Thema in einer Schulung sehen? Kontaktieren Sie unser akademisches Team.",
+        "contact_button": "Team kontaktieren"
     },
     "settings": {
         "title": "Einstellungen & Präferenzen",

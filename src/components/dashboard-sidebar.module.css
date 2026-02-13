@@ -12,8 +12,9 @@
 .sidebarMenuButton {
   transition: all 0.2s ease-in-out;
   border-radius: 0.5rem;
-  margin: 0.125rem 0.5rem;
+  margin: 0.05rem 0.5rem;
   color: #e2e8f0;
+  height: 2rem !important;
 }
 
 .sidebarMenuButton:hover {
