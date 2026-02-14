@@ -108,6 +108,15 @@ type LayoutConfig<Route extends LayoutRoutes = LayoutRoutes> = {
   type __Unused = __Check
 }
 
+// Validate ../../src/app/(dashboard)/diamond-purity/simulator/page.tsx
+{
+  type __IsExpected<Specific extends AppPageConfig<"/diamond-purity/simulator">> = Specific
+  const handler = {} as typeof import("../../src/app/(dashboard)/diamond-purity/simulator/page.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 // Validate ../../src/app/(dashboard)/events/page.tsx
 {
   type __IsExpected<Specific extends AppPageConfig<"/events">> = Specific

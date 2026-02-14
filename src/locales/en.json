@@ -362,7 +362,8 @@
                         "intra_right": "Right lateral intra-oral",
                         "intra_face": "Frontal intra-oral",
                         "intra_left": "Left lateral intra-oral"
-                    }
+                    },
+                    "add_photo": "Add photo"
                 },
                 "scans": {
                     "title": "Scans",

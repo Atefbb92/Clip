@@ -101,6 +101,7 @@ const PatientDetailPage = () => {
   )
   const [galleryIndex, setGalleryIndex] = useState<number>(0)
   const [activeTab, setActiveTab] = useState('overview')
+  const [activeTPTab, setActiveTPTab] = useState('initial')
   const [show3DModal, setShow3DModal] = useState(false)
   const [showCephModal, setShowCephModal] = useState(false)
   // Lien simulé inséré depuis le back office pour l'analyse céphalométrique
@@ -853,23 +854,49 @@ const PatientDetailPage = () => {
               <DiamondCard className="bg-white border-slate-200 shadow-sm">
                 <DiamondCardHeader>
                   <DiamondCardTitle className="flex items-center justify-between text-slate-800">
-                    <div className="flex items-center">
-                      <Package className="h-5 w-5 mr-2 text-[#0072B8]" />
-                      <span className="mr-2">TP Check</span>
-                      <div className="flex items-center gap-1 ml-2">
-                        {tpChecks.map((tp, idx) => (
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center">
+                        <Package className="h-5 w-5 mr-2 text-[#0072B8]" />
+                        <span className="font-bold">TP Check</span>
+                      </div>
+                      <div className="flex flex-col gap-2 ml-1 mt-2">
+                        <div className="flex items-center gap-4">
                           <button
-                            key={tp.id}
-                            aria-label={`TP Check ${idx + 1}`}
-                            onClick={() => setSelectedTPVersion(idx)}
-                            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center text-xs font-semibold transition-all duration-200 ${selectedTPVersion === idx
-                              ? 'bg-[#00B4D8] text-white border-[#0072B8] shadow-sm'
-                              : 'bg-white text-slate-700 border-slate-300 hover:border-[#00B4D8]'
-                              }`}
+                            onClick={() => setActiveTPTab('initial')}
+                            className={`text-sm font-semibold pb-1 transition-colors ${activeTPTab === 'initial' ? 'text-slate-700 border-b-2 border-[#0072B8]' : 'text-slate-500 hover:text-slate-700'}`}
                           >
-                            {idx + 1}
+                            Traitement initial
                           </button>
-                        ))}
+                          <button
+                            onClick={() => setActiveTPTab('c1')}
+                            className={`text-sm font-semibold pb-1 transition-colors ${activeTPTab === 'c1' ? 'text-slate-700 border-b-2 border-[#0072B8]' : 'text-slate-500 hover:text-slate-700'}`}
+                          >
+                            Correction 1
+                          </button>
+                          <button
+                            onClick={() => setActiveTPTab('c2')}
+                            className={`text-sm font-semibold pb-1 transition-colors ${activeTPTab === 'c2' ? 'text-slate-700 border-b-2 border-[#0072B8]' : 'text-slate-500 hover:text-slate-700'}`}
+                          >
+                            Correction 2
+                          </button>
+                        </div>
+
+                        <div className={`flex items-center gap-1 transition-opacity duration-200 ${activeTPTab === 'initial' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+                          {tpChecks.map((tp, idx) => (
+                            <button
+                              key={tp.id}
+                              aria-label={`TP Check ${idx + 1}`}
+                              onClick={() => setSelectedTPVersion(idx)}
+                              tabIndex={activeTPTab === 'initial' ? 0 : -1}
+                              className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold transition-all duration-200 border-2 ${selectedTPVersion === idx
+                                ? 'bg-[#0072B8] text-white border-[#0072B8] shadow-md'
+                                : 'bg-white text-[#0072B8] border-slate-200 hover:border-[#0072B8] hover:bg-blue-50'
+                                }`}
+                            >
+                              {idx + 1}
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     </div>
                     <Button
@@ -951,19 +978,7 @@ const PatientDetailPage = () => {
                     </div>
 
                     {/* Actions */}
-                    <div className="flex gap-3 pt-4">
-                      <Button
-                        variant="outline"
-                        className="border-slate-300 text-slate-700 hover:bg-slate-50 flex-1"
-                      >
-                        <Eye className="h-4 w-4 mr-2" />
-                        {t('patients.detail.tp_check.details')}
-                      </Button>
-                      <Button className="bg-[#0072B8] hover:bg-[#005a94] text-white flex-1">
-                        <Download className="h-4 w-4 mr-2" />
-                        {t('patients.detail.tp_check.report')}
-                      </Button>
-                    </div>
+
                   </div>
                 </DiamondCardContent>
               </DiamondCard>

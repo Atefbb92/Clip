@@ -419,8 +419,10 @@
                     "occlusal_lower": "Occlusale inférieure",
                     "intra_right": "Intra-orale latérale droite",
                     "intra_face": "Intra-orale de face",
-                    "intra_left": "Intra-orale latérale gauche"
-                }
+                    "intra_left": "Intra-orale latérale gauche",
+                    "other": "Autre"
+                },
+                "add_photo": "Ajouter une photo"
             },
             "scans": {
                 "title": "Scans",

@@ -12,7 +12,6 @@ import {
   PieChart,
   LineChart,
   Filter,
-  Download,
   RefreshCw,
   Eye,
   CheckCircle,
@@ -131,10 +130,7 @@ export default function StatistiquesPage() {
     setIsRefreshing(false)
   }
 
-  const handleExport = () => {
-    // Logique d'export des données
-    console.log('Export des statistiques...')
-  }
+
 
   return (
     <div className="flex flex-col gap-8 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen p-8">
@@ -171,15 +167,7 @@ export default function StatistiquesPage() {
               {t('statistics.refresh')}
             </Button>
 
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleExport}
-              className="bg-white border-gray-300 text-gray-700 hover:bg-gray-50"
-            >
-              <Download className="w-4 h-4 mr-2" />
-              {t('statistics.export')}
-            </Button>
+
           </div>
         </HeadingTitle>
       </div>

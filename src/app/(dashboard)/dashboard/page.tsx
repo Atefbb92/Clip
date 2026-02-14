@@ -18,7 +18,16 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   PlusIcon,
+  Bell,
+  Check,
+  MessageCircle,
 } from 'lucide-react'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import {
   DiamondCard,
   DiamondCardContent,
@@ -72,6 +81,82 @@ const Dashboard: React.FC = () => {
     successRate: 0,
     monthlyGrowth: 0,
   })
+
+  // Mock notifications state
+  const [notifications, setNotifications] = useState([
+    {
+      id: 1,
+      title: 'Nouveau patient ajouté',
+      message: 'Le patient Sarah Connor a été ajouté avec succès.',
+      time: 'Il y a 2 heures',
+      read: false,
+    },
+    {
+      id: 2,
+      title: 'Traitement terminé',
+      message: 'Le traitement de John Doe est marqué comme terminé.',
+      time: 'Il y a 5 heures',
+      read: false,
+    },
+    {
+      id: 3,
+      title: 'Rappel de rendez-vous',
+      message: 'Consultation prévue avec Dr. Smith demain à 10h.',
+      time: 'Il y a 1 jour',
+      read: true,
+    },
+  ])
+
+  const unreadCount = notifications.filter(n => !n.read).length
+
+  const markAllAsRead = () => {
+    setNotifications(notifications.map(n => ({ ...n, read: true })))
+  }
+
+  const markAsRead = (id: number) => {
+    setNotifications(notifications.map(n => n.id === id ? { ...n, read: true } : n))
+  }
+
+
+
+  // Mock messages state
+  const [messages, setMessages] = useState([
+    {
+      id: 1,
+      sender: 'Dr. House',
+      avatar: 'H',
+      message: 'Le patient de la chambre 3 a besoin de vous.',
+      time: '15 min',
+      unread: true,
+    },
+    {
+      id: 2,
+      sender: 'Sarah (Secrétaire)',
+      avatar: 'S',
+      message: 'Nouveau rendez-vous ajouté pour demain 14h.',
+      time: '1h',
+      unread: true,
+    },
+    {
+      id: 3,
+      sender: 'Laboratoire',
+      avatar: 'L',
+      message: 'Les résultats d\'analyse sont disponibles.',
+      time: '3h',
+      unread: false,
+    },
+  ])
+
+  const unreadMessagesCount = messages.filter(m => m.unread).length
+
+  const markMessageAsRead = (id: number) => {
+    setMessages(messages.map(m => m.id === id ? { ...m, unread: false } : m))
+  }
+
+  const markAllMessagesAsRead = () => {
+    setMessages(messages.map(m => ({ ...m, unread: false })))
+  }
+
   const [loading, setLoading] = useState(true)
   const { t, language } = useTranslation()
 
@@ -230,16 +315,143 @@ const Dashboard: React.FC = () => {
           titleClassName="text-4xl font-bold text-gray-900"
           subtitleClassName="text-lg text-gray-600"
         />
-        <div className="flex items-center gap-3 bg-white px-6 py-3 rounded-xl shadow-sm border border-gray-200 min-w-[320px]">
-          <Calendar className="w-5 h-5 text-blue-500" />
-          <span className="text-gray-700 font-medium whitespace-nowrap">
-            {new Date().toLocaleDateString(language === 'FR' ? 'fr-FR' : language === 'DE' ? 'de-DE' : 'en-US', {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
-          </span>
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 bg-white px-6 py-3 rounded-xl shadow-sm border border-gray-200 min-w-[320px]">
+            <Calendar className="w-5 h-5 text-blue-500" />
+            <span className="text-gray-700 font-medium whitespace-nowrap">
+              {new Date().toLocaleDateString(language === 'FR' ? 'fr-FR' : language === 'DE' ? 'de-DE' : 'en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
+            </span>
+          </div>
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="icon" className="relative h-12 w-12 rounded-xl border-gray-200 bg-white shadow-sm hover:bg-gray-50">
+                <MessageCircle className="h-5 w-5 text-gray-600" />
+                {unreadMessagesCount > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 ring-2 ring-white"></span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80 p-0 bg-white border border-gray-200 shadow-xl z-[100]" align="end" sideOffset={5}>
+              <div className="flex items-center justify-between border-b px-4 py-3 bg-white rounded-t-lg">
+                <h4 className="font-semibold text-gray-900">Messages</h4>
+                {unreadMessagesCount > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto px-2 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                    onClick={markAllMessagesAsRead}
+                  >
+                    Tout lire
+                  </Button>
+                )}
+              </div>
+              <ScrollArea className="h-[300px] bg-white rounded-b-lg">
+                {messages.length > 0 ? (
+                  <div className="divide-y">
+                    {messages.map((message) => (
+                      <div
+                        key={message.id}
+                        className={`flex gap-3 p-4 transition-colors hover:bg-gray-50 cursor-pointer ${message.unread ? 'bg-blue-50/30' : 'bg-white'}`}
+                        onClick={() => markMessageAsRead(message.id)}
+                      >
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600 font-semibold text-xs">
+                          {message.avatar}
+                        </div>
+                        <div className="flex flex-col gap-1 flex-1 min-w-0">
+                          <div className="flex items-center justify-between">
+                            <span className={`text-sm font-medium truncate ${message.unread ? 'text-gray-900' : 'text-gray-700'}`}>
+                              {message.sender}
+                            </span>
+                            <span className="text-[10px] text-gray-400 whitespace-nowrap ml-2">
+                              {message.time}
+                            </span>
+                          </div>
+                          <p className={`text-xs line-clamp-2 ${message.unread ? 'text-gray-900 font-medium' : 'text-gray-500'}`}>
+                            {message.message}
+                          </p>
+                        </div>
+                        {message.unread && (
+                          <div className="self-center h-2 w-2 shrink-0 rounded-full bg-blue-500" />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center gap-2 py-12 text-center text-gray-500 bg-white">
+                    <MessageCircle className="h-8 w-8 text-gray-300" />
+                    <p className="text-sm">Aucun message</p>
+                  </div>
+                )}
+              </ScrollArea>
+            </PopoverContent>
+          </Popover>
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="icon" className="relative h-12 w-12 rounded-xl border-gray-200 bg-white shadow-sm hover:bg-gray-50">
+                <Bell className="h-5 w-5 text-gray-600" />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow-sm ring-2 ring-white">
+                    {unreadCount}
+                  </span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80 p-0 bg-white border border-gray-200 shadow-xl z-[100]" align="end" sideOffset={5}>
+              <div className="flex items-center justify-between border-b px-4 py-3 bg-white rounded-t-lg">
+                <h4 className="font-semibold text-gray-900">Notifications</h4>
+                {unreadCount > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-auto px-2 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                    onClick={markAllAsRead}
+                  >
+                    Tout marquer comme lu
+                  </Button>
+                )}
+              </div>
+              <ScrollArea className="h-[300px] bg-white rounded-b-lg">
+                {notifications.length > 0 ? (
+                  <div className="divide-y">
+                    {notifications.map((notification) => (
+                      <div
+                        key={notification.id}
+                        className={`flex flex-col gap-1 p-4 transition-colors hover:bg-gray-50 ${!notification.read ? 'bg-blue-50/30' : 'bg-white'}`}
+                        onClick={() => markAsRead(notification.id)}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <span className={`text-sm font-medium ${!notification.read ? 'text-gray-900' : 'text-gray-700'}`}>
+                            {notification.title}
+                          </span>
+                          {!notification.read && (
+                            <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-blue-500" />
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-500 line-clamp-2">
+                          {notification.message}
+                        </p>
+                        <span className="text-[10px] text-gray-400">
+                          {notification.time}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center gap-2 py-12 text-center text-gray-500 bg-white">
+                    <Bell className="h-8 w-8 text-gray-300" />
+                    <p className="text-sm">Aucune notification</p>
+                  </div>
+                )}
+              </ScrollArea>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 

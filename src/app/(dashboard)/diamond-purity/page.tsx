@@ -104,7 +104,7 @@ export default function DiamondPurityProgram() {
   }, [])
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen p-8">
       {/* Header Standardisé */}
       <HeadingTitle
         title="Programme Diamond Purity"
@@ -285,12 +285,17 @@ export default function DiamondPurityProgram() {
         </DiamondCard>
 
         {/* Bottom Banner */}
-        <div className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-700 p-8 md:p-12 text-center text-white shadow-lg">
+        <div className="rounded-2xl bg-gradient-to-r from-[#0072B8] via-[#0097c0] to-[#00BFA5] p-8 md:p-12 text-center text-white shadow-lg">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Prêt à passer au niveau supérieur ?</h2>
           <p className="text-blue-100 max-w-2xl mx-auto mb-8 text-lg">
             Utilisez notre simulateur pour voir comment l&apos;augmentation de votre volume de cas peut impacter votre rentabilité.
           </p>
-          <Button size="lg" variant="secondary" className="bg-white text-blue-700 hover:bg-blue-50 border-none font-semibold shadow-md">
+          <Button
+            size="lg"
+            variant="secondary"
+            className="bg-white text-blue-700 hover:bg-blue-50 border-none font-semibold shadow-md"
+            onClick={() => window.location.href = '/diamond-purity/simulator'}
+          >
             Accéder au Simulateur
           </Button>
         </div>

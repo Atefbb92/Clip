@@ -8,7 +8,7 @@ import * as z from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, X, User, FileText, Camera, Scan, Stethoscope, CheckCircle, Maximize2, ClipboardCheck } from 'lucide-react'
+import { ArrowLeft, X, User, FileText, Camera, Scan, Stethoscope, CheckCircle, Maximize2, ClipboardCheck, Plus } from 'lucide-react'
 import { HeadingTitle } from '@/components/HeadingTitle'
 import {
   DiamondCard,
@@ -152,6 +152,7 @@ export default function AjouterPatient() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [uploadTarget, setUploadTarget] = useState<{ type: 'photos' | 'radiographies' | 'scans'; key: string } | null>(null)
   const [previewFile, setPreviewFile] = useState<{ file: File | string, title: string } | null>(null)
+  const [otherPhotosCount, setOtherPhotosCount] = useState(0)
 
   const handleUploadClick = (type: 'photos' | 'radiographies' | 'scans', key: string) => {
     setUploadTarget({ type, key })
@@ -887,8 +888,15 @@ export default function AjouterPatient() {
                     { key: 'image4', label: t('patients.new.photos.labels.occlusal_upper'), required: true },
                     { key: 'image6', label: t('patients.new.photos.labels.occlusal_lower'), required: true },
                     { key: 'image7', label: t('patients.new.photos.labels.intra_right'), required: true },
+
                     { key: 'image8', label: t('patients.new.photos.labels.intra_face'), required: true },
                     { key: 'image9', label: t('patients.new.photos.labels.intra_left'), required: true },
+                    // Generate "Other" photos dynamically
+                    ...Array.from({ length: otherPhotosCount }).map((_, index) => ({
+                      key: `other_${index}`,
+                      label: t('patients.new.photos.labels.other') || 'Autre',
+                      required: false,
+                    })),
                   ].map((photo) => (
                     <div key={photo.key} className="border-0 bg-gray-50 rounded-lg p-4 text-center transition-colors relative group">
                       <div
@@ -934,6 +942,19 @@ export default function AjouterPatient() {
                       </Button>
                     </div>
                   ))}
+
+                  {/* Add button for new "Other" photo */}
+                  <div
+                    onClick={() => setOtherPhotosCount(prev => prev + 1)}
+                    className="rounded-lg p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition-all min-h-[220px] group"
+                    role="button"
+                    tabIndex={0}
+                  >
+                    <div className="w-20 h-20 rounded-full bg-white border-2 border-dashed border-gray-300 flex items-center justify-center mb-3 shadow-sm group-hover:border-[#0170B4] group-hover:scale-110 transition-all">
+                      <Plus className="w-10 h-10 text-gray-400 group-hover:text-[#0170B4] transition-colors" />
+                    </div>
+                    <span className="text-sm font-medium text-gray-600 group-hover:text-[#0170B4] transition-colors">{t('patients.new.photos.add_photo') || 'Ajouter une photo'}</span>
+                  </div>
                 </div>
               </div>
 

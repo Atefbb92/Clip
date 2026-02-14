@@ -8,7 +8,11 @@ import * as z from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, X, User, FileText, Camera, Scan, Stethoscope, CheckCircle } from 'lucide-react'
+import { ArrowLeft, X, User, FileText, Camera, Scan, Stethoscope, CheckCircle, Plus } from 'lucide-react'
+
+// ... (existing imports)
+
+// ... (inside AjouterPatient component)
 import { HeadingTitle } from '@/components/HeadingTitle'
 import {
   DiamondCard,
@@ -183,6 +187,8 @@ export default function AjouterPatient() {
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set())
+  const [otherPhotosCount, setOtherPhotosCount] = useState(0)
+
 
   const [patientData, setPatientData] = useState<PatientData>({
     nom: '',
@@ -384,8 +390,8 @@ export default function AjouterPatient() {
                   <div
                     key={type}
                     className={`cursor-pointer border rounded-lg overflow-hidden ${selectedPatientType === type
-                        ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 bg-white hover:bg-gray-50'
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-200 bg-white hover:bg-gray-50'
                       }`}
                     onClick={() => handleCardClick(type)}
                   >
@@ -422,14 +428,14 @@ export default function AjouterPatient() {
                         {/* Select button */}
                         <button
                           className={`w-full py-2 px-4 rounded font-medium transition-colors duration-200 ${selectedPatientType === type
-                              ? `${color === 'blue'
-                                ? 'bg-blue-600 hover:bg-blue-700'
-                                : 'bg-gray-700 hover:bg-gray-800'
-                              } text-white`
-                              : `${color === 'blue'
-                                ? 'bg-blue-500 hover:bg-blue-600'
-                                : 'bg-gray-600 hover:bg-gray-700'
-                              } text-white`
+                            ? `${color === 'blue'
+                              ? 'bg-blue-600 hover:bg-blue-700'
+                              : 'bg-gray-700 hover:bg-gray-800'
+                            } text-white`
+                            : `${color === 'blue'
+                              ? 'bg-blue-500 hover:bg-blue-600'
+                              : 'bg-gray-600 hover:bg-gray-700'
+                            } text-white`
                             }`}
                         >
                           {selectedPatientType === type ? (
@@ -655,8 +661,8 @@ export default function AjouterPatient() {
                   <div
                     key={condition}
                     className={`p-2 text-xs border-0 rounded cursor-pointer transition-colors ${selectedConditions.includes(condition)
-                        ? 'bg-blue-50 border border-blue-500 text-blue-700'
-                        : 'hover:bg-gray-50 bg-gray-50'
+                      ? 'bg-blue-50 border border-blue-500 text-blue-700'
+                      : 'hover:bg-gray-50 bg-gray-50'
                       }`}
                     onClick={() => handleConditionClick(condition)}
                   >
@@ -703,6 +709,7 @@ export default function AjouterPatient() {
                       </Button>
                     </div>
                   ))}
+
                 </div>
               </div>
 
@@ -873,8 +880,8 @@ export default function AjouterPatient() {
                     onClick={handleSubmit}
                     disabled={!areAllStepsCompleted()}
                     className={`border-gray-300 bg-white ${areAllStepsCompleted()
-                        ? 'text-gray-600 hover:bg-gray-50'
-                        : 'text-gray-400 cursor-not-allowed'
+                      ? 'text-gray-600 hover:bg-gray-50'
+                      : 'text-gray-400 cursor-not-allowed'
                       }`}
                   >
                     {areAllStepsCompleted() ? 'Soumettre' : 'Complétez toutes les étapes'}
@@ -902,19 +909,19 @@ export default function AjouterPatient() {
                     <div
                       key={index}
                       className={`flex items-center gap-3 p-3 rounded-lg transition-colors cursor-pointer ${isActive
-                          ? 'bg-blue-50 border border-blue-200'
-                          : isCompleted
-                            ? 'bg-green-50 border border-green-200'
-                            : 'hover:bg-gray-50'
+                        ? 'bg-blue-50 border border-blue-200'
+                        : isCompleted
+                          ? 'bg-green-50 border border-green-200'
+                          : 'hover:bg-gray-50'
                         }`}
                       onClick={() => handleStepClick(index)}
                     >
                       <div
                         className={`flex items-center justify-center w-8 h-8 rounded-full ${isActive
-                            ? 'bg-blue-600 text-white'
-                            : isCompleted
-                              ? 'bg-green-600 text-white'
-                              : 'bg-gray-200 text-gray-600'
+                          ? 'bg-blue-600 text-white'
+                          : isCompleted
+                            ? 'bg-green-600 text-white'
+                            : 'bg-gray-200 text-gray-600'
                           }`}
                       >
                         {isCompleted && !isActive ? (
@@ -926,10 +933,10 @@ export default function AjouterPatient() {
                       <div className="flex-1">
                         <div
                           className={`font-medium ${isActive
-                              ? 'text-blue-900'
-                              : isCompleted
-                                ? 'text-green-900'
-                                : 'text-gray-700'
+                            ? 'text-blue-900'
+                            : isCompleted
+                              ? 'text-green-900'
+                              : 'text-gray-700'
                             }`}
                         >
                           {step.label}
