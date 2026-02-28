@@ -14,9 +14,17 @@ import { HeadingTitle } from '@/components/HeadingTitle'
 import { Badge } from '@/components/ui/badge'
 import { Trophy, Star, Target, TrendingUp, Info, CheckCircle, AlertCircle } from 'lucide-react'
 import Image from 'next/image'
+import { useTranslation } from '@/hooks/useTranslation'
 
 export default function DiamondPurityProgram() {
   const [progressValue, setProgressValue] = useState(0)
+  const { t, language } = useTranslation()
+
+  // Format current date based on active learning
+  const currentDate = new Date().toLocaleDateString(
+    language === 'FR' ? 'fr-FR' : language === 'DE' ? 'de-DE' : 'en-US',
+    { month: 'short', day: 'numeric', year: 'numeric' }
+  )
 
   const levels = [
     {
@@ -64,33 +72,33 @@ export default function DiamondPurityProgram() {
   const stats = [
     {
       value: '15',
-      label: 'Cas validés au nov. 14, 2025',
+      label: t('diamond_purity.stats.validated_cases', { date: currentDate }),
       icon: <CheckCircle className="w-5 h-5 text-cyan-600" />,
       color: 'text-cyan-600',
       bg: 'bg-cyan-50',
       border: 'border-cyan-100',
       subStats: [
-        { value: '0', label: 'En attente' },
-        { value: '0', label: 'Soumis' },
+        { value: '0', label: t('diamond_purity.stats.pending') },
+        { value: '0', label: t('diamond_purity.stats.submitted') },
       ],
     },
     {
       value: '0',
-      label: 'Cas requis pour maintenir Starter',
+      label: t('diamond_purity.stats.required_maintain'),
       icon: <AlertCircle className="w-5 h-5 text-green-700" />,
       color: 'text-green-700',
       bg: 'bg-green-50',
       border: 'border-green-100',
-      subStats: [{ value: '0,0%', label: 'de remise actuelle' }],
+      subStats: [{ value: '0,0%', label: t('diamond_purity.stats.current_discount') }],
     },
     {
       value: '5',
-      label: 'Cas requis pour atteindre Prime',
+      label: t('diamond_purity.stats.required_next'),
       icon: <Target className="w-5 h-5 text-purple-700" />,
       color: 'text-purple-700',
       bg: 'bg-purple-50',
       border: 'border-purple-100',
-      subStats: [{ value: '10,0%', label: 'de remise future' }],
+      subStats: [{ value: '10,0%', label: t('diamond_purity.stats.future_discount') }],
     },
   ]
 
@@ -107,8 +115,8 @@ export default function DiamondPurityProgram() {
     <div className="min-h-screen p-8">
       {/* Header Standardisé */}
       <HeadingTitle
-        title="Programme Diamond Purity"
-        subtitle="Suivez votre progression et débloquez des avantages exclusifs"
+        title={t('diamond_purity.title')}
+        subtitle={t('diamond_purity.subtitle')}
         titleClassName="text-4xl font-bold text-slate-900"
         subtitleClassName="text-lg text-slate-600"
       />
@@ -126,7 +134,7 @@ export default function DiamondPurityProgram() {
             <DiamondCardHeader className="relative z-10 pb-2">
               <DiamondCardTitle className="text-blue-100 flex items-center gap-2 text-lg font-medium">
                 <Trophy className="w-5 h-5 text-yellow-400" />
-                Niveau Actuel
+                {t('diamond_purity.current_level')}
               </DiamondCardTitle>
             </DiamondCardHeader>
             <DiamondCardContent className="relative z-10 text-center space-y-6 pt-4">
@@ -141,15 +149,15 @@ export default function DiamondPurityProgram() {
               </div>
               <div>
                 <h2 className="text-4xl font-bold text-white mb-1">Starter</h2>
-                <p className="text-slate-400 text-sm">Validité: juil. 1, 2025 - juin 30, 2026</p>
+                <p className="text-slate-400 text-sm">{t('diamond_purity.validity')}</p>
               </div>
               <div className="grid grid-cols-2 gap-4 border-t border-white/10 pt-6">
                 <div>
-                  <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">Remise</p>
+                  <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">{t('diamond_purity.discount_current')}</p>
                   <p className="text-2xl font-bold text-white">0,0%</p>
                 </div>
                 <div>
-                  <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">Cas Validés</p>
+                  <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">{t('diamond_purity.validated_cases_count')}</p>
                   <p className="text-2xl font-bold text-white">15</p>
                 </div>
               </div>
@@ -185,7 +193,7 @@ export default function DiamondPurityProgram() {
               <DiamondCardHeader>
                 <DiamondCardTitle className="flex items-center gap-2">
                   <TrendingUp className="w-5 h-5 text-blue-600" />
-                  Progression Annuelle
+                  {t('diamond_purity.progress.title')}
                 </DiamondCardTitle>
               </DiamondCardHeader>
               <DiamondCardContent>
@@ -193,11 +201,11 @@ export default function DiamondPurityProgram() {
                   <div className="relative pt-6 pb-2">
                     <div className="flex mb-2 items-center justify-between">
                       <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-blue-600 bg-blue-100">
-                        Progression
+                        {t('diamond_purity.progress.label')}
                       </span>
                       <div className="text-right">
                         <span className="text-xs font-semibold inline-block text-blue-600">
-                          {progressValue}% vers Ultimate
+                          {progressValue}% {t('diamond_purity.progress.to_ultimate')}
                         </span>
                       </div>
                     </div>
@@ -224,7 +232,7 @@ export default function DiamondPurityProgram() {
                 <Alert className="mt-6 bg-slate-50 border-slate-200">
                   <Info className="h-4 w-4 text-slate-500" />
                   <AlertDescription className="text-slate-600 text-sm">
-                    Veuillez noter qu&apos;à partir du 1er juillet, les valeurs indiquées pourraient être ajustées. Cette progression est basée sur l&apos;année fiscale en cours.
+                    {t('diamond_purity.info')}
                   </AlertDescription>
                 </Alert>
               </DiamondCardContent>
@@ -235,15 +243,15 @@ export default function DiamondPurityProgram() {
         {/* Levels Details Table */}
         <DiamondCard>
           <DiamondCardHeader>
-            <DiamondCardTitle>Détails du Programme</DiamondCardTitle>
-            <DiamondCardDescription>Aperçu complet des niveaux et remises associées</DiamondCardDescription>
+            <DiamondCardTitle>{t('diamond_purity.details.title')}</DiamondCardTitle>
+            <DiamondCardDescription>{t('diamond_purity.details.subtitle')}</DiamondCardDescription>
           </DiamondCardHeader>
           <DiamondCardContent className="p-0">
             <div className="overflow-x-auto">
               <table className="w-full text-sm text-left">
                 <thead className="bg-slate-50 border-b border-slate-200">
                   <tr>
-                    <th className="px-6 py-4 font-semibold text-slate-700">Niveau</th>
+                    <th className="px-6 py-4 font-semibold text-slate-700">{t('diamond_purity.details.level')}</th>
                     {levels.map(level => (
                       <th key={level.name} className={`px-6 py-4 font-semibold text-center ${level.iconColor}`}>{level.name}</th>
                     ))}
@@ -251,7 +259,7 @@ export default function DiamondPurityProgram() {
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   <tr>
-                    <td className="px-6 py-4 font-medium text-slate-900">Badge</td>
+                    <td className="px-6 py-4 font-medium text-slate-900">{t('diamond_purity.details.badge')}</td>
                     {levels.map(level => (
                       <td key={level.name} className="px-6 py-4">
                         <div className="flex justify-center">
@@ -263,7 +271,7 @@ export default function DiamondPurityProgram() {
                     ))}
                   </tr>
                   <tr>
-                    <td className="px-6 py-4 font-medium text-slate-900">Cas requis</td>
+                    <td className="px-6 py-4 font-medium text-slate-900">{t('diamond_purity.details.required_cases')}</td>
                     {levels.map(level => (
                       <td key={level.name} className="px-6 py-4 text-center text-slate-600">
                         {level.cases} {level.name === 'ULTIMATE' ? '+' : ''}
@@ -271,7 +279,7 @@ export default function DiamondPurityProgram() {
                     ))}
                   </tr>
                   <tr className="bg-slate-50/50">
-                    <td className="px-6 py-4 font-bold text-slate-900">Remise accordée</td>
+                    <td className="px-6 py-4 font-bold text-slate-900">{t('diamond_purity.details.granted_discount')}</td>
                     {levels.map(level => (
                       <td key={level.name} className={`px-6 py-4 text-center font-bold text-lg ${level.iconColor}`}>
                         {level.discount}
@@ -286,9 +294,9 @@ export default function DiamondPurityProgram() {
 
         {/* Bottom Banner */}
         <div className="rounded-2xl bg-gradient-to-r from-[#0072B8] via-[#0097c0] to-[#00BFA5] p-8 md:p-12 text-center text-white shadow-lg">
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">Prêt à passer au niveau supérieur ?</h2>
+          <h2 className="text-2xl md:text-3xl font-bold mb-4">{t('diamond_purity.banner.title')}</h2>
           <p className="text-blue-100 max-w-2xl mx-auto mb-8 text-lg">
-            Utilisez notre simulateur pour voir comment l&apos;augmentation de votre volume de cas peut impacter votre rentabilité.
+            {t('diamond_purity.banner.subtitle')}
           </p>
           <Button
             size="lg"
@@ -296,7 +304,7 @@ export default function DiamondPurityProgram() {
             className="bg-white text-blue-700 hover:bg-blue-50 border-none font-semibold shadow-md"
             onClick={() => window.location.href = '/diamond-purity/simulator'}
           >
-            Accéder au Simulateur
+            {t('diamond_purity.banner.button')}
           </Button>
         </div>
 

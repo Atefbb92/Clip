@@ -1,6 +1,7 @@
 'use client'
 
 import React from 'react'
+import { useTranslation } from '@/hooks/useTranslation'
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -46,11 +47,12 @@ interface AnimationProgressContext {
 }
 
 const PatientsEvolutionChart: React.FC<PatientsEvolutionChartProps> = ({ data }) => {
+  const { t } = useTranslation()
   const defaultData = {
     labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
     datasets: [
       {
-        label: 'New patients',
+        label: t('dashboard.charts.evolution_new_cases'),
         data: [12, 19, 15, 25, 22, 30],
         fill: true,
         backgroundColor: 'rgba(1, 112, 180, 0.1)',
@@ -64,7 +66,7 @@ const PatientsEvolutionChart: React.FC<PatientsEvolutionChartProps> = ({ data })
         tension: 0.4,
       },
       {
-        label: 'Approved cases',
+        label: t('dashboard.charts.evolution_approved_cases'),
         data: [8, 14, 13, 20, 18, 26],
         fill: true,
         backgroundColor: 'rgba(0, 182, 174, 0.1)', // #00B6AE at 0.1
@@ -104,6 +106,12 @@ const PatientsEvolutionChart: React.FC<PatientsEvolutionChartProps> = ({ data })
     scales: {
       y: {
         beginAtZero: true,
+        min: 0,
+        suggestedMax: 6,
+        ticks: {
+          stepSize: 1,
+          precision: 0,
+        },
         grid: {
           color: 'rgba(0, 0, 0, 0.1)',
         },
@@ -114,7 +122,7 @@ const PatientsEvolutionChart: React.FC<PatientsEvolutionChartProps> = ({ data })
         },
       },
     },
-  } as const
+  }
 
   return (
     <div style={{ width: '100%', height: '300px' }}>

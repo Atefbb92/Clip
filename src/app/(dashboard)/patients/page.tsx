@@ -52,6 +52,7 @@ interface Patient {
   images?: {
     img2?: string
   }
+  conditions?: string[]
 }
 
 const PatientsPage = () => {
@@ -439,13 +440,9 @@ const PatientsPage = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {(() => {
-                          const conditions = [
-                            'condition 1',
-                            'condition 2',
-                            'condition 3',
-                            'condition 4',
-                            'condition 5',
-                          ]
+                          const conditions = patient.conditions || []
+                          if (conditions.length === 0) return null
+
                           const maxDisplay = 3
                           const remainingConditions = conditions.slice(maxDisplay)
 
@@ -487,17 +484,19 @@ const PatientsPage = () => {
                         })()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center w-px">
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="h-9 w-9 text-[#0072B8] hover:text-[#00619c] hover:bg-blue-50 rounded-full"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setViewerPatient(patient)
-                          }}
-                        >
-                          <PlayCircle className="h-6 w-6 fill-[#0072B8]/10" />
-                        </Button>
+                        {patient.status >= 2 && (
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-9 w-9 text-[#0072B8] hover:text-[#00619c] hover:bg-blue-50 rounded-full"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setViewerPatient(patient)
+                            }}
+                          >
+                            <PlayCircle className="h-6 w-6 fill-[#0072B8]/10" />
+                          </Button>
+                        )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <DropdownMenu>

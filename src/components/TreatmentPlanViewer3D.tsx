@@ -20,9 +20,10 @@ import {
 
 interface TreatmentPlanViewer3DProps {
     patientName?: string
+    versionLabel?: string
 }
 
-const TreatmentPlanViewer3D: React.FC<TreatmentPlanViewer3DProps> = ({ patientName }) => {
+const TreatmentPlanViewer3D: React.FC<TreatmentPlanViewer3DProps> = ({ patientName, versionLabel }) => {
     const mountRef = useRef<HTMLDivElement | null>(null)
 
     useEffect(() => {
@@ -119,7 +120,7 @@ const TreatmentPlanViewer3D: React.FC<TreatmentPlanViewer3DProps> = ({ patientNa
         <div className="w-full h-full flex flex-col items-center justify-center bg-slate-50 rounded-lg overflow-hidden relative border border-slate-200 shadow-inner">
             <div ref={mountRef} className="w-full h-full cursor-grab active:cursor-grabbing" />
             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur px-4 py-1.5 rounded-full shadow-sm text-xs font-medium text-slate-500 border border-slate-200 z-10">
-                Visuel 3D : {patientName || 'Plan de traitement'}
+                Visuel 3D : {patientName || 'Plan de traitement'} {versionLabel ? `- ${versionLabel}` : ''}
             </div>
         </div>
     )

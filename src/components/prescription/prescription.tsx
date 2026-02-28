@@ -29,7 +29,8 @@ interface PrescriptionProps {
   initialSection?: string;
   prescriptionData?: any; // Replace `any` with a more specific type if possible
   patientDetails?: any;  // Replace `any` with a more specific type if possible
-  onModify?: (step: any, section: any) => void; // Replace `any` with appropriate types
+  onModify?: (step: any, section: any) => void;
+  onChange?: (data: any) => void;
 }
 
 // Define proper types for the state
@@ -99,7 +100,7 @@ const lowerTeethMapping = [
 ];
 const validTeethNumbers = new Set([...upperTeethMapping, ...lowerTeethMapping]);
 
-const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSection, prescriptionData, patientDetails, onModify }, ref) => {
+const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSection, prescriptionData, patientDetails, onModify, onChange }, ref) => {
   const [showDentalChart, setShowDentalChart] = useState(false);
   const [modifications, setModifications] = useState<
     { code: string, type: string }[]
@@ -149,8 +150,8 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
     taquets: 'none',
     taquetsTeeth: new Set(),
     rapportAP: {
-      D: '',
-      G: '',
+      D: 'conserver',
+      G: 'conserver',
       options: [],
       rip: false,
       ripPrecision: '',
@@ -199,12 +200,26 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
     milieux: 'realiser',
     milieuxOptions: [],
     milieuxTeeth: new Set(),
-    extractions: '',
+    extractions: 'none',
     extractionsTeeth: new Set(),
     specialInstructions: ''
   });
 
   const [activeSection, setActiveSection] = useState('arcade');
+  useEffect(() => {
+    if (onChange) {
+      const data = {
+        ...formState,
+        restrictionsTeeth: Array.from(formState.restrictionsTeeth),
+        taquetsTeeth: Array.from(formState.taquetsTeeth),
+        milieuxTeeth: Array.from(formState.milieuxTeeth),
+        extractionsTeeth: Array.from(formState.extractionsTeeth),
+        savedTeethStates // Include dental chart states
+      };
+      onChange(data);
+    }
+  }, [formState, savedTeethStates, onChange]);
+
   const [userRole, setUserRole] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
   const router = useRouter();
@@ -263,7 +278,7 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
       const sectionElement = document.getElementById(activeSection);
       if (sectionElement) {
         setTimeout(() => {
-          sectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          sectionElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
           sectionElement.classList.add(styles.highlight);
           setTimeout(() => {
             sectionElement.classList.remove(styles.highlight);
@@ -283,7 +298,7 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
     if (prescriptionData?.activeSection) {
       const sectionElement = document.getElementById(prescriptionData.activeSection);
       if (sectionElement) {
-        sectionElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        sectionElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
         sectionElement.classList.add(styles.highlight);
 
@@ -766,37 +781,7 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
         <h2 className={styles.patientType}>Type de patient : {patientDetails.category || 'Non spécifié'}</h2>
       </div>
 
-      <div className={styles.scrollableContent}>
-        <DiamondCard className="mb-6">
-          <DiamondCardHeader>
-            <DiamondCardTitle>Anamnèse</DiamondCardTitle>
-          </DiamondCardHeader>
-          <DiamondCardContent>
-            <div className={styles.dentalChartContainer}>
-              <img
-                className={styles.perimg}
-                // @ts-ignore
-                src={anamnese}
-                alt="Anamnèse"
-                onClick={() => setShowDentalChart(true)}
-                style={{ cursor: 'pointer' }}
-                title="Cliquez pour ouvrir le tableau dentaire"
-              />
-              {showChartPreview && chartImage && (
-                <div className={styles.chartPreview}>
-                  <img
-                    src={chartImage}
-                    alt="Tableau dentaire"
-                    className={styles.previewImage}
-                    onClick={() => setShowDentalChart(true)}
-                  />
-                </div>
-              )}
-            </div>
-          </DiamondCardContent>
-        </DiamondCard>
-
-        {/* Modal popup for dental chart */}
+      <div className={styles.scrollableContent}>        {/* Modal popup for dental chart */}
         {showDentalChart && (
           <div className={styles.modalOverlay}>
             <div className={styles.modalContainer} id="custom-dental-modal">
@@ -805,6 +790,19 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
                 onClick={() => setShowDentalChart(false)}
               >
                 ✕
+              </button>
+              <button
+                className={styles.resetButton}
+                title="Restaurer tous les statuts"
+                onClick={() => {
+                  if (dentalChartRef.current?.handleReset) {
+                    dentalChartRef.current.handleReset();
+                    setSavedTeethStates({});
+                    setModifications([]);
+                  }
+                }}
+              >
+                ↺
               </button>
               <div className={styles.modalHeader}>
                 <h2 className={styles.modalTitle}>
@@ -918,7 +916,28 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
           </div>)}
       </div>
       <div className={styles.prescriptionForm}>
-        <DiamondCard id="arcade" className={`mb-6 ${activeSection === 'arcade' ? 'ring-2 ring-blue-500' : ''}`}>
+        <DiamondCard className="mb-6">
+          <DiamondCardHeader>
+            <DiamondCardTitle>Anamnèse</DiamondCardTitle>
+          </DiamondCardHeader>
+          <DiamondCardContent>
+            <div className={styles.dentalChartContainer}>
+              <div
+                className={styles.chartPreviewWrapper}
+                onClick={() => setShowDentalChart(true)}
+                style={{ cursor: 'pointer' }}
+                title="Cliquez pour ouvrir le tableau dentaire"
+              >
+                <DentalChart
+                  initialStates={savedTeethStates}
+                  readOnly={true}
+                  onChartClick={() => setShowDentalChart(true)}
+                />
+              </div>
+            </div>
+          </DiamondCardContent>
+        </DiamondCard>
+        <DiamondCard id="arcade" className={`mb-6 ${activeSection === 'arcade' ? 'ring-2 border-2 border-[#0170B4] ring-[#0170B4] shadow-[0_0_15px_rgba(1,112,180,0.15)]' : ''}`} onClick={() => setActiveSection('arcade')}>
           <DiamondCardHeader>
             <DiamondCardTitle>1. Arcade(s) à traiter</DiamondCardTitle>
           </DiamondCardHeader>
@@ -958,7 +977,7 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
           </DiamondCardContent>
         </DiamondCard>
 
-        <DiamondCard id="restrictions" className={`mb-6 ${activeSection === 'restrictions' ? 'ring-2 ring-blue-500' : ''}`}>
+        <DiamondCard id="restrictions" className={`mb-6 ${activeSection === 'restrictions' ? 'ring-2 border-2 border-[#0170B4] ring-[#0170B4] shadow-[0_0_15px_rgba(1,112,180,0.15)]' : ''}`} onClick={() => setActiveSection('restrictions')}>
           <DiamondCardHeader>
             <DiamondCardTitle>2. Restrictions des mouvements dentaires (ex. bridges, dents ankylosées, implants, etc.)</DiamondCardTitle>
           </DiamondCardHeader>
@@ -1039,7 +1058,7 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
             </div>
           </DiamondCardContent>
         </DiamondCard>
-        <DiamondCard id="taquets" className={`mb-6 ${activeSection === 'taquets' ? 'ring-2 ring-blue-500' : ''}`}>
+        <DiamondCard id="taquets" className={`mb-6 ${activeSection === 'taquets' ? 'ring-2 border-2 border-[#0170B4] ring-[#0170B4] shadow-[0_0_15px_rgba(1,112,180,0.15)]' : ''}`} onClick={() => setActiveSection('taquets')}>
           <DiamondCardHeader>
             <DiamondCardTitle>3. Taquets (Spécifier les taquets, voir les Préférences Cliniques)</DiamondCardTitle>
           </DiamondCardHeader>
@@ -1134,7 +1153,7 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
         </DiamondCard>
         {userRole === 'orthodontiste' && (
           <>
-            <DiamondCard id="rapportAP" className={`mb-6 ${activeSection === 'rapportAP' ? 'ring-2 ring-blue-500' : ''}`}>
+            <DiamondCard id="rapportAP" className={`mb-6 ${activeSection === 'rapportAP' ? 'ring-2 border-2 border-[#0170B4] ring-[#0170B4] shadow-[0_0_15px_rgba(1,112,180,0.15)]' : ''}`} onClick={() => setActiveSection('rapportAP')}>
               <DiamondCardHeader>
                 <DiamondCardTitle>4. Rapport antéro-postérieur</DiamondCardTitle>
               </DiamondCardHeader>
@@ -1336,14 +1355,14 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
                       </div>
                     </div>
 
-                    <label className={`${styles.radioOption} ${patientDetails.category !== 'adolescent' ? styles.disabled : ''}`}>
+                    <label className={`${styles.radioOption} ${patientDetails?.category?.toLowerCase() !== 'adolescent' ? styles.disabled : ''}`}>
                       <input
                         type="radio"
                         name="rapportAP_options"
                         value="avanceeMandibulaire"
                         checked={formState.rapportAP.options === 'avanceeMandibulaire'}
                         onChange={() => handleRapportAPRadioChange('avanceeMandibulaire')}
-                        disabled={patientDetails.category !== 'adolescent'}
+                        disabled={patientDetails?.category?.toLowerCase() !== 'adolescent'}
                       />
                       <span>Avancée mandibulaire (AM) (L'utilisation de préférences cliniques sera limitée pendant les étapes d'AM)</span>
                     </label>
@@ -1351,7 +1370,7 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
                 </div>
               </DiamondCardContent>
             </DiamondCard>
-            <DiamondCard id="overjet" className={`mb-6 ${activeSection === 'overjet' ? 'ring-2 ring-blue-500' : ''}`}>
+            <DiamondCard id="overjet" className={`mb-6 ${activeSection === 'overjet' ? 'ring-2 border-2 border-[#0170B4] ring-[#0170B4] shadow-[0_0_15px_rgba(1,112,180,0.15)]' : ''}`} onClick={() => setActiveSection('overjet')}>
               <DiamondCardHeader>
                 <DiamondCardTitle>5. Overjet</DiamondCardTitle>
               </DiamondCardHeader>
@@ -1362,6 +1381,7 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
                       type="radio"
                       name="Overjet"
                       value="realiser"
+                      checked={formState.overjet === 'realiser'}
                       onChange={(e) => handleOverjetChange(e.target.value)}
                     />
                     <span>Réaliser les autres objectifs et j'évaluerai le surplomb</span>
@@ -1371,6 +1391,7 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
                       type="radio"
                       name="Overjet"
                       value="maintenir"
+                      checked={formState.overjet === 'maintenir'}
                       onChange={(e) => handleOverjetChange(e.target.value)}
                     />
                     <span>Maintenir le surplomb d'origine (IPR peut être nécessaire)</span>
@@ -1380,6 +1401,7 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
                       type="radio"
                       name="Overjet"
                       value="ameliorer"
+                      checked={formState.overjet === 'ameliorer'}
                       onChange={(e) => handleOverjetChange(e.target.value)}
                     />
                     <span>Améliorer le surplomb créé par IPR</span>
@@ -1387,7 +1409,7 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
                 </div>
               </DiamondCardContent>
             </DiamondCard>
-            <DiamondCard id="overbite" className={`mb-6 ${activeSection === 'overbite' ? 'ring-2 ring-blue-500' : ''}`}>
+            <DiamondCard id="overbite" className={`mb-6 ${activeSection === 'overbite' ? 'ring-2 border-2 border-[#0170B4] ring-[#0170B4] shadow-[0_0_15px_rgba(1,112,180,0.15)]' : ''}`} onClick={() => setActiveSection('overbite')}>
               <DiamondCardHeader>
                 <DiamondCardTitle>6. Overbite</DiamondCardTitle>
               </DiamondCardHeader>
@@ -1571,7 +1593,7 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
                 </div>
               </DiamondCardContent>
             </DiamondCard>
-            <DiamondCard id="biteRamps" className={`mb-6 ${activeSection === 'biteRamps' ? 'ring-2 ring-blue-500' : ''}`}>
+            <DiamondCard id="biteRamps" className={`mb-6 ${activeSection === 'biteRamps' ? 'ring-2 border-2 border-[#0170B4] ring-[#0170B4] shadow-[0_0_15px_rgba(1,112,180,0.15)]' : ''}`} onClick={() => setActiveSection('biteRamps')}>
               <DiamondCardHeader>
                 <DiamondCardTitle>7. Bite ramps</DiamondCardTitle>
               </DiamondCardHeader>
@@ -1659,7 +1681,7 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
           </>
         )}
 
-        <DiamondCard id="milieux" className={`mb-6 ${activeSection === 'milieux' ? 'ring-2 ring-blue-500' : ''}`}>
+        <DiamondCard id="milieux" className={`mb-6 ${activeSection === 'milieux' ? 'ring-2 border-2 border-[#0170B4] ring-[#0170B4] shadow-[0_0_15px_rgba(1,112,180,0.15)]' : ''}`} onClick={() => setActiveSection('milieux')}>
           <DiamondCardHeader>
             <DiamondCardTitle>{userRole === 'orthodontiste' ? '8.' : '4.'} Milieux inter-incisifs</DiamondCardTitle>
           </DiamondCardHeader>
@@ -1771,7 +1793,7 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
           </DiamondCardContent>
         </DiamondCard>
         {userRole === 'orthodontiste' && (
-          <DiamondCard id="extractions" className={`mb-6 ${activeSection === 'extractions' ? 'ring-2 ring-blue-500' : ''}`}>
+          <DiamondCard id="extractions" className={`mb-6 ${activeSection === 'extractions' ? 'ring-2 border-2 border-[#0170B4] ring-[#0170B4] shadow-[0_0_15px_rgba(1,112,180,0.15)]' : ''}`} onClick={() => setActiveSection('extractions')}>
             <DiamondCardHeader>
               <DiamondCardTitle>9. Articulé croisé postérieur (si présent)</DiamondCardTitle>
             </DiamondCardHeader>
@@ -1779,6 +1801,7 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
               <div className={styles.radioGroup}>
                 <label className={styles.radioOption}>
                   <input type="radio" name="Articule" value="none"
+                    checked={formState.extractions === 'none'}
                     onChange={(e) => handleRadioChange('extractions', e.target.value)}
                     className={styles.radioInput}
                   />
@@ -1796,7 +1819,7 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
             </DiamondCardContent>
           </DiamondCard>
         )}
-        <DiamondCard id="Espacement" className={`mb-6 ${activeSection === 'specialInstructions' ? 'ring-2 ring-blue-500' : ''}`}>
+        <DiamondCard id="Espacement" className={`mb-6 ${activeSection === 'Espacement' ? 'ring-2 border-2 border-[#0170B4] ring-[#0170B4] shadow-[0_0_15px_rgba(1,112,180,0.15)]' : ''}`} onClick={() => setActiveSection('Espacement')}>
           <DiamondCardHeader>
             <DiamondCardTitle>{userRole === 'orthodontiste' ? '10.' : '5.'}Espacement et Encombrement (DDM)</DiamondCardTitle>
           </DiamondCardHeader>
@@ -2246,10 +2269,11 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
                 </table>
               </div>
               {userRole === 'orthodontiste' && (<div>
-                <h3>Extractions</h3>
+                <h3 className={styles.extractionsTitle}>Extractions</h3>
                 <div className={styles.radioGroup}>
                   <label className={styles.radioOption}>
                     <input type="radio" name="extractions" value="none"
+                      checked={formState.extractions === 'none'}
                       onChange={(e) => handleRadioChange('extractions', e.target.value)}
                       className={styles.radioInput}
                     />
@@ -2310,7 +2334,7 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
                     </div>
                   </div>
                 </div>
-                <p>
+                <p className={styles.auxiliaryText}>
                   Pour les auxiliaires (par exemple, Power Arm), spécifier dans les Instructions Spéciales.
                 </p>
               </div>
@@ -2318,7 +2342,7 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
             </div>
           </DiamondCardContent>
         </DiamondCard>
-        <DiamondCard id="specialInstructions" className={`mb-6 ${activeSection === 'specialInstructions' ? 'ring-2 ring-blue-500' : ''}`}>
+        <DiamondCard id="specialInstructions" className={`mb-6 ${activeSection === 'specialInstructions' ? 'ring-2 border-2 border-[#0170B4] ring-[#0170B4] shadow-[0_0_15px_rgba(1,112,180,0.15)]' : ''}`} onClick={() => setActiveSection('specialInstructions')}>
           <DiamondCardHeader>
             <DiamondCardTitle>{userRole === 'orthodontiste' ? '11.' : '6.'} Instructions Spéciales</DiamondCardTitle>
           </DiamondCardHeader>

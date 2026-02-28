@@ -53,7 +53,7 @@ const StatusCard = ({ selectedStatus, onStatusSelect }) => {
     {
       icon: <Calendar className="w-6 h-6" />,
       number: counts.enplanification,
-      label: t('status.en-planification'),
+      label: t('status.planning'),
       statusId: 1,
       color: 'blue'
     },

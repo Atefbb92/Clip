@@ -107,6 +107,11 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ userRole }) => {
       icon: CreditCard,
       href: '/billing',
     },
+    {
+      title: 'Administration',
+      icon: User,
+      href: '/admin',
+    }
   ]
 
   const bottomMenuItems = [
@@ -120,11 +125,11 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ userRole }) => {
       icon: Settings,
       href: '/settings',
     },
-    {
-      title: t('navigation.clinical_preferences'), // Assuming this for clinical prefs too or add key
-      icon: User,
-      href: '/profileMedecin',
-    },
+    // {
+    //   title: t('navigation.clinical_preferences'), // Assuming this for clinical prefs too or add key
+    //   icon: User,
+    //   href: '/profileMedecin',
+    // },
   ]
 
   return (
@@ -146,8 +151,8 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ userRole }) => {
 
       <SidebarContent className="bg-transparent overflow-hidden pt-2">
         <SidebarGroup className="py-1">
-          <SidebarGroupLabel className="text-slate-300 font-medium px-4 py-1 h-6">
-            Main Navigation
+          <SidebarGroupLabel className="text-slate-300 font-medium px-4 py-1 h-6 mt-4">
+            {t('navigation.main')}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
@@ -176,7 +181,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ userRole }) => {
         <SidebarSeparator className="bg-green-500/30 my-2" />
         <SidebarGroup className="py-1">
           <SidebarGroupLabel className="text-slate-300 font-medium px-4 py-1 h-6">
-            System
+            {t('navigation.system')}
           </SidebarGroupLabel>
           <SidebarGroupContent className="flex flex-col h-full">
             <SidebarMenu>
@@ -201,7 +206,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ userRole }) => {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        <SidebarSeparator className="bg-green-500/30 my-2" />
+        {/* <SidebarSeparator className="bg-green-500/30 my-2" />
         <SidebarGroup>
           <SidebarGroupContent className="flex flex-col h-full">
             <SidebarMenu>
@@ -214,7 +219,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ userRole }) => {
                 >
                   <Link href="/demo">
                     <PuzzleIcon className={`h-4 w-4 ${styles.sidebarIcon}`} />
-                    <span className={styles.sidebarText}>Demo</span>
+                    <span className={styles.sidebarText}>{t('navigation.demo')}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -262,7 +267,7 @@ const DashboardSidebar: React.FC<DashboardSidebarProps> = ({ userRole }) => {
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
-        </SidebarGroup>
+        </SidebarGroup> */}
       </SidebarContent>
 
       <SidebarFooter className="bg-slate-800/50 mt-auto">

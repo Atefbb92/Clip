@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useTranslation } from '@/hooks/useTranslation'
 import {
   HelpCircle,
   Book,
@@ -57,6 +58,7 @@ interface DocumentationSection {
 }
 
 const SupportPage: React.FC = () => {
+  const { t } = useTranslation()
   const [searchTerm, setSearchTerm] = useState('')
   const [expandedFAQ, setExpandedFAQ] = useState<string | null>(null)
   const [selectedCategory, setSelectedCategory] = useState('all')
@@ -65,44 +67,38 @@ const SupportPage: React.FC = () => {
   const faqData: FAQItem[] = [
     {
       id: '1',
-      question: 'Comment ajouter un nouveau patient ?',
-      answer:
-        'Pour ajouter un nouveau patient, cliquez sur "Nouveau patient" dans la sidebar, puis remplissez le formulaire avec les informations personnelles, médicales et orthodontiques du patient.',
+      question: t('support.faq.items.add_patient.question'),
+      answer: t('support.faq.items.add_patient.answer'),
       category: 'patients',
     },
     {
       id: '2',
-      question: "Comment modifier le statut d'un patient ?",
-      answer:
-        'Accédez à la fiche du patient, cliquez sur "Modifier" et changez le statut dans la section "Statut du traitement". Les statuts disponibles sont : Brouillon, En attente, En planification, En production, En traitement, Terminé.',
+      question: t('support.faq.items.modify_status.question'),
+      answer: t('support.faq.items.modify_status.answer'),
       category: 'patients',
     },
     {
       id: '3',
-      question: 'Comment interpréter les graphiques du tableau de bord ?',
-      answer:
-        "Le tableau de bord affiche l'évolution des patients, la répartition par statut, les métriques de performance et la distribution des packs. Chaque graphique est interactif et vous pouvez survoler les éléments pour plus de détails.",
+      question: t('support.faq.items.interpret_charts.question'),
+      answer: t('support.faq.items.interpret_charts.answer'),
       category: 'dashboard',
     },
     {
       id: '4',
-      question: "Comment télécharger les fichiers d'un patient ?",
-      answer:
-        'Dans la fiche patient, allez dans l\'onglet "Fichiers" et cliquez sur l\'icône de téléchargement à côté du fichier souhaité.',
+      question: t('support.faq.items.download_files.question'),
+      answer: t('support.faq.items.download_files.answer'),
       category: 'files',
     },
     {
       id: '5',
-      question: "Que faire si j'ai oublié mon mot de passe ?",
-      answer:
-        'Sur la page de connexion, cliquez sur "Mot de passe oublié" et suivez les instructions envoyées par email pour réinitialiser votre mot de passe.',
+      question: t('support.faq.items.forgot_password.question'),
+      answer: t('support.faq.items.forgot_password.answer'),
       category: 'account',
     },
     {
       id: '6',
-      question: 'Comment archiver un patient ?',
-      answer:
-        'Dans la fiche patient, cliquez sur "Modifier" puis cochez la case "Archiver ce patient". Les patients archivés n\'apparaissent plus dans la liste principale mais restent accessibles via les filtres.',
+      question: t('support.faq.items.archive_patient.question'),
+      answer: t('support.faq.items.archive_patient.answer'),
       category: 'patients',
     },
   ]
@@ -110,114 +106,104 @@ const SupportPage: React.FC = () => {
   const documentationSections: DocumentationSection[] = [
     {
       id: 'getting-started',
-      title: 'Premiers pas',
-      description: 'Guide de démarrage rapide pour utiliser Diamond',
+      title: t('support.documentation.getting_started.title'),
+      description: t('support.documentation.getting_started.description'),
       icon: <Book className="w-5 h-5" />,
       subsections: [
         {
           id: 'login',
-          title: 'Connexion à la plateforme',
-          content:
-            "Utilisez vos identifiants fournis par l'équipe Diamond pour vous connecter. En cas de problème, contactez le support.",
+          title: t('support.documentation.getting_started.subsections.login.title'),
+          content: t('support.documentation.getting_started.subsections.login.content'),
         },
         {
           id: 'interface',
-          title: 'Interface utilisateur',
-          content:
-            "L'interface est composée d'une sidebar de navigation à gauche et d'une zone de contenu principale. Le tableau de bord vous donne une vue d'ensemble de votre pratique.",
+          title: t('support.documentation.getting_started.subsections.interface.title'),
+          content: t('support.documentation.getting_started.subsections.interface.content'),
         },
         {
           id: 'navigation',
-          title: 'Navigation',
-          content:
-            'Utilisez la sidebar pour naviguer entre les différentes sections : Tableau de bord, Liste des patients, Nouveau patient, Statistiques & KPI.',
+          title: t('support.documentation.getting_started.subsections.navigation.title'),
+          content: t('support.documentation.getting_started.subsections.navigation.content'),
         },
       ],
     },
     {
       id: 'patients',
-      title: 'Gestion des patients',
-      description: 'Tout savoir sur la gestion des dossiers patients',
+      title: t('support.documentation.patients.title'),
+      description: t('support.documentation.patients.description'),
       icon: <Users className="w-5 h-5" />,
       subsections: [
         {
           id: 'add-patient',
-          title: 'Ajouter un patient',
-          content:
-            'Cliquez sur "Nouveau patient" et remplissez les informations personnelles, médicales et orthodontiques. Tous les champs marqués d\'un * sont obligatoires.',
+          title: t('support.documentation.patients.subsections.add_patient.title'),
+          content: t('support.documentation.patients.subsections.add_patient.content'),
         },
         {
           id: 'patient-status',
-          title: 'Statuts des patients',
-          content:
-            "Les statuts permettent de suivre l'évolution du traitement : Brouillon (en cours de saisie), En attente (validation requise), En planification (planification du traitement), En production (fabrication des aligneurs), En traitement (patient en cours de traitement), Terminé (traitement achevé).",
+          title: t('support.documentation.patients.subsections.patient_status.title'),
+          content: t('support.documentation.patients.subsections.patient_status.content'),
         },
         {
           id: 'patient-files',
-          title: 'Gestion des fichiers',
-          content:
-            'Chaque patient peut avoir des fichiers associés (radiographies, photos, scans 3D). Utilisez l\'onglet "Fichiers" pour les consulter et les télécharger.',
+          title: t('support.documentation.patients.subsections.patient_files.title'),
+          content: t('support.documentation.patients.subsections.patient_files.content'),
         },
       ],
     },
     {
       id: 'dashboard',
-      title: 'Tableau de bord',
-      description: 'Comprendre les métriques et graphiques',
+      title: t('support.documentation.dashboard.title'),
+      description: t('support.documentation.dashboard.description'),
       icon: <BarChart3 className="w-5 h-5" />,
       subsections: [
         {
           id: 'metrics',
-          title: 'Métriques principales',
-          content:
-            'Le tableau de bord affiche 6 métriques clés : Total patients, Nouveaux ce mois, En traitement, Terminés, Actions requises, et Taux de croissance.',
+          title: t('support.documentation.dashboard.subsections.metrics.title'),
+          content: t('support.documentation.dashboard.subsections.metrics.content'),
         },
         {
           id: 'charts',
-          title: 'Graphiques et analyses',
-          content:
-            "L'évolution des patients (graphique linéaire), la répartition par statut (barres de progression), les métriques de performance et la répartition des packs (graphique en anneau).",
+          title: t('support.documentation.dashboard.subsections.charts.title'),
+          content: t('support.documentation.dashboard.subsections.charts.content'),
         },
       ],
     },
     {
       id: 'settings',
-      title: 'Paramètres',
-      description: 'Configuration de votre compte et préférences',
+      title: t('support.documentation.settings.title'),
+      description: t('support.documentation.settings.description'),
       icon: <Settings className="w-5 h-5" />,
       subsections: [
         {
           id: 'profile',
-          title: 'Profil utilisateur',
-          content:
-            'Modifiez vos informations personnelles, votre mot de passe et vos préférences de notification dans la section "Utilisateur".',
+          title: t('support.documentation.settings.subsections.profile.title'),
+          content: t('support.documentation.settings.subsections.profile.content'),
         },
         {
           id: 'security',
-          title: 'Sécurité',
-          content:
-            "Changez régulièrement votre mot de passe et activez l'authentification à deux facteurs si disponible.",
+          title: t('support.documentation.settings.subsections.security.title'),
+          content: t('support.documentation.settings.subsections.security.content'),
         },
       ],
     },
   ]
 
   const categories = [
-    { id: 'all', label: 'Toutes', count: faqData.length },
+    { id: 'all', label: t('support.faq.categories.all'), count: faqData.length },
     {
       id: 'patients',
-      label: 'Patients',
+      label: t('support.faq.categories.patients'),
       count: faqData.filter((f) => f.category === 'patients').length,
     },
     {
       id: 'dashboard',
-      label: 'Tableau de bord',
+      label: t('support.faq.categories.dashboard'),
       count: faqData.filter((f) => f.category === 'dashboard').length,
     },
-    { id: 'files', label: 'Fichiers', count: faqData.filter((f) => f.category === 'files').length },
+    { id: 'files', label: t('support.faq.categories.files'), count: faqData.filter((f) => f.category === 'files').length },
     {
       id: 'account',
-      label: 'Compte',
+      label: t('support.faq.categories.account'),
       count: faqData.filter((f) => f.category === 'account').length,
     },
   ]
@@ -235,8 +221,8 @@ const SupportPage: React.FC = () => {
       {/* En-tête avec HeadingTitle */}
       <div className="flex justify-between items-start">
         <HeadingTitle
-          title="Centre d'aide Diamond"
-          subtitle="Trouvez rapidement les réponses à vos questions et optimisez votre utilisation de la plateforme"
+          title={t('support.title')}
+          subtitle={t('support.subtitle')}
           titleClassName="text-4xl font-bold text-slate-900"
           subtitleClassName="text-lg text-slate-600"
         />
@@ -246,13 +232,13 @@ const SupportPage: React.FC = () => {
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-3 bg-white px-5 py-2 rounded-lg shadow-sm border border-slate-200 hover:shadow-md transition-shadow  "
-            aria-label="Ouvrir le support clinique (Calendly)"
+            aria-label={t('support.clinical_support')}
           >
             <div className="p-2 bg-blue-400 rounded-full">
               <Phone className="w-5 h-5 text-white" />
             </div>
             <span className="text-sm font-semibold  text-slate-800 whitespace-nowrap">
-              Support clinique
+              {t('support.clinical_support')}
             </span>
           </a>
         </div>
@@ -264,7 +250,7 @@ const SupportPage: React.FC = () => {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5" />
             <Input
-              placeholder="Rechercher dans la documentation, FAQ, tutoriels..."
+              placeholder={t('support.search_placeholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 h-12 border-slate-200 focus:border-curious-blue-500 focus:ring-curious-blue-500"
@@ -285,7 +271,7 @@ const SupportPage: React.FC = () => {
                 }`}
             >
               <Book className="w-4 h-4" />
-              Documentation
+              {t('support.tabs.documentation')}
             </button>
             <button
               onClick={() => setActiveTab('faq')}
@@ -295,7 +281,7 @@ const SupportPage: React.FC = () => {
                 }`}
             >
               <MessageSquare className="w-4 h-4" />
-              FAQ
+              {t('support.tabs.faq')}
             </button>
             <button
               onClick={() => setActiveTab('tutorials')}
@@ -305,7 +291,7 @@ const SupportPage: React.FC = () => {
                 }`}
             >
               <Video className="w-4 h-4" />
-              Tutoriels
+              {t('support.tabs.tutorials')}
             </button>
             <button
               onClick={() => setActiveTab('contact')}
@@ -315,7 +301,7 @@ const SupportPage: React.FC = () => {
                 }`}
             >
               <Mail className="w-4 h-4" />
-              Contact
+              {t('support.tabs.contact')}
             </button>
           </nav>
         </div>
@@ -449,7 +435,7 @@ const SupportPage: React.FC = () => {
                       <div className="p-2 bg-blue-100 rounded-lg">
                         <Video className="w-5 h-5 text-blue-600" />
                       </div>
-                      <span className="text-slate-900">Premiers pas</span>
+                      <span className="text-slate-900">{t('support.documentation.getting_started.title')}</span>
                     </CardTitle>
                     <CardDescription className="ml-10 text-slate-600">
                       Introduction à Diamond • 5 minutes
@@ -477,7 +463,7 @@ const SupportPage: React.FC = () => {
                       <div className="p-2 bg-green-100 rounded-lg">
                         <UserPlus className="w-5 h-5 text-green-600" />
                       </div>
-                      <span className="text-slate-900">Gestion des patients</span>
+                      <span className="text-slate-900">{t('support.documentation.patients.title')}</span>
                     </CardTitle>
                     <CardDescription className="ml-10 text-slate-600">
                       Ajouter et gérer vos patients • 8 minutes
@@ -505,7 +491,7 @@ const SupportPage: React.FC = () => {
                       <div className="p-2 bg-curious-blue-100 rounded-lg">
                         <BarChart3 className="w-5 h-5 text-curious-blue-600" />
                       </div>
-                      <span className="text-slate-900">Tableau de bord</span>
+                      <span className="text-slate-900">{t('support.documentation.dashboard.title')}</span>
                     </CardTitle>
                     <CardDescription className="ml-10 text-slate-600">
                       Comprendre vos statistiques • 6 minutes
@@ -541,10 +527,10 @@ const SupportPage: React.FC = () => {
                       <div className="p-2 bg-blue-100 rounded-lg">
                         <Mail className="w-5 h-5 text-blue-600" />
                       </div>
-                      <span className="text-slate-900">Nous contacter</span>
+                      <span className="text-slate-900">{t('support.contact.title')}</span>
                     </CardTitle>
                     <CardDescription className="ml-10 text-slate-600">
-                      Plusieurs moyens pour nous joindre rapidement
+                      {t('support.contact.subtitle')}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -553,9 +539,9 @@ const SupportPage: React.FC = () => {
                         <Mail className="w-4 h-4 text-white" />
                       </div>
                       <div className="flex-1">
-                        <p className="font-semibold text-slate-900">Email Support</p>
-                        <p className="text-blue-600 font-medium">support@diamond-aligner.com</p>
-                        <p className="text-xs text-slate-500 mt-1">Réponse sous 2h en moyenne</p>
+                        <p className="font-semibold text-slate-900">{t('support.contact.email_support.title')}</p>
+                        <p className="text-blue-600 font-medium">{t('support.contact.email_support.value')}</p>
+                        <p className="text-xs text-slate-500 mt-1">{t('support.contact.email_support.desc')}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
@@ -563,9 +549,9 @@ const SupportPage: React.FC = () => {
                         <Phone className="w-4 h-4 text-white" />
                       </div>
                       <div className="flex-1">
-                        <p className="font-semibold text-slate-900">Whatsapp</p>
-                        <p className="text-green-600 font-medium">+49 176 89739948</p>
-                        <p className="text-xs text-slate-500 mt-1">Support direct immédiat</p>
+                        <p className="font-semibold text-slate-900">{t('support.contact.whatsapp.title')}</p>
+                        <p className="text-green-600 font-medium">{t('support.contact.whatsapp.value')}</p>
+                        <p className="text-xs text-slate-500 mt-1">{t('support.contact.whatsapp.desc')}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
@@ -573,9 +559,9 @@ const SupportPage: React.FC = () => {
                         <Clock className="w-4 h-4 text-white" />
                       </div>
                       <div className="flex-1">
-                        <p className="font-semibold text-slate-900">Horaires d&apos;ouverture</p>
-                        <p className="text-slate-600 font-medium">Lundi - Vendredi: 9h00 - 18h00</p>
-                        <p className="text-xs text-slate-500 mt-1">Support 24/7 par email</p>
+                        <p className="font-semibold text-slate-900">{t('support.contact.hours.title')}</p>
+                        <p className="text-slate-600 font-medium">{t('support.contact.hours.value')}</p>
+                        <p className="text-xs text-slate-500 mt-1">{t('support.contact.hours.desc')}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
@@ -587,9 +573,9 @@ const SupportPage: React.FC = () => {
                         />
                       </div>
                       <div className="flex-1">
-                        <p className="font-semibold text-slate-900">Assistance distante TeamViewer</p>
-                        <p className="text-blue-700 font-medium">Démarrer une session sécurisée</p>
-                        <p className="text-xs text-slate-500 mt-1">Nécessite TeamViewer installé</p>
+                        <p className="font-semibold text-slate-900">{t('support.contact.teamviewer.title')}</p>
+                        <p className="text-blue-700 font-medium">{t('support.contact.teamviewer.value')}</p>
+                        <p className="text-xs text-slate-500 mt-1">{t('support.contact.teamviewer.desc')}</p>
                       </div>
                       <Button
                         onClick={() => {
@@ -601,10 +587,10 @@ const SupportPage: React.FC = () => {
                             )
                           }
                         }}
-                        aria-label="Démarrer TeamViewer"
+                        aria-label={t('support.contact.teamviewer.button')}
                         className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
                       >
-                        <span>Démarrer TeamViewer</span>
+                        <span>{t('support.contact.teamviewer.button')}</span>
                       </Button>
                     </div>
                   </CardContent>
@@ -617,10 +603,10 @@ const SupportPage: React.FC = () => {
                       <div className="p-2 bg-green-100 rounded-lg">
                         <CheckCircle className="w-5 h-5 text-green-600" />
                       </div>
-                      <span className="text-slate-900">Statut du système</span>
+                      <span className="text-slate-900">{t('support.contact.system_status.title')}</span>
                     </CardTitle>
                     <CardDescription className="ml-10 text-slate-600">
-                      État en temps réel des services Diamond
+                      {t('support.contact.system_status.desc')}
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -631,11 +617,11 @@ const SupportPage: React.FC = () => {
                           <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full"></div>
                         </div>
                         <div>
-                          <span className="font-semibold text-slate-900">Plateforme web</span>
+                          <span className="font-semibold text-slate-900">{t('support.contact.system_status.web_platform')}</span>
                           <p className="text-xs text-slate-500">Dernière vérification: il y a 2 min</p>
                         </div>
                       </div>
-                      <Badge className="bg-green-600 text-white">Opérationnel</Badge>
+                      <Badge className="bg-green-600 text-white">{t('support.contact.system_status.operational')}</Badge>
                     </div>
                     <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
                       <div className="flex items-center gap-3">
@@ -644,11 +630,11 @@ const SupportPage: React.FC = () => {
                           <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full"></div>
                         </div>
                         <div>
-                          <span className="font-semibold text-slate-900">Base de données</span>
+                          <span className="font-semibold text-slate-900">{t('support.contact.system_status.database')}</span>
                           <p className="text-xs text-slate-500">Temps de réponse: 12ms</p>
                         </div>
                       </div>
-                      <Badge className="bg-green-600 text-white">Opérationnel</Badge>
+                      <Badge className="bg-green-600 text-white">{t('support.contact.system_status.operational')}</Badge>
                     </div>
                     <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg border border-yellow-200">
                       <div className="flex items-center gap-3">
@@ -657,11 +643,11 @@ const SupportPage: React.FC = () => {
                           <div className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-500 rounded-full"></div>
                         </div>
                         <div>
-                          <span className="font-semibold text-slate-900">API externe</span>
+                          <span className="font-semibold text-slate-900">{t('support.contact.system_status.external_api')}</span>
                           <p className="text-xs text-slate-500">Maintenance programmée</p>
                         </div>
                       </div>
-                      <Badge className="bg-yellow-600 text-white">Maintenance</Badge>
+                      <Badge className="bg-yellow-600 text-white">{t('support.contact.system_status.maintenance')}</Badge>
                     </div>
                   </CardContent>
                 </Card>
@@ -674,23 +660,23 @@ const SupportPage: React.FC = () => {
                     <div className="p-2 bg-curious-blue-100 rounded-lg">
                       <Mail className="w-5 h-5 text-curious-blue-600" />
                     </div>
-                    Contact rapide
+                    {t('support.contact.form.title')}
                   </CardTitle>
                   <CardDescription className="ml-10 text-slate-600">
-                    Envoyez-nous un message et recevez une réponse sous 2h
+                    {t('support.contact.form.subtitle')}
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-slate-700 font-medium">Nom complet</label>
+                      <label className="text-slate-700 font-medium">{t('support.contact.form.name')}</label>
                       <Input
-                        placeholder="Votre nom complet"
+                        placeholder={t('support.contact.form.name')}
                         className="border-slate-200 focus:border-curious-blue-500 focus:ring-curious-blue-500"
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-slate-700 font-medium">Email</label>
+                      <label className="text-slate-700 font-medium">{t('support.contact.form.email')}</label>
                       <Input
                         placeholder="votre.email@exemple.com"
                         type="email"
@@ -699,26 +685,26 @@ const SupportPage: React.FC = () => {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-slate-700 font-medium">Sujet</label>
+                    <label className="text-slate-700 font-medium">{t('support.contact.form.subject')}</label>
                     <Input
-                      placeholder="Sujet de votre demande"
+                      placeholder={t('support.contact.form.subject')}
                       className="border-slate-200 focus:border-curious-blue-500 focus:ring-curious-blue-500"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-slate-700 font-medium">Message</label>
+                    <label className="text-slate-700 font-medium">{t('support.contact.form.message')}</label>
                     <textarea
                       className="w-full p-3 border border-slate-200 rounded-lg resize-none focus:border-curious-blue-500 focus:ring-curious-blue-500 transition-colors"
                       rows={4}
-                      placeholder="Décrivez votre demande en détail..."
+                      placeholder={t('support.contact.form.message')}
                     />
                   </div>
                   <Button className="w-full bg-curious-blue-500 hover:bg-curious-blue-600 text-white">
                     <Mail className="w-4 h-4 mr-2" />
-                    Envoyer le message
+                    {t('support.contact.form.submit')}
                   </Button>
                   <p className="text-center text-slate-500 text-sm">
-                    Vos données sont sécurisées et ne seront jamais partagées
+                    {t('support.contact.form.privacy')}
                   </p>
                 </CardContent>
               </Card>

@@ -11,7 +11,10 @@
         "support": "Support & Wartung",
         "settings": "Einstellungen",
         "clinical_preferences": "Klinische Präferenzen",
-        "logout": "Abmelden"
+        "logout": "Abmelden",
+        "main": "Hauptnavigation",
+        "demo": "Demo",
+        "system": "System"
     },
     "common": {
         "language": "Sprache",
@@ -25,7 +28,9 @@
         "view": "Ansehen",
         "new_patient": "Neuer Patient",
         "days": "T",
-        "months": "Monate"
+        "months": "Monate",
+        "years": "Jahre",
+        "week": "Woche"
     },
     "dashboard": {
         "welcome_morning": "Guten Morgen User ☀️",
@@ -47,7 +52,9 @@
             "evolution": "Patientenentwicklung",
             "status_dist": "Statusverteilung",
             "performance": "Leistungskennzahlen",
-            "pack_dist": "Packungsverteilung"
+            "pack_dist": "Packungsverteilung",
+            "evolution_new_cases": "Neue Fälle",
+            "evolution_approved_cases": "Genehmigte Fälle"
         },
         "recent_patients": {
             "title": "Aktuelle Patienten",
@@ -65,7 +72,17 @@
             "Ein neuer Tag, ein neues Lächeln zu kreieren",
             "Ihre kieferorthopädische Expertise in Aktion",
             "Gemeinsam schaffen wir perfekte Lächeln"
-        ]
+        ],
+        "notifications": {
+            "title": "Benachrichtigungen",
+            "mark_all_read": "Alle als gelesen markieren",
+            "empty": "Keine Benachrichtigungen"
+        },
+        "messages": {
+            "title": "Nachrichten",
+            "read_all": "Alle lesen",
+            "empty": "Keine Nachrichten"
+        }
     },
     "status": {
         "brouillon": "Entwurf",
@@ -157,9 +174,13 @@
             "category": "Kategorie",
             "submission_date": "Einreichungsdatum",
             "validation_date": "Validierungsdatum",
+            "start_date": "Startdatum",
             "clinical_conditions": "Klinische Bedingungen",
             "tp_check": "TP-Check",
-            "actions": "Aktionen"
+            "actions": "Aktionen",
+            "continue_prescription": "Verschreibung fortsetzen",
+            "validate_tp": "TP-Check bestätigen",
+            "start_treatment": "Behandlung starten"
         },
         "categories": {
             "adult": "Erwachsener",
@@ -182,13 +203,35 @@
         "detail": {
             "actions": {
                 "back": "Zurück",
-                "request_correction": "Korrektur",
+                "request_correction": "Refinement",
                 "view_tp_check": "TP-Check",
                 "finish": "Beenden",
                 "order_eterna": "ETERNA®"
             },
             "status": {
-                "active": "Aktiv"
+                "active": "Aktiv",
+                "rejected": "Abgelehnt",
+                "revision_requested": "Überarbeitung angefordert",
+                "validated": "Validiert",
+                "treatment_started": "Behandlung begonnen",
+                "aligner_delivered": "Aligner-Set geliefert",
+                "tp_validated": "TP Check validiert",
+                "tp_ready": "TP Check bereit",
+                "prescription_submitted": "Verschreibung eingereicht"
+            },
+            "alerts": {
+                "reject_error": "Fehler beim Ablehnen des Patienten."
+            },
+            "dialogs": {
+                "refinement_confirm_title": "Ein Refinement anfordern?",
+                "refinement_confirm_desc": "Möchten Sie wirklich ein Refinement für diesen Patienten anfordern?",
+                "refinement_upload_title": "Refinement-Dateien",
+                "refinement_upload_desc": "Bitte laden Sie neue Fotos und Scans für den Patienten hoch. Scans sind zwingend erforderlich.",
+                "submit_refinement": "Einreichen",
+                "reject_title": "Patient ablehnen",
+                "reject_desc": "Bitte bestätigen Sie, dass Sie diesen Patienten ablehnen möchten. Diese Aktion kann nicht rückgängig gemacht werden.",
+                "validate_tp_title": "Behandlungsplan validieren",
+                "validate_tp_desc": "Sie sind dabei, Version {{version}} des TP-Checks zu validieren."
             },
             "tabs": {
                 "overview": "Übersicht",
@@ -284,10 +327,10 @@
                     "choose": "Profil wählen",
                     "pack_title": "Paket auswählen",
                     "steps_per_arch": "Schritte pro Kiefer",
-                    "step_count": "{count} Schritte",
+                    "step_count": "{{count}} Schritte",
                     "corrections": "Korrekturen inklusive",
-                    "correction_count": "{count} Korrektur",
-                    "correction_count_plural": "{count} Korrekturen",
+                    "correction_count": "{{count}} Korrektur",
+                    "correction_count_plural": "{{count}} Korrekturen",
                     "one_arch": "1 Kiefer",
                     "two_arches": "2 Kiefer",
                     "choose_pack": "Paket wählen",
@@ -330,6 +373,7 @@
                     "month": "MM",
                     "year": "JJJJ",
                     "age_display": "Alter: {age} Jahre",
+                    "age": "Alter",
                     "gender": "Geschlecht",
                     "male": "Männlich",
                     "female": "Weiblich",
@@ -387,13 +431,20 @@
                         "place_if_needed": "Bei Bedarf platzieren",
                         "do_not_place_on": "Nicht platzieren auf",
                         "ap_report": "4. A-P Bericht",
+                        "ap_report_conserve": "Aktuelle Situation beibehalten",
                         "overjet": "5. Overjet",
+                        "overjet_default": "Andere Ziele erreichen und ich werde den Overjet beurteilen",
                         "overbite": "6. Overbite",
+                        "overbite_default": "Andere Ziele erreichen und ich werde den Overbite beurteilen",
                         "bite_ramps": "7. Bite Ramps",
+                        "bite_ramps_auto": "Bite Ramps automatisch platzieren, wenn die Intrusion der unteren Schneidezähne > 1,5 mm ist",
                         "midlines": "8. Mittellinien",
-                        "extractions": "9. Extraktionen",
+                        "midlines_default": "Andere Ziele erreichen und ich werde die Mittellinien beurteilen",
+                        "extractions": "9. Posteriorer Kreuzbiss",
+                        "extractions_none": "Nicht korrigieren",
                         "extract": "Extrahieren",
                         "spacing": "10. Abstand",
+                        "spacing_default": "Alle Lücken schließen",
                         "instructions": "11. Anweisungen"
                     }
                 },
@@ -404,7 +455,10 @@
                     "not_selected": "Nicht ausgewählt",
                     "not_filled": "Nicht ausgefüllt",
                     "not_specified": "Nicht spezifiziert",
-                    "modify": "Ändern"
+                    "modify": "Ändern",
+                    "pack": "Gewünschtes Paket",
+                    "scroll_to_read": "Scrollen Sie nach unten, um das Lesen der Verschreibung zu bestätigen",
+                    "validation_checkbox": "Ich bestätige, dass ich die gesamte Verordnung geprüft habe und bestätige sie."
                 },
                 "buttons": {
                     "prev": "Zurück",
@@ -422,6 +476,8 @@
                     "cancel_desc": "Alle eingegebenen Daten gehen verloren. Diese Aktion kann nicht rückgängig gemacht werden.",
                     "continue_editing": "Bearbeitung fortsetzen",
                     "yes_cancel": "Ja, abbrechen",
+                    "submit_confirm_title": "Falleinreichung bestätigen",
+                    "submit_confirm_desc": "Sind Sie sicher, dass Sie diesen Fall einreichen möchten? Er wird zur Bearbeitung gesendet und kann nicht mehr geändert werden.",
                     "add_cbct_title": "CBCT hinzufügen",
                     "add_cbct_desc": "CBCT-URL eingeben",
                     "scan_options_title": "Scan-Versandoptionen",
@@ -446,6 +502,10 @@
                     "scan_link_req": "Bitte geben Sie den Scan-Link ein",
                     "age_adult_error": "Alter muss 18 oder älter für einen erwachsenen Patienten sein",
                     "age_teen_error": "Alter muss zwischen 12 und 17 für einen jugendlichen Patienten liegen"
+                },
+                "alerts": {
+                    "file_limit": "Dateigröße überschreitet das Limit von 15 MB.",
+                    "file_format": "Dateiformat nicht unterstützt. Verwenden Sie .stl, .ply oder .obj"
                 }
             },
             "photos": {
@@ -458,7 +518,8 @@
                 "my_diamond_title": "My Diamond App",
                 "uploaded_photos": "Von MyDiamond App hochgeladene Fotos",
                 "download_all": "Alle herunterladen",
-                "follow_up_desc": "Der Patient sendet jede Woche Follow-up-Fotos über die mobile MyDiamond App"
+                "follow_up_desc": "Der Patient sendet alle 5 Aligner Follow-up-Fotos über die mobile MyDiamond App",
+                "add_photo": "Foto hinzufügen"
             },
             "quick_actions": {
                 "title": "Schnellaktionen"
@@ -520,8 +581,8 @@
         "title": "Rechnungsverwaltung",
         "subtitle": "Verwalten, verfolgen und analysieren Sie Ihre Kundenabrechnung",
         "stats": {
-            "revenue": "Umsatz",
-            "pending": "Ausstehend",
+            "revenue": "Gesamteinkäufe",
+            "pending": "Ausstehende Zahlung",
             "paid_amount": "Gezahlter Betrag",
             "total_bills": "Rechnungen gesamt"
         },
@@ -616,11 +677,13 @@
             "data": "Daten"
         },
         "practitioner": {
-            "title": "Informationen zum Behandler",
-            "desc": "Verwalten Sie Ihre beruflichen und persönlichen Informationen",
+            "title": "Persönliche Informationen",
+            "desc": "Aktualisieren Sie Ihre persönlichen Informationen.",
             "first_name": "Vorname",
             "last_name": "Nachname",
-            "email": "Berufliche E-Mail",
+            "email": "E-Mail",
+            "phone": "Telefon",
+            "active_since": "Aktiv seit",
             "specialty": "Fachgebiet",
             "specialty_placeholder": "Wählen Sie Ihr Fachgebiet",
             "verified": "Verifiziertes Konto",
@@ -650,6 +713,43 @@
         "placeholder": {
             "title": "Bereich im Aufbau",
             "desc": "Der Bereich {{section}} befindet sich derzeit in der Entwicklung."
+        },
+        "notifications": {
+            "title": "Benachrichtigungen",
+            "desc": "Wählen Sie, wie Sie benachrichtigt werden möchten",
+            "communications": "Kommunikation",
+            "communications_desc": "Erhalten Sie E-Mails über Ihre Kontoaktivitäten",
+            "email": "E-Mail",
+            "push": "Push-Benachrichtigungen",
+            "sms": "SMS",
+            "appointments": "Termine",
+            "appointments_desc": "Erinnerungen an Ihre nächsten Termine",
+            "reminders": "Erinnerungen",
+            "changes": "Änderungen am Behandlungsplan"
+        },
+        "security": {
+            "password_title": "Passwort",
+            "password_desc": "Ändern Sie Ihr Passwort",
+            "current_password": "Aktuelles Passwort",
+            "new_password": "Neues Passwort",
+            "confirm_password": "Passwort bestätigen",
+            "update_password": "Passwort aktualisieren",
+            "2fa_title": "Zwei-Faktor-Authentifizierung",
+            "2fa_desc": "Fügen Sie Ihrem Konto eine zusätzliche Sicherheitsebene hinzu",
+            "2fa_enable": "2FA aktivieren",
+            "2fa_help": "Wir senden Ihnen einen Code, um Ihre Identität zu bestätigen.",
+            "sessions_title": "Aktive Sitzungen",
+            "sessions_desc": "Verwalten Sie Ihre aktiven Sitzungen auf anderen Geräten"
+        },
+        "data": {
+            "export_title": "Daten exportieren",
+            "export_desc": "Laden Sie eine Kopie Ihrer Daten herunter",
+            "download": "Daten herunterladen",
+            "delete_account_title": "Konto löschen",
+            "delete_account_desc": "Löschen Sie Ihr Konto und alle Ihre Daten dauerhaft",
+            "delete_account": "Konto löschen",
+            "delete_warning": "Diese Aktion ist irreversibel. Bitte seien Sie sich sicher.",
+            "confirm_delete": "Ja, mein Konto löschen"
         }
     },
     "preferences_cliniques": {
@@ -855,6 +955,256 @@
                     "no_add": "Keine Überkorrektur-Aligner hinzufügen"
                 }
             }
+        }
+    },
+    "support": {
+        "title": "Diamond Hilfezentrum",
+        "subtitle": "Finden Sie schnell Antworten und optimieren Sie Ihre Nutzung der Plattform",
+        "clinical_support": "Klinischer Support",
+        "search_placeholder": "Dokumentation, FAQ, Tutorials durchsuchen...",
+        "tabs": {
+            "documentation": "Dokumentation",
+            "faq": "FAQ",
+            "tutorials": "Tutorials",
+            "contact": "Kontakt"
+        },
+        "documentation": {
+            "getting_started": {
+                "title": "Erste Schritte",
+                "description": "Kurzanleitung zur Nutzung von Diamond",
+                "subsections": {
+                    "login": {
+                        "title": "Plattform-Login",
+                        "content": "Verwenden Sie die vom Diamond-Team bereitgestellten Zugangsdaten. Kontaktieren Sie bei Problemen den Support."
+                    },
+                    "interface": {
+                        "title": "Benutzeroberfläche",
+                        "content": "Seitenleiste zur Navigation und Hauptinhaltsbereich. Dashboard-Übersicht."
+                    },
+                    "navigation": {
+                        "title": "Navigation",
+                        "content": "Verwenden Sie die Seitenleiste, um auf Dashboard, Patienten, Neuer Patient, Statistiken zuzugreifen."
+                    }
+                }
+            },
+            "patients": {
+                "title": "Patientenverwaltung",
+                "description": "Alles über die Verwaltung von Patientenakten",
+                "subsections": {
+                    "add_patient": {
+                        "title": "Patient hinzufügen",
+                        "content": "Klicken Sie auf 'Neuer Patient' und füllen Sie die erforderlichen Formulare aus."
+                    },
+                    "patient_status": {
+                        "title": "Patientenstatus",
+                        "content": "Entwurf, Ausstehend, Planung, Produktion, In Behandlung, Abgeschlossen."
+                    },
+                    "patient_files": {
+                        "title": "Dateiverwaltung",
+                        "content": "Verwalten Sie Röntgenbilder, Fotos und 3D-Scans im Reiter 'Dateien'."
+                    }
+                }
+            },
+            "dashboard": {
+                "title": "Dashboard",
+                "description": "Metriken und Diagramme verstehen",
+                "subsections": {
+                    "metrics": {
+                        "title": "Wichtige Kennzahlen",
+                        "content": "Gesamtpatienten, Neu in diesem Monat, In Behandlung, Abgeschlossen, Aktionen erforderlich, Wachstumsrate."
+                    },
+                    "charts": {
+                        "title": "Diagramme & Analyse",
+                        "content": "Patientenentwicklung, Statusverteilung, Leistungskennzahlen."
+                    }
+                }
+            },
+            "settings": {
+                "title": "Einstellungen",
+                "description": "Kontokonfiguration und Präferenzen",
+                "subsections": {
+                    "profile": {
+                        "title": "Benutzerprofil",
+                        "content": "Persönliche Infos, Passwort, Benachrichtigungspräferenzen bearbeiten."
+                    },
+                    "security": {
+                        "title": "Sicherheit",
+                        "content": "Ändern Sie regelmäßig Ihr Passwort, aktivieren Sie 2FA."
+                    }
+                }
+            }
+        },
+        "faq": {
+            "categories": {
+                "all": "Alle",
+                "patients": "Patienten",
+                "dashboard": "Dashboard",
+                "files": "Dateien",
+                "account": "Konto"
+            },
+            "items": {
+                "add_patient": {
+                    "question": "Wie füge ich einen neuen Patienten hinzu?",
+                    "answer": "Klicken Sie in der Seitenleiste auf 'Neuer Patient', füllen Sie die Formulare aus."
+                },
+                "modify_status": {
+                    "question": "Wie ändere ich den Patientenstatus?",
+                    "answer": "Gehen Sie zur Patientenakte, klicken Sie auf 'Bearbeiten', ändern Sie den Status."
+                },
+                "interpret_charts": {
+                    "question": "Wie interpretiere ich Dashboard-Diagramme?",
+                    "answer": "Das Dashboard zeigt Entwicklung, Statusverteilung, Metriken."
+                },
+                "download_files": {
+                    "question": "Wie lade ich Patientendateien herunter?",
+                    "answer": "In der Patientenakte, gehen Sie zum Reiter 'Dateien', klicken Sie auf das Download-Symbol."
+                },
+                "forgot_password": {
+                    "question": "Was tun, wenn ich mein Passwort vergessen habe?",
+                    "answer": "Klicken Sie auf der Login-Seite auf 'Passwort vergessen'."
+                },
+                "archive_patient": {
+                    "question": "Wie archiviere ich einen Patienten?",
+                    "answer": "In der Patientenakte, klicken Sie auf 'Bearbeiten', aktivieren Sie 'Diesen Patienten archivieren'."
+                }
+            }
+        },
+        "contact": {
+            "title": "Kontaktieren Sie uns",
+            "subtitle": "Wege, uns schnell zu erreichen",
+            "email_support": {
+                "title": "E-Mail-Support",
+                "value": "support@diamond-aligner.com",
+                "desc": "Antwort durchschnittlich innerhalb von 2 Stunden"
+            },
+            "whatsapp": {
+                "title": "Whatsapp",
+                "value": "+49 176 89739948",
+                "desc": "Sofortiger direkter Support"
+            },
+            "hours": {
+                "title": "Öffnungszeiten",
+                "value": "Mo - Fr: 9:00 - 18:00",
+                "desc": "24/7 E-Mail-Support"
+            },
+            "teamviewer": {
+                "title": "TeamViewer Fernwartung",
+                "value": "Sichere Sitzung starten",
+                "desc": "Erfordert installierten TeamViewer",
+                "button": "TeamViewer starten"
+            },
+            "form": {
+                "title": "Schnellkontakt",
+                "subtitle": "Senden Sie uns eine Nachricht, Antwort innerhalb von 2 Stunden",
+                "name": "Vollständiger Name",
+                "email": "E-Mail",
+                "subject": "Betreff",
+                "message": "Nachricht",
+                "submit": "Nachricht senden",
+                "privacy": "Ihre Daten sind sicher und werden niemals weitergegeben"
+            },
+            "system_status": {
+                "title": "Systemstatus",
+                "desc": "Echtzeit-Status der Diamond-Dienste",
+                "web_platform": "Web-Plattform",
+                "database": "Datenbank",
+                "external_api": "Externe API",
+                "operational": "Betriebsbereit",
+                "maintenance": "Wartung"
+            }
+        }
+    },
+    "demo": {
+        "hero": {
+            "techno_ai": "Diamond AI Technologie",
+            "title": "Visualisieren Sie die Zukunft des Lächelns",
+            "description": "Unsere prädiktiven Algorithmen simulieren Zahnbewegungen mit 98% Genauigkeit.",
+            "precision": "98% Genauigkeit",
+            "cases_count": "50k+ Fälle"
+        },
+        "library": {
+            "title": "Bibliothek",
+            "description": "Zugriff auf über 50 Arten dokumentierter Malokklusionen.",
+            "button": "Dokumentation ansehen"
+        },
+        "gallery": {
+            "title": "Häufige Malokklusionen",
+            "subtitle": "Erkunden Sie unsere Datenbank behandelter Fälle",
+            "filter_placeholder": "Filtern...",
+            "view_details": "Details ansehen",
+            "malocclusion": "Malokklusion",
+            "class": "Klasse",
+            "duration": "Dauer",
+            "difficulty": "Schwierigkeit",
+            "ai_insights": "KI-Erkenntnisse",
+            "ai_suggestion": "KI schlägt einen sequenziellen Aligner-Ansatz für eine optimale Lösung in {{duration}} vor.",
+            "simulation_3d": "3D-Simulation",
+            "before_after": "Vorher/Nachher Fotos",
+            "interactive_model": "Interaktives 3D-Modell",
+            "before": "Vorher",
+            "after": "Nachher"
+        },
+        "cases": {
+            "crowding": {
+                "title": "Engstand",
+                "description": "Korrektur von schwerem Engstand durch Expansion und IPR."
+            },
+            "spacing": {
+                "title": "Lückenstand",
+                "description": "Schluss mehrerer Diastemata mit ästhetischer Ausrichtung."
+            },
+            "openbite": {
+                "title": "Offener Biss",
+                "description": "Korrektur des offenen Bisses durch Molarintrusion und Gummizüge."
+            },
+            "deepbite": {
+                "title": "Tiefbiss",
+                "description": "Nivellierung der Spee-Kurve und Bissöffnung."
+            },
+            "class2": {
+                "title": "Klasse II",
+                "description": "Sagittale Korrektur mit sequenzieller Distalisierung."
+            },
+            "class3": {
+                "title": "Klasse III",
+                "description": "Orthodontische Tarnung mit mandibulärer IPR."
+            }
+        }
+    },
+    "diamond_purity": {
+        "title": "Diamond Purity Programm",
+        "subtitle": "Verfolgen Sie Ihren Fortschritt und schalten Sie exklusive Vorteile frei",
+        "current_level": "Aktuelles Niveau",
+        "validity": "Gültigkeit: 1. Juli 2025 - 30. Juni 2026",
+        "discount_current": "Rabatt",
+        "validated_cases_count": "Validierte Fälle",
+        "stats": {
+            "validated_cases": "Validierte Fälle bis {{date}}",
+            "pending": "Ausstehend",
+            "submitted": "Eingereicht",
+            "required_maintain": "Erforderliche Fälle, um Starter zu halten",
+            "current_discount": "aktueller Rabatt",
+            "required_next": "Erforderliche Fälle, um Prime zu erreichen",
+            "future_discount": "zukünftiger Rabatt"
+        },
+        "progress": {
+            "title": "Jährlicher Fortschritt",
+            "label": "Fortschritt",
+            "to_ultimate": "bis Ultimate"
+        },
+        "info": "Bitte beachten Sie, dass die angezeigten Werte ab dem 1. Juli angepasst werden können. Dieser Fortschritt basiert auf dem aktuellen Geschäftsjahr.",
+        "details": {
+            "title": "Programmdetails",
+            "subtitle": "Umfassender Überblick über Stufen und zugehörige Rabatte",
+            "level": "Niveau",
+            "badge": "Abzeichen",
+            "required_cases": "Erforderliche Fälle",
+            "granted_discount": "Gewährter Rabatt"
+        },
+        "banner": {
+            "title": "Bereit für die nächste Stufe?",
+            "subtitle": "Nutzen Sie unseren Simulator, um zu sehen, wie eine Erhöhung Ihres Fallvolumens Ihre Rentabilität beeinflussen kann.",
+            "button": "Simulator aufrufen"
         }
     }
 }
