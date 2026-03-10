@@ -33,9 +33,9 @@
         "week": "Week"
     },
     "dashboard": {
-        "welcome_morning": "Good morning User ☀️",
-        "welcome_afternoon": "Good afternoon User 👋",
-        "welcome_evening": "Good evening User 🌙",
+        "welcome_morning": "Good morning {{name}} ☀️",
+        "welcome_afternoon": "Good afternoon {{name}} 👋",
+        "welcome_evening": "Good evening {{name}} 🌙",
         "stats": {
             "total_patients": "Total patients",
             "new_this_month": "New this month",

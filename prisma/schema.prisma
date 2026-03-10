@@ -1,15 +1,36 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+model User {
+  id             String    @id @default(cuid())
+  name           String?
+  email          String    @unique
+  emailVerified  Boolean   @default(false)
+  image          String?
+  isApproved     Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  accounts       Account[]
+  admin          Admin?
+  sessions       Session[]
+  role           String?
+  profession     String?
+  address        String?
+  zipCode        String?
+  city           String?
+  country        String?
+  agreeMarketing Boolean   @default(false)
+  banned         Boolean?  @default(false)
+  banReason      String?
+  banExpires     DateTime?
+
+  patients Patient[]
+  cases    Case[]
 }
 
 model Admin {
@@ -26,7 +47,197 @@ model Admin {
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model User {
-  id    String  @id @default(cuid())
-  admin Admin?
+model Session {
+  id             String   @id @default(cuid())
+  userId         String
+  token          String   @unique
+  expiresAt      DateTime
+  ipAddress      String?
+  userAgent      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  impersonatedBy String?
+
+  @@index([userId])
+}
+
+model Account {
+  id                    String    @id @default(cuid())
+  userId                String
+  accountId             String
+  providerId            String
+  accessToken           String?
+  refreshToken          String?
+  expiresAt             DateTime?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+
+  @@index([userId])
+}
+
+model Verification {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+}
+
+model Patient {
+  id        String   @id @default(cuid())
+  firstName String
+  lastName  String
+  email     String?
+  phone     String?
+  status    String   @default("En attente")
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Clinical Fields
+  genre      String?
+  birthDate  Json?
+  conditions String[]
+
+  cases Case[]
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Case {
+  id        String @id @default(cuid())
+  patientId String
+  userId    String
+
+  decision           String  @default("En attente")
+  status             String  @default("Brouillon")
+  hasEterna          Boolean @default(false)
+  correctionsDone    Int     @default(0)
+  correctionsAllowed String?
+
+  // Wizard Fields
+  patientType   String?
+  pack          String?
+  photos        Json?
+  radiographies Json?
+  scans         Json?
+  scanMode      String?
+  scanLink      String?
+  cbctUrl       String?
+  cephUrl       String?
+  prescription  Json?
+  history       Json?
+
+  globalStatus    GlobalStatus     @default(EN_PLANIFICATION)
+  tpCheckVersions TPCheckVersion[]
+  treatmentEvents TreatmentEvent[]
+  corrections     Correction[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  patient Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  invoice Invoice?
+  messages TPCheckMessage[]
+}
+
+enum GlobalStatus {
+  EN_PLANIFICATION
+  EN_ATTENTE_DE_VALIDATION
+  EN_PRODUCTION
+  EN_TRAITEMENT
+  TRAITEMENT_TERMINE
+}
+
+enum EventType {
+  STATUS_CHANGE
+  TP_CHECK_ADDED
+  TP_CHECK_APPROVED
+  TP_CHECK_REJECTED
+  CORRECTION_REQUESTED
+  LIVRAISON_SET
+  TREATMENT_STARTED
+}
+
+model TPCheckVersion {
+  id           String  @id @default(cuid())
+  caseId       String
+  correctionId String?
+  version      Int
+  url          String
+  message      String? // backend note provided along with the URL
+  status       String  @default("PENDING") // PENDING, APPROVED, REJECTED
+
+  // Clinical & Financial fields from DiamondSuite
+  pack         String?
+  stepsUpper   Int?
+  stepsLower   Int?
+  rhythm       String?
+  quoteHT      Float?
+  discount     Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  case      Case             @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  correction Correction?     @relation(fields: [correctionId], references: [id], onDelete: Cascade)
+}
+
+model TPCheckMessage {
+  id        String   @id @default(cuid())
+  caseId    String
+  text      String
+  sender    String // "MEDECIN" ou "DIAMONDSUITE"
+  createdAt DateTime @default(now())
+
+  case Case @relation(fields: [caseId], references: [id], onDelete: Cascade)
+}
+
+model TreatmentEvent {
+  id          String    @id @default(cuid())
+  caseId      String
+  type        EventType
+  description String?
+  date        DateTime  @default(now())
+  actor       String // "MEDECIN" ou "DIAMONDSUITE" ou "SYSTEM"
+
+  case Case @relation(fields: [caseId], references: [id], onDelete: Cascade)
+}
+
+model Correction {
+  id      String       @id @default(cuid())
+  caseId  String
+  version Int
+  photos  Json?
+  scans   Json?
+  status  GlobalStatus @default(EN_PLANIFICATION)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  case     Case             @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  tpChecks TPCheckVersion[]
+}
+
+model Invoice {
+  id        String    @id @default(cuid())
+  caseId    String    @unique
+  number    String    @unique
+  amountTTC Float
+  status    String    @default("En attente")
+  dueDate   DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  type      String    @default("facture")
+  case      Case      @relation(fields: [caseId], references: [id], onDelete: Cascade)
 }

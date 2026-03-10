@@ -1,6 +1,70 @@
 import type { Timestamp } from 'firebase/firestore';
 import type { ReactElement } from 'react';
 
+export enum GlobalStatus {
+    EN_PLANIFICATION = 'EN_PLANIFICATION',
+    EN_ATTENTE_DE_VALIDATION = 'EN_ATTENTE_DE_VALIDATION',
+    EN_PRODUCTION = 'EN_PRODUCTION',
+    EN_TRAITEMENT = 'EN_TRAITEMENT',
+    TRAITEMENT_TERMINE = 'TRAITEMENT_TERMINE'
+}
+
+export enum EventType {
+    STATUS_CHANGE = 'STATUS_CHANGE',
+    TP_CHECK_ADDED = 'TP_CHECK_ADDED',
+    TP_CHECK_APPROVED = 'TP_CHECK_APPROVED',
+    TP_CHECK_REJECTED = 'TP_CHECK_REJECTED',
+    CORRECTION_REQUESTED = 'CORRECTION_REQUESTED',
+    LIVRAISON_SET = 'LIVRAISON_SET',
+    TREATMENT_STARTED = 'TREATMENT_STARTED'
+}
+
+export interface TPCheckVersion {
+    id: string;
+    caseId: string;
+    correctionId: string | null;
+    version: number;
+    url: string;
+    status: string;
+    pack?: string | null;
+    stepsUpper?: number | null;
+    stepsLower?: number | null;
+    rhythm?: string | null;
+    quoteHT?: number | null;
+    discount?: number | null;
+    createdAt: string | Date;
+    updatedAt: string | Date;
+}
+
+export interface TPCheckMessage {
+    id: string;
+    caseId: string;
+    text: string;
+    sender: string;
+    createdAt: string | Date;
+}
+
+export interface TreatmentEvent {
+    id: string;
+    caseId: string;
+    type: EventType;
+    description: string | null;
+    date: string | Date;
+    actor: string;
+}
+
+export interface Correction {
+    id: string;
+    caseId: string;
+    version: number;
+    photos: any | null;
+    scans: any | null;
+    status: GlobalStatus;
+    createdAt: string | Date;
+    updatedAt: string | Date;
+    tpChecks?: TPCheckVersion[];
+}
+
 export type PatientCategory = 'Adulte' | 'Adolescent';
 export type Gender = 'Male' | 'Female' | 'Autre' | '';
 export type ArcadeOption = 'both' | 'maxillaire' | 'mandibular';
@@ -82,6 +146,7 @@ export interface PatientData {
     scans: Record<string, File | null>;
     prescription?: PrescriptionData | null;
     cbctUrl?: string;
+    cephUrl?: string;
     scanMode?: 'link' | 'scanner';
     scanLink?: string;
 }
@@ -128,6 +193,9 @@ export interface Patient {
     treatmentGoals?: string;
     notes?: string;
     status: number;
+    caseStatus?: string;
+    globalStatus?: string;
+    approvedTPCheckUrl?: string | null;
     archived: number;
     files?: string[];
     createdAt?: Timestamp | Date | null;
@@ -135,6 +203,12 @@ export interface Patient {
     updatedAt?: Timestamp | Date | null;
     userId: string;
     images?: PatientImages;
+    pack?: string;
+    patientType?: string;
+    photos?: any;
+    radiographies?: any;
+    scans?: any;
+    history?: any;
 }
 
 export interface DashboardStats {

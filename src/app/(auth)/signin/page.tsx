@@ -1,10 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { signInWithEmailAndPassword } from 'firebase/auth'
-import { auth, db } from '../../../firebase/firebase'
+import { authClient } from '@/lib/auth-client'
 import { useRouter } from 'next/navigation'
-import { collection, query, where, getDocs } from 'firebase/firestore'
 import { Eye, EyeOff } from 'lucide-react'
 import Header from '../../../components/header/header/header'
 import signinImage from '../../../assets/img/signin.jpg'
@@ -22,7 +20,7 @@ export default function SignInPage() {
     e.preventDefault()
     setLoading(true)
     setError('')
-    
+
     if (!email || !password) {
       setError('Email and password are required.')
       setLoading(false)
@@ -32,32 +30,20 @@ export default function SignInPage() {
     const normalizedEmail = email.toLowerCase()
 
     try {
-      // Check if email exists in candidates collection
-      const candidatesRef = collection(db, 'candidates')
-      const candidateQuery = query(candidatesRef, where('email', '==', normalizedEmail))
-      const candidateSnapshot = await getDocs(candidateQuery)
+      const { error } = await authClient.signIn.email({
+        email: normalizedEmail,
+        password,
+      })
 
-      if (!candidateSnapshot.empty) {
-        setError('Please complete your registration before signing in.')
+      if (error) {
+        setError(error.message || 'Sign-in failed. Please check your credentials.')
         setLoading(false)
         return
       }
 
-      // Check if email exists in medecins collection
-      const medecinsRef = collection(db, 'medecins')
-      const medecinQuery = query(medecinsRef, where('email', '==', normalizedEmail))
-      const medecinSnapshot = await getDocs(medecinQuery)
-
-      if (medecinSnapshot.empty) {
-        setError('Account not found. Please check your credentials.')
-        setLoading(false)
-        return
-      }
-
-      await signInWithEmailAndPassword(auth, normalizedEmail, password)
       router.push('/patients')
-    } catch (error) {
-      setError('Sign-in failed. Please check your credentials.')
+    } catch (err: any) {
+      setError(err?.message || 'Sign-in failed. Please check your credentials.')
       setLoading(false)
     }
   }

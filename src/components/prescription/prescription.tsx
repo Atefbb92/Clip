@@ -9,9 +9,9 @@ import anamnese from "../../assets/img/presciptionframe.png"
 // @ts-ignore
 import prescription3 from "../../assets/icons/Prescription-3.png"
 import { doc, getDoc, collection, where, getDocs, query } from 'firebase/firestore'
-import { onAuthStateChanged } from 'firebase/auth'
 import { useRouter } from 'next/navigation'
-import { db, auth, storage } from '../../firebase/firebase'
+import { db, storage } from '../../firebase/firebase'
+import { useSession } from '@/lib/auth-client'
 import "./dental-dialog.css";
 import DentalChart from "../../components/dental-chart";
 import { Button } from "../../components/ui/button";
@@ -220,58 +220,10 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
     }
   }, [formState, savedTeethStates, onChange]);
 
-  const [userRole, setUserRole] = useState("");
-  const [userId, setUserId] = useState<string | null>(null);
+  const { data: session } = useSession();
+  const userRole = (session?.user as any)?.profession?.toLowerCase() || "omnipraticien";
+  const userId = session?.user?.id || null;
   const router = useRouter();
-
-  useEffect(() => {
-    /*console.log('Auth state change effect running');*/
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        /*console.log('No user found, redirecting to signin');*/
-        router.push('/signin');
-      } else {
-        /*console.log('User authenticated:', user.uid);*/
-        setUserId(user.uid);
-        fetchUserRole(user.uid);
-      }
-    });
-    return () => unsubscribe();
-  }, [router]);
-
-  const fetchUserRole = async (uid: string) => {
-    try {
-      /*console.log('Fetching role for UID:', uid);*/
-      const q = query(collection(db, 'medecins'), where('uid', '==', uid));
-      const querySnapshot = await getDocs(q);
-
-      if (!querySnapshot.empty) {
-        const userData = querySnapshot.docs[0].data();
-        /*console.log('Full user data:', userData);*/
-        const { role } = userData;
-        /*console.log('Role from database:', role);*/
-
-        if (role) {
-          /*console.log('Setting user role to:', role);*/
-          setUserRole(role.toLowerCase());
-        } else {
-          /*console.log('No role found in user data, defaulting to omnipraticien');*/
-          setUserRole('omnipraticien');
-        }
-      } else {
-        /*console.log('No user document found for UID:', uid);*/
-        setUserRole('omnipraticien');
-      }
-    } catch (error: unknown) {
-      console.error('Error fetching user role:', error);
-      console.error('Error details:', {
-        code: error instanceof Error ? (error as any).code : 'unknown',
-        message: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : 'No stack trace'
-      });
-      setUserRole('omnipraticien');
-    }
-  };
 
   useEffect(() => {
     if (activeSection) {
@@ -1159,95 +1111,99 @@ const Prescription = forwardRef<HTMLDivElement, PrescriptionProps>(({ initialSec
               </DiamondCardHeader>
               <DiamondCardContent>
                 <table className={styles.apTable}>
-                  <tr>
-                    <th></th>
-                    <th>D</th>
-                    <th>G</th>
-                  </tr>
-                  <tr>
-                    <td className={styles.td1}>Conserver la situation actuelle</td>
-                    <td>
-                      <input
-                        type="radio"
-                        name="rapportAP_D"
-                        value="conserver"
-                        checked={formState.rapportAP.D === 'conserver'}
-                        onChange={(e) => handleRapportAPChange('D', e.target.value)}
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="radio"
-                        name="rapportAP_G"
-                        value="conserver"
-                        checked={formState.rapportAP.G === 'conserver'}
-                        onChange={(e) => handleRapportAPChange('G', e.target.value)}
-                      />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td1}>Améliorer la relation canine uniquement</td>
-                    <td>
-                      <input
-                        type="radio"
-                        name="rapportAP_D"
-                        value="ameliorer_canine"
-                        checked={formState.rapportAP.D === 'ameliorer_canine'}
-                        onChange={(e) => handleRapportAPChange('D', e.target.value)}
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="radio"
-                        name="rapportAP_G"
-                        value="ameliorer_canine"
-                        checked={formState.rapportAP.G === 'ameliorer_canine'}
-                        onChange={(e) => handleRapportAPChange('G', e.target.value)}
-                      />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td1}>Améliorer la relation canine & molaire</td>
-                    <td>
-                      <input
-                        type="radio"
-                        name="rapportAP_D"
-                        value="ameliorer_both"
-                        checked={formState.rapportAP.D === 'ameliorer_both'}
-                        onChange={(e) => handleRapportAPChange('D', e.target.value)}
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="radio"
-                        name="rapportAP_G"
-                        value="ameliorer_both"
-                        checked={formState.rapportAP.G === 'ameliorer_both'}
-                        onChange={(e) => handleRapportAPChange('G', e.target.value)}
-                      />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className={styles.td1}>Correction en Classe I (canine et molaire)</td>
-                    <td>
-                      <input
-                        type="radio"
-                        name="rapportAP_D"
-                        value="correction"
-                        checked={formState.rapportAP.D === 'correction'}
-                        onChange={(e) => handleRapportAPChange('D', e.target.value)}
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="radio"
-                        name="rapportAP_G"
-                        value="correction"
-                        checked={formState.rapportAP.G === 'correction'}
-                        onChange={(e) => handleRapportAPChange('G', e.target.value)}
-                      />
-                    </td>
-                  </tr>
+                  <thead>
+                    <tr>
+                      <th></th>
+                      <th>D</th>
+                      <th>G</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td className={styles.td1}>Conserver la situation actuelle</td>
+                      <td>
+                        <input
+                          type="radio"
+                          name="rapportAP_D"
+                          value="conserver"
+                          checked={formState.rapportAP.D === 'conserver'}
+                          onChange={(e) => handleRapportAPChange('D', e.target.value)}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="radio"
+                          name="rapportAP_G"
+                          value="conserver"
+                          checked={formState.rapportAP.G === 'conserver'}
+                          onChange={(e) => handleRapportAPChange('G', e.target.value)}
+                        />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className={styles.td1}>Améliorer la relation canine uniquement</td>
+                      <td>
+                        <input
+                          type="radio"
+                          name="rapportAP_D"
+                          value="ameliorer_canine"
+                          checked={formState.rapportAP.D === 'ameliorer_canine'}
+                          onChange={(e) => handleRapportAPChange('D', e.target.value)}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="radio"
+                          name="rapportAP_G"
+                          value="ameliorer_canine"
+                          checked={formState.rapportAP.G === 'ameliorer_canine'}
+                          onChange={(e) => handleRapportAPChange('G', e.target.value)}
+                        />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className={styles.td1}>Améliorer la relation canine & molaire</td>
+                      <td>
+                        <input
+                          type="radio"
+                          name="rapportAP_D"
+                          value="ameliorer_both"
+                          checked={formState.rapportAP.D === 'ameliorer_both'}
+                          onChange={(e) => handleRapportAPChange('D', e.target.value)}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="radio"
+                          name="rapportAP_G"
+                          value="ameliorer_both"
+                          checked={formState.rapportAP.G === 'ameliorer_both'}
+                          onChange={(e) => handleRapportAPChange('G', e.target.value)}
+                        />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className={styles.td1}>Correction en Classe I (canine et molaire)</td>
+                      <td>
+                        <input
+                          type="radio"
+                          name="rapportAP_D"
+                          value="correction"
+                          checked={formState.rapportAP.D === 'correction'}
+                          onChange={(e) => handleRapportAPChange('D', e.target.value)}
+                        />
+                      </td>
+                      <td>
+                        <input
+                          type="radio"
+                          name="rapportAP_G"
+                          value="correction"
+                          checked={formState.rapportAP.G === 'correction'}
+                          onChange={(e) => handleRapportAPChange('G', e.target.value)}
+                        />
+                      </td>
+                    </tr>
+                  </tbody>
                 </table>
 
                 <div className={styles.optionsSection}>

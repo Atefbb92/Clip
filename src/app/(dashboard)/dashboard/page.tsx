@@ -1,9 +1,8 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { auth, db } from '@/firebase/firebase'
-import { collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore'
-import { onAuthStateChanged } from 'firebase/auth'
+import { authClient } from '@/lib/auth-client'
+import { trpc } from '@/lib/trpc/client'
 import {
   Users,
   UserPlus,
@@ -35,7 +34,7 @@ import {
   DiamondCardHeader,
   DiamondCardTitle,
 } from '@/components/ui/diamond-card'
-import StatCard from '@/components/StatCard/StatCard'
+import StatCard from '@/components/StatCard'
 import PacksDistributionChart from '@/components/charts/PacksDistributionChart'
 import PatientsEvolutionChart from '@/components/charts/PatientsEvolutionChart'
 import { HeadingTitle } from '@/components/HeadingTitle'
@@ -181,12 +180,13 @@ const Dashboard: React.FC = () => {
   // Messages de bienvenue dynamiques
   const getWelcomeMessage = () => {
     const hour = new Date().getHours()
+    const nameStr = user?.name ? user.name.split(' ')[0] : 'Dr.'
     if (hour >= 5 && hour < 12) {
-      return t('dashboard.welcome_morning')
+      return t('dashboard.welcome_morning', { name: nameStr })
     } else if (hour >= 12 && hour < 18) {
-      return t('dashboard.welcome_afternoon')
+      return t('dashboard.welcome_afternoon', { name: nameStr })
     } else {
-      return t('dashboard.welcome_evening')
+      return t('dashboard.welcome_evening', { name: nameStr })
     }
   }
 
@@ -195,35 +195,37 @@ const Dashboard: React.FC = () => {
     const phrases = t('dashboard.dynamic_phrases') as string[]
     return phrases[Math.floor(Math.random() * phrases.length)]
   }
-  const [userEmail, setUserEmail] = useState<string | null>(null)
+  const { data: session, isPending: sessionPending } = authClient.useSession()
+  const user = session?.user
+
+  const { data: fetchedPatients, isLoading: isPatientsLoading } = trpc.patients.getAll.useQuery(
+    { userId: user?.id as string },
+    { enabled: !!user?.id }
+  )
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUserEmail(user.email)
-        fetchDashboardData(user)
-      }
-    })
+    if (sessionPending || isPatientsLoading) {
+      setLoading(true)
+      return
+    }
 
-    return () => unsubscribe()
-  }, [])
-
-  const fetchDashboardData = async (user: any) => {
-    if (!user) return
-
-    try {
-      const patientsRef = collection(db, 'patients')
-      // Standardize query on userId like patients/page.tsx
-      const q = query(patientsRef, where('userId', '==', user.uid))
-      const querySnapshot = await getDocs(q)
-
-      const patients: Patient[] = querySnapshot.docs.map(
-        (doc) =>
-        ({
-          id: doc.id,
-          ...doc.data(),
-        } as Patient)
-      )
+    if (fetchedPatients) {
+      const patients: Patient[] = fetchedPatients.map((p: any) => ({
+        id: p.id,
+        name: p.name,
+        surname: p.surname,
+        genre: p.genre,
+        birthDate: p.birthDate,
+        conditions: p.conditions,
+        status: p.status,
+        caseStatus: p.caseStatus,
+        archived: p.archived,
+        userId: p.userId,
+        createdAt: p.createdAt,
+        updatedAt: p.updatedAt,
+        pack: p.pack,
+        patientType: p.patientType
+      }) as any)
 
       // Calculer les statistiques
       const now = new Date()
@@ -352,12 +354,11 @@ const Dashboard: React.FC = () => {
           ]
         }
       })
-    } catch (error) {
-      console.error('Error loading data:', error)
-    } finally {
+      setLoading(false)
+    } else if (!sessionPending && !isPatientsLoading) {
       setLoading(false)
     }
-  }
+  }, [fetchedPatients, sessionPending, isPatientsLoading])
 
   const getStatusLabel = (status: any) => {
     const statusKeys: { [key: number]: string } = {

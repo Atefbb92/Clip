@@ -27,7 +27,7 @@ import {
   DiamondCardTitle,
 } from '@/components/ui/diamond-card'
 import { HeadingTitle } from '@/components/HeadingTitle'
-import StatCard from '@/components/StatCard/StatCard'
+import StatCard from '@/components/StatCard'
 import { Badge } from '@/components/ui/badge'
 import {
   Select,
@@ -39,7 +39,7 @@ import {
 import { useTranslation } from '@/hooks/useTranslation'
 
 // Types pour les données statistiques
-interface StatCard {
+interface StatCardData {
   id: string
   title: string
   value: string | number
@@ -69,7 +69,7 @@ export default function StatistiquesPage() {
 
   // Données simulées pour les statistiques
   // Don't move this up, it needs t
-  const statsCards: StatCard[] = [
+  const statsCards: StatCardData[] = [
     {
       id: 'total-patients',
       title: t('statistics.cards.total_patients'),
@@ -233,7 +233,7 @@ export default function StatistiquesPage() {
                   icon={stat.icon}
                   value={stat.value}
                   label={stat.title}
-                  color={colorMap[stat.color] || 'blue'}
+                  color={(colorMap[stat.color] || 'blue') as any}
                 />
               )
             })}

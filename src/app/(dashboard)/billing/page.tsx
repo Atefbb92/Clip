@@ -25,7 +25,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { HeadingTitle } from '@/components/HeadingTitle'
-import StatCard from '@/components/StatCard/StatCard'
+import StatCard from '@/components/StatCard'
 import {
   Dialog,
   DialogContent,

@@ -10,9 +10,8 @@ import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { ArrowLeft, X, User, FileText, Camera, Scan, Stethoscope, CheckCircle, Maximize2, ClipboardCheck, Plus, AlertTriangle, Loader2 } from 'lucide-react'
 import { HeadingTitle } from '@/components/HeadingTitle'
-import { auth, db, storage } from '@/firebase/firebase'
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore'
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
+import { useSession } from '@/lib/auth-client'
+import { trpc } from '@/lib/trpc/client'
 
 import rightSideImg from '@/assets/img/right.png'
 import leftSideImg from '@/assets/img/left.png'
@@ -160,6 +159,9 @@ interface PatientData {
 export default function AjouterPatient() {
   const { t } = useTranslation()
   const router = useRouter()
+  const { data: session } = useSession()
+  const utils = trpc.useUtils()
+  const createPatientMutation = trpc.patients.create.useMutation()
   const [currentStep, setCurrentStep] = useState(0)
   const [showCancelDialog, setShowCancelDialog] = useState(false)
   const [selectedPatientType, setSelectedPatientType] = useState<string | null>(null)
@@ -494,7 +496,7 @@ export default function AjouterPatient() {
     setIsLoading(true);
     setError(null);
     try {
-      const user = auth.currentUser;
+      const user = session?.user;
       if (!user) {
         const msg = "Vous devez être connecté pour enregistrer un brouillon";
         setError(msg);
@@ -508,47 +510,64 @@ export default function AjouterPatient() {
         currentPrescription = prescriptionRef.current.getPrescriptionData();
       }
 
-      // Sanitize data for Firestore (remove File objects)
-      const sanitizeGroup = (group: any) => {
+      // Upload files to local storage API
+      const uploadGroupToLocal = async (group: any, userId: string) => {
         if (!group) return {};
-        return Object.keys(group).reduce((acc: any, key) => {
+        const result: any = {};
+        for (const key of Object.keys(group)) {
           const val = group[key];
           if (val instanceof File) {
-            acc[key] = {
-              name: val.name,
-              size: val.size,
-              type: val.type,
-              lastModified: val.lastModified,
-              isPlaceholder: true
-            };
+            const formData = new FormData();
+            formData.append('file', val);
+            formData.append('path', `patients/${userId}`);
+
+            const res = await fetch('/api/upload', {
+              method: 'POST',
+              body: formData
+            });
+            const resData = await res.json();
+
+            if (resData.success) {
+              result[key] = {
+                name: val.name,
+                size: val.size,
+                type: val.type,
+                lastModified: val.lastModified,
+                url: resData.url
+              };
+            }
           } else {
-            acc[key] = val;
+            result[key] = val;
           }
-          return acc;
-        }, {});
+        }
+        return result;
       };
 
-      const draftData = {
+      const [photosData, radiographiesData, scansData] = await Promise.all([
+        uploadGroupToLocal(patientData.photos, user.id),
+        uploadGroupToLocal(patientData.radiographies, user.id),
+        uploadGroupToLocal(patientData.scans, user.id),
+      ]);
+
+      await createPatientMutation.mutateAsync({
         name: patientData.nom,
         surname: patientData.prenom,
         genre: patientData.genre,
         birthDate: patientData.birthDate,
         conditions: patientData.conditions,
-        photos: sanitizeGroup(patientData.photos),
-        radiographies: sanitizeGroup(patientData.radiographies),
-        scans: sanitizeGroup(patientData.scans),
+        photos: photosData,
+        radiographies: radiographiesData,
+        scans: scansData,
         cbctUrl: patientData.cbctUrl || null,
         scanMode: patientData.scanMode || null,
         scanLink: patientData.scanLink || null,
         prescription: currentPrescription || null,
-        userId: user.uid,
-        status: 0, // Brouillon
-        archived: 0,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      };
-
-      await addDoc(collection(db, 'patients'), draftData);
+        userId: user.id,
+        status: "Brouillon",
+        patientType: selectedPatientType || undefined,
+        pack: selectedPack || undefined,
+      });
+      await utils.patients.getAll.invalidate();
       router.push('/patients');
     } catch (err: any) {
       console.error('Error saving draft:', err);
@@ -572,7 +591,7 @@ export default function AjouterPatient() {
       setIsLoading(true);
       setError(null);
       try {
-        const user = auth.currentUser;
+        const user = session?.user;
         if (!user) {
           const msg = "Vous devez être connecté pour soumettre un cas";
           setError(msg);
@@ -580,47 +599,64 @@ export default function AjouterPatient() {
           return;
         }
 
-        // Sanitize data for Firestore (remove File objects)
-        const sanitizeGroup = (group: any) => {
+        // Upload files to local storage API
+        const uploadGroupToLocal = async (group: any, userId: string) => {
           if (!group) return {};
-          return Object.keys(group).reduce((acc: any, key) => {
+          const result: any = {};
+          for (const key of Object.keys(group)) {
             const val = group[key];
             if (val instanceof File) {
-              acc[key] = {
-                name: val.name,
-                size: val.size,
-                type: val.type,
-                lastModified: val.lastModified,
-                isPlaceholder: true
-              };
+              const formData = new FormData();
+              formData.append('file', val);
+              formData.append('path', `patients/${userId}`);
+
+              const res = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+              });
+              const resData = await res.json();
+
+              if (resData.success) {
+                result[key] = {
+                  name: val.name,
+                  size: val.size,
+                  type: val.type,
+                  lastModified: val.lastModified,
+                  url: resData.url
+                };
+              }
             } else {
-              acc[key] = val;
+              result[key] = val;
             }
-            return acc;
-          }, {});
+          }
+          return result;
         };
 
-        const submissionData = {
+        const [photosData, radiographiesData, scansData] = await Promise.all([
+          uploadGroupToLocal(patientData.photos, user.id),
+          uploadGroupToLocal(patientData.radiographies, user.id),
+          uploadGroupToLocal(patientData.scans, user.id),
+        ]);
+
+        await createPatientMutation.mutateAsync({
           name: patientData.nom,
           surname: patientData.prenom,
           genre: patientData.genre,
           birthDate: patientData.birthDate,
           conditions: patientData.conditions,
-          photos: sanitizeGroup(patientData.photos),
-          radiographies: sanitizeGroup(patientData.radiographies),
-          scans: sanitizeGroup(patientData.scans),
+          photos: photosData,
+          radiographies: radiographiesData,
+          scans: scansData,
           cbctUrl: patientData.cbctUrl || null,
           scanMode: patientData.scanMode || null,
           scanLink: patientData.scanLink || null,
           prescription: currentPrescription || null,
-          userId: user.uid,
-          status: 2, // En attente
-          archived: 0,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp(),
-        };
-
-        await addDoc(collection(db, 'patients'), submissionData);
+          userId: user.id,
+          status: "En attente",
+          patientType: selectedPatientType || undefined,
+          pack: selectedPack || undefined,
+        });
+        await utils.patients.getAll.invalidate();
         router.push('/patients');
       } catch (err: any) {
         console.error('Error submitting case:', err);

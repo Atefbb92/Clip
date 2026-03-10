@@ -3,8 +3,11 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { auth, db } from '@/firebase/firebase'
-import { doc, getDoc, updateDoc } from 'firebase/firestore'
+import { doc, updateDoc, getDoc } from 'firebase/firestore'
 import { onAuthStateChanged } from 'firebase/auth'
+import { authClient } from '@/lib/auth-client'
+import { trpc } from '@/lib/trpc/client'
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -100,6 +103,10 @@ interface Patient {
   email?: string
   createdAt: unknown
   userId: string
+  photos?: any
+  radiographies?: any
+  scans?: any
+  history?: any[]
 }
 
 const PatientDetailPage = () => {
@@ -110,6 +117,46 @@ const PatientDetailPage = () => {
 
   const [patient, setPatient] = useState<Patient | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+
+  const { data: session, isPending: sessionPending } = authClient.useSession()
+  const utils = trpc.useUtils()
+  const currentUserId = session?.user?.id || ''
+  const updateScansMutation = trpc.patients.updateScans.useMutation()
+  const addHistoryEventMutation = trpc.patients.addHistoryEvent.useMutation()
+
+  const appendHistoryEvent = (date: string, statut: string, type: 'success' | 'info' | 'error') => {
+    if (patientId) {
+      addHistoryEventMutation.mutateAsync({
+        id: patientId,
+        event: { date, statut, type }
+      }).catch(err => console.error("Failed to append history", err))
+
+      setPatient((prev: any) => {
+        if (!prev) return prev;
+        const currentHistory = Array.isArray(prev.history) ? prev.history : [];
+        return {
+          ...prev,
+          history: [{ date, statut, type }, ...currentHistory]
+        }
+      })
+    }
+  }
+
+  const addMessageMutation = trpc.tpchecks.addMessage.useMutation()
+
+  const { data: fetchedPatient, isLoading: trpcLoading, error: trpcError } = trpc.patients.getById.useQuery(
+    { id: patientId! },
+    { enabled: !!patientId && !!currentUserId, retry: 1 }
+  )
+
+  const { data: casesData } = trpc.cases.getByPatientId.useQuery(
+    { patientId: patientId! },
+    { enabled: !!patientId }
+  )
+  const currentCase = casesData?.[0] as any
+  console.log("🔥 fetched case tpchecks:", currentCase?.tpCheckVersions)
+  const globalStatus = currentCase?.globalStatus || 'EN_PLANIFICATION'
+
   const [selectedTPVersion, setSelectedTPVersion] = useState(0)
   const [showPhotosModal, setShowPhotosModal] = useState(false)
   const [showRadiosModal, setShowRadiosModal] = useState(false)
@@ -124,14 +171,16 @@ const PatientDetailPage = () => {
   const [activeTab, setActiveTab] = useState('overview')
   const [activeTPTab, setActiveTPTab] = useState('initial')
   const [show3DModal, setShow3DModal] = useState(false)
+  const [override3DUrl, setOverride3DUrl] = useState<string | null>(null)
   const [showCephModal, setShowCephModal] = useState(false)
-  // Lien simulé inséré depuis le back office pour l'analyse céphalométrique
-  const cephalometricUrl = 'https://example.com/cephalometric-analysis-frame'
+  const [isCephLoading, setIsCephLoading] = useState(true)
+  // Lien réel inséré par DiamondSuite via la base de données (au niveau du Case)
+  const cephalometricUrl = currentCase?.cephUrl || null
   const messageInputRef = useRef<HTMLTextAreaElement>(null)
 
   // Eterna Scan Dialog states
   const [showEternaScanDialog, setShowEternaScanDialog] = useState(false)
-  const [eternaScans, setEternaScans] = useState<{ upper: File | null; lower: File | null }>({
+  const [eternaScans, setEternaScans] = useState<{ upper: File | string | null; lower: File | string | null }>({
     upper: null,
     lower: null
   })
@@ -142,6 +191,13 @@ const PatientDetailPage = () => {
 
   // Treatment finished state
   const [isTreatmentFinished, setIsTreatmentFinished] = useState(false)
+
+  useEffect(() => {
+    if (globalStatus) {
+      setTreatmentStarted(globalStatus === 'EN_TRAITEMENT' || globalStatus === 'TRAITEMENT_TERMINE')
+      setIsTreatmentFinished(globalStatus === 'TRAITEMENT_TERMINE')
+    }
+  }, [globalStatus])
   const [showFinishConfirm, setShowFinishConfirm] = useState(false)
   const [previewFile, setPreviewFile] = useState<{ file: File | string, title: string } | null>(null)
   const [otherPhotosCount, setOtherPhotosCount] = useState(0)
@@ -302,58 +358,75 @@ const PatientDetailPage = () => {
     },
   ]
 
-  // Données simulées
+  // Données
   const patientData = {
-    nom: 'Dubois',
-    prenom: 'Marie',
-    dateNaissance: '15/03/1992',
-    numeroPatient: 'PT-2024-1547',
-    email: 'marie.dubois@email.com',
-    telephone: '+33 6 12 34 56 78',
-    dateInscription: '12/01/2024',
+    nom: patient?.surname || 'Dubois',
+    prenom: patient?.name || 'Marie',
+    dateNaissance: patient?.birthDate ?
+      (typeof patient.birthDate === 'object' && (patient.birthDate as any).day
+        ? `${(patient.birthDate as any).day}/${(patient.birthDate as any).month}/${(patient.birthDate as any).year}`
+        : String(patient.birthDate))
+      : '15/03/1992',
+    numeroPatient: patient?.id ? `PT-${patient.id.substring(0, 8).toUpperCase()}` : 'PT-2024-1547',
+    email: patient?.email || 'marie.dubois@email.com',
+    telephone: patient?.phone || '+33 6 12 34 56 78',
+    dateInscription: patient?.createdAt ? new Date(patient.createdAt as string).toLocaleDateString('fr-FR') : '12/01/2024',
     // Type de commande: "Totalité du pack" ou "Moitié du pack"
     commandeType: 'Totalité du pack',
-    sexe: t('patients.new.details.female'),
+    sexe: patient?.gender === 'Male' ? t('patients.new.details.male') : patient?.gender === 'Female' ? t('patients.new.details.female') :
+      (patient?.gender ? patient.gender : t('patients.new.details.female')),
   }
 
-  const [historique, setHistorique] = useState([
-    { date: '15/10/2024', statut: t('patients.detail.status.treatment_started'), type: 'success' },
-    { date: '08/10/2024', statut: t('patients.detail.status.aligner_delivered'), type: 'success' },
-    { date: '01/10/2024', statut: t('patients.detail.status.tp_validated'), type: 'success' },
-    { date: '25/09/2024', statut: t('patients.detail.status.tp_ready'), type: 'info' },
-    { date: '18/09/2024', statut: t('patients.detail.status.prescription_submitted'), type: 'info' },
-  ])
+  // Injecter "Cas soumis" comme premier événement historique lors de la création
+  const baseHistory = [{
+    date: patientData.dateInscription,
+    statut: 'Cas soumis',
+    type: 'info'
+  }];
+  const events = (currentCase as any)?.treatmentEvents || [];
+  const historique = [
+    ...baseHistory,
+    ...events.map((e: any) => ({
+      date: new Date(e.date).toLocaleDateString('fr-TN'),
+      statut: e.description || e.type,
+      type: e.type.includes('APPROVED') || e.type.includes('STARTED') || e.type.includes('LIVRAISON') ? 'success' : 'info'
+    }))
+  ];
 
-  // Liste des TP Checks (exemples simulés)
-  const [tpChecksList, setTpChecksList] = useState([
-    {
-      id: 1,
-      date: '01/10/2024',
-      status: t('patients.detail.status.rejected'),
-      patientType: t('patients.categories.adult'),
-      pack: t('patients.new.product.packs.full.name'),
-      stepsUpper: 12,
-      stepsLower: 12,
-    },
-    {
-      id: 2,
-      date: '15/10/2024',
-      status: t('patients.detail.status.revision_requested'),
-      patientType: t('patients.categories.adult'),
-      pack: t('patients.new.product.packs.medium.name'),
-      stepsUpper: 14,
-      stepsLower: 13,
-    },
-    {
-      id: 3,
-      date: '20/10/2024',
-      status: t('patients.detail.status.validated'),
-      patientType: t('patients.categories.teen'),
-      pack: t('patients.new.product.packs.full.name'),
-      stepsUpper: 10,
-      stepsLower: 11,
-    },
-  ])
+  const initialTpChecksList = (currentCase as any)?.tpCheckVersions?.filter((tp: any) => !tp.correctionId).map((tp: any) => ({
+    id: tp.id,
+    date: new Date(tp.createdAt).toLocaleDateString('fr-TN'),
+    status: tp.status === 'APPROVED' ? t('patients.detail.status.validated') || 'Validé' : tp.status === 'REJECTED' ? t('patients.detail.status.rejected') || 'Rejeté' : 'En attente',
+    patientType: (currentCase as any)?.patientType || 'Adulte',
+    pack: tp.pack || (currentCase as any)?.pack || '',
+    stepsUpper: tp.stepsUpper || 0,
+    stepsLower: tp.stepsLower || 0,
+    rhythm: tp.rhythm || '7',
+    quoteHT: tp.quoteHT || 0,
+    discount: tp.discount || 0,
+    url: tp.url,
+    message: tp.message,
+    messages: tp.messages,
+  })) || []
+
+  // Liste des TP Checks dynamique
+  const [tpChecksList, setTpChecksList] = useState<any[]>(initialTpChecksList)
+
+  useEffect(() => {
+    if (initialTpChecksList.length > 0) {
+      setTpChecksList(initialTpChecksList)
+    }
+  }, [(currentCase as any)?.tpCheckVersions])
+
+  const isLivred = events.some((e: any) => e.type === 'LIVRAISON_SET')
+
+  // Un TP est considéré comme validé si le statut global est EN_PRODUCTION (ou au-delà)
+  // On n'attend plus la livraison ('isLivred') pour pouvoir commencer le traitement
+  const canStartTreatment = (currentCase as any)?.tpCheckVersions?.some((tp: any) => tp.status === 'APPROVED' || tp.status === 'Validé') || globalStatus === 'EN_PRODUCTION' || globalStatus === 'EN_TRAITEMENT'
+  const startTreatmentMutation = trpc.cases.startTreatment.useMutation()
+
+  // Correction events
+  const correctionsTabs = (currentCase as any)?.corrections || []
 
   // Photos envoyées par le patient depuis MyDiamond (données simulées)
   const myDiamondPhotos: { id: string; url: string; date: string }[] = [
@@ -364,16 +437,42 @@ const PatientDetailPage = () => {
     { id: 'md-5', url: '/images/p5.png', date: '2024-10-15' },
     { id: 'md-6', url: '/images/p6.png', date: '2024-10-15' },
   ]
-  // Photos initiales et radios (simulées, vides pour l’instant)
-  const initialPhotos: { id: string; url: string; label?: string }[] = [
-    { id: 'image1', url: '/images/p1.png', label: 'Profil' },
-    { id: 'image2', url: '/images/p2.png', label: 'Face' },
-    { id: 'image4', url: '/images/p4.png', label: 'Maxillaire' },
-    { id: 'image6', url: '/images/p5.png', label: 'Mandibule' },
-  ]
-  const radioImages: { id: string; url: string; label?: string }[] = [
-    { id: 'panoramic', url: '/images/p3.png', label: 'Panoramique' },
-  ]
+  const photoMapping: Record<string, string> = {
+    face_profile: 'image1',
+    face_front: 'image2',
+    face_smile: 'image3',
+    teeth_maxillary: 'image4',
+    teeth_mandibular: 'image6',
+    teeth_right: 'image7',
+    teeth_front: 'image8',
+    teeth_left: 'image9',
+  };
+
+  const initialPhotos: { id: string; url: string; label?: string }[] = Object.entries((patient?.photos as any) || {})
+    .map(([key, val]: any) => {
+      return {
+        id: photoMapping[key] || key,
+        url: val?.url || '',
+        label: key
+      }
+    })
+    .filter(p => p.url);
+
+  const radioMapping: Record<string, string> = {
+    panoramic: 'panoramic',
+    xray_profile: 'xray_profile'
+  };
+
+  const radioImages: { id: string; url: string; label?: string }[] = Object.entries((patient?.radiographies as any) || {})
+    .map(([key, val]: any) => {
+      return {
+        id: radioMapping[key] || key,
+        url: val?.url || '',
+        label: key
+      }
+    })
+    .filter(p => p.url);
+
   const initialPhotosCount = initialPhotos.length
   const radioCount = radioImages.length
 
@@ -414,23 +513,25 @@ const PatientDetailPage = () => {
 
   const age = calculateAgeFromFrenchDate(patientData.dateNaissance)
   const categorie = age >= 18 ? t('patients.categories.adult') : t('patients.categories.teen')
-  const currentTP = tpChecksList[selectedTPVersion] ?? tpChecksList[0]
+  const currentTP = tpChecksList[selectedTPVersion] ?? tpChecksList[0] ?? {}
   const hasValidatedTP = tpChecksList.some(tp => tp.status === t('patients.detail.status.validated') || tp.status === 'Validated' || tp.status === 'Validé')
 
-  // Données d'avancement (démo)
-  const progressPercent = 65
-  const currentAligner = 8
-  const totalAligners = 24
-  const remainingDays = 75
+  // Données d'avancement (démo - bloquées à 0 en planification)
+  const isPlanification = globalStatus === 'EN_PLANIFICATION'
+
+  const progressPercent = isPlanification ? 0 : 65
+  const currentAligner = isPlanification ? 0 : 8
+  const totalAligners = isPlanification ? 0 : 24
+  const remainingDays = isPlanification ? 0 : 75
   // Démos de pourcentages pour anneaux complémentaires
-  const alignerPercent = Math.round((currentAligner / totalAligners) * 100)
-  const totalDays = 90 // nombre de jours total estimé (démo)
-  const remainingDaysPercent = Math.round((remainingDays / totalDays) * 100)
+  const alignerPercent = isPlanification || totalAligners === 0 ? 0 : Math.round((currentAligner / totalAligners) * 100)
+  const totalDays = isPlanification ? 0 : 90 // nombre de jours total estimé (démo)
+  const remainingDaysPercent = isPlanification || totalDays === 0 ? 0 : Math.round((remainingDays / totalDays) * 100)
   // Démo: jours jusqu’au prochain aligneur
-  const daysBetweenAligners = 7 // intervalle standard (démo)
-  const daysToNextAligner = 3 // jours restants avant prochain aligneur (démo)
-  const nextAlignerPercent = Math.round((daysToNextAligner / daysBetweenAligners) * 100)
-  const progressHistory = [50, 55, 57, 60, 62, 65, 66, 68]
+  const daysBetweenAligners = isPlanification ? 0 : 7 // intervalle standard (démo)
+  const daysToNextAligner = isPlanification ? 0 : 3 // jours restants avant prochain aligneur (démo)
+  const nextAlignerPercent = isPlanification || daysBetweenAligners === 0 ? 0 : Math.round((daysToNextAligner / daysBetweenAligners) * 100)
+  const progressHistory = isPlanification ? [0] : [50, 55, 57, 60, 62, 65, 66, 68]
   const sparkWidth = 200
   const sparkHeight = 60
   const sparkPoints = progressHistory
@@ -466,8 +567,15 @@ const PatientDetailPage = () => {
   })
   const [treatmentStarted, setTreatmentStarted] = useState(false)
 
-  // Quote amounts (demo)
-  const devisFinalTTC = 2280
+  // Dynamic Calculation of TP Check Financials
+  const quoteHT = currentTP?.quoteHT || 0
+  const discount = currentTP?.discount || 0
+  const isDiscountPercent = discount <= 100 && discount > 0
+  const finalQuoteHT = isDiscountPercent ? quoteHT * (1 - discount / 100) : Math.max(0, quoteHT - discount)
+  const devisFinalTTC = finalQuoteHT * 1.19 // TVA Tunisienne: 19%
+  const tpRhythm = currentTP?.rhythm || '7'
+
+  const hasTreatmentStarted = globalStatus === 'EN_TRAITEMENT' || globalStatus === 'TRAITEMENT_TERMINE' || treatmentStarted
 
   // Zod schema for validation form
   const validationSchema = z.object({
@@ -565,33 +673,48 @@ const PatientDetailPage = () => {
     switch (id) {
       case 'progress':
         return (
-          <DiamondCard className={`bg-white border-slate-200 shadow-sm ${cardMinH}`}>
+          <DiamondCard className={`bg-white border-slate-200 shadow-sm flex flex-col ${cardMinH}`}>
             <DiamondCardHeader>
               <DiamondCardTitle className="text-center text-slate-800">
                 {isTreatmentFinished ? 'Traitement terminé' : t('patients.detail.cards.progress')}
               </DiamondCardTitle>
             </DiamondCardHeader>
-            <DiamondCardContent className={`text-center ${contentPadding}`}>
-              <div
-                className={`relative mx-auto mb-4 ${ringSize} rounded-full`}
-                style={{
-                  background: isTreatmentFinished
-                    ? `conic-gradient(#10b981 360deg, #e2e8f0 0)` /* Emerald green for finished */
-                    : `conic-gradient(#0072B8 ${progressPercent * 3.6}deg, #e2e8f0 0)`,
-                }}
-                aria-label={isTreatmentFinished ? 'Treatment Finished 100%' : `Progress ${progressPercent}%`}
-              >
-                <div className="absolute inset-2 bg-white rounded-full"></div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <span className={`font-bold ${isTreatmentFinished ? 'text-emerald-500' : 'text-slate-800'} ${hero ? 'text-2xl' : 'text-xl'}`}>
-                    {isTreatmentFinished ? '100%' : `${progressPercent}%`}
-                  </span>
+            <DiamondCardContent className={`text-center flex-1 flex flex-col justify-center items-center ${contentPadding}`}>
+              {!hasTreatmentStarted ? (
+                <div className="flex flex-col items-center justify-center space-y-3 px-2">
+                  <div className="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center border border-amber-100">
+                    <AlertCircle className="w-6 h-6 text-amber-500" />
+                  </div>
+                  <p className="text-sm font-medium text-slate-700 leading-snug">
+                    {!hasValidatedTP
+                      ? "Veuillez valider votre TP Check."
+                      : "Veuillez confirmer le début de traitement."}
+                  </p>
                 </div>
-              </div>
-              {!isTreatmentFinished && (
-                <p className={`text-sm text-slate-600 ${subtitleMargin}`}>
-                  {t('patients.detail.cards.estimated')}
-                </p>
+              ) : (
+                <>
+                  <div
+                    className={`relative mx-auto mb-4 ${ringSize} rounded-full`}
+                    style={{
+                      background: isTreatmentFinished
+                        ? `conic-gradient(#10b981 360deg, #e2e8f0 0)` /* Emerald green for finished */
+                        : `conic-gradient(#0072B8 ${progressPercent * 3.6}deg, #e2e8f0 0)`,
+                    }}
+                    aria-label={isTreatmentFinished ? 'Treatment Finished 100%' : `Progress ${progressPercent}%`}
+                  >
+                    <div className="absolute inset-2 bg-white rounded-full"></div>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className={`font-bold ${isTreatmentFinished ? 'text-emerald-500' : 'text-slate-800'} ${hero ? 'text-2xl' : 'text-xl'}`}>
+                        {isTreatmentFinished ? '100%' : `${progressPercent === 65 ? 0 : progressPercent}%`}
+                      </span>
+                    </div>
+                  </div>
+                  {!isTreatmentFinished && (
+                    <p className={`text-sm text-slate-600 ${subtitleMargin}`}>
+                      {t('patients.detail.cards.estimated')}
+                    </p>
+                  )}
+                </>
               )}
             </DiamondCardContent>
           </DiamondCard>
@@ -691,36 +814,51 @@ const PatientDetailPage = () => {
   }
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        // Redirection si l'id patient est manquant
-        if (!patientId) {
-          setIsLoading(false)
-          router.push('/patients')
-          return
-        }
-        try {
-          const patientDoc = await getDoc(doc(db, 'patients', patientId))
-          if (patientDoc.exists()) {
-            setPatient({ id: patientDoc.id, ...patientDoc.data() } as Patient)
-          }
-        } catch (error) {
-          console.error('Erreur lors du chargement du patient:', error)
-        } finally {
-          setIsLoading(false)
-        }
-      } else {
-        router.push('/login')
-      }
-    })
+    if (!sessionPending && !session) {
+      router.push('/signin')
+    }
+  }, [session, sessionPending, router])
 
-    return () => unsubscribe()
-  }, [patientId, router])
+  useEffect(() => {
+    if (!patientId) {
+      setIsLoading(false)
+      router.push('/patients')
+      return
+    }
+
+    if (!trpcLoading) {
+      if (fetchedPatient) {
+        setPatient({
+          ...(fetchedPatient as any),
+          age: String((fetchedPatient as any).birthDate ? calculateAgeFromFrenchDate(String((fetchedPatient as any).birthDate)) : 0),
+          phone: '',
+          email: '',
+          userId: (fetchedPatient as any).userId
+        } as any)
+      }
+      setIsLoading(false)
+    }
+  }, [fetchedPatient as any, trpcLoading, patientId, router])
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-[#0072B8]"></div>
+      </div>
+    )
+  }
+
+  if (trpcError || (!fetchedPatient && !isLoading)) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen text-slate-800">
+        <AlertCircle className="w-16 h-16 text-red-500 mb-4" />
+        <h1 className="text-2xl font-bold mb-2">Patient introuvable</h1>
+        <p className="text-slate-500 mb-6 text-center max-w-md">
+          {trpcError?.message || "Désolé, nous n'avons pas pu trouver ce patient. Assurez-vous que l'URL est correcte ou que le patient n'a pas été supprimé."}
+        </p>
+        <Button onClick={() => router.push('/patients')} className="bg-[#0072B8]">
+          Retour à la liste
+        </Button>
       </div>
     )
   }
@@ -787,7 +925,7 @@ const PatientDetailPage = () => {
         {activeTab === 'overview' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Colonne gauche: Actions rapides + Historique */}
-            <div className="lg:col-span-2 flex flex-col gap-6">
+            <div className="lg:col-span-2 flex flex-col gap-4">
               {/* Actions rapides */}
               <DiamondCard className="bg-white border-slate-200 shadow-sm">
                 <DiamondCardHeader>
@@ -799,31 +937,43 @@ const PatientDetailPage = () => {
                 <DiamondCardContent>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                     <Button
-                      onClick={() => setShow3DModal(true)}
-                      className="w-full bg-blue-100 text-[#0072B8] border border-blue-200 hover:bg-blue-200 px-2"
+                      onClick={() => {
+                        const allTPChecks = [
+                          ...(currentCase?.tpCheckVersions || []),
+                          ...(currentCase?.corrections || []).flatMap((c: any) => c.tpChecks || [])
+                        ];
+                        const approvedTPCheck = allTPChecks.find(tp => tp.status === 'APPROVED');
+                        if (approvedTPCheck?.url) {
+                          setOverride3DUrl(approvedTPCheck.url);
+                        }
+                        setShow3DModal(true);
+                      }}
+                      disabled={!treatmentStarted}
+                      className="w-full bg-blue-100 text-[#0072B8] border border-blue-200 hover:bg-blue-200 px-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200"
                     >
                       <Play className="h-4 w-4 mr-2 fill-current flex-shrink-0" />
-                      <span className="truncate">{t('patients.detail.actions.view_tp_check')}</span>
+                      <span className="truncate">TP Check validé</span>
                     </Button>
                     <Button
                       onClick={() => setShowRefinementConfirm(true)}
-                      disabled={isTreatmentFinished}
-                      className="w-full bg-amber-100 text-amber-700 border border-amber-200 hover:bg-amber-200 px-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={!treatmentStarted || isTreatmentFinished}
+                      className="w-full bg-amber-100 text-amber-700 border border-amber-200 hover:bg-amber-200 px-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200"
                     >
                       <AlertCircle className="h-4 w-4 mr-2 flex-shrink-0" />
-                      <span className="truncate">{t('patients.detail.actions.request_correction')}</span>
+                      <span className="truncate">Demander une finition</span>
                     </Button>
                     <Button
                       onClick={() => setShowEternaScanDialog(true)}
-                      className="w-full bg-sky-100 text-sky-700 border border-sky-200 hover:bg-sky-200 px-2"
+                      disabled={!treatmentStarted}
+                      className="w-full bg-sky-100 text-sky-700 border border-sky-200 hover:bg-sky-200 px-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200"
                     >
                       <Moon className="h-4 w-4 mr-2 flex-shrink-0" />
                       <span className="truncate">{t('patients.detail.actions.order_eterna')}</span>
                     </Button>
                     <Button
                       onClick={() => setShowFinishConfirm(true)}
-                      disabled={isTreatmentFinished}
-                      className="w-full bg-emerald-100 text-emerald-700 border border-emerald-200 hover:bg-emerald-200 px-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={!treatmentStarted || isTreatmentFinished}
+                      className="w-full bg-emerald-100 text-emerald-700 border border-emerald-200 hover:bg-emerald-200 px-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200"
                     >
                       <Check className="h-4 w-4 mr-2 flex-shrink-0" />
                       <span className="truncate">{t('patients.detail.actions.finish')}</span>
@@ -886,12 +1036,17 @@ const PatientDetailPage = () => {
                     </Button>
                     <Button
                       className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                      onClick={() => {
+                      onClick={async () => {
                         setOpenStartTreatmentDialog(false)
                         setTreatmentStarted(true)
                         const [y, m, d] = startTreatmentDate.split('-')
                         const formattedDate = `${d}/${m}/${y}`
-                        setHistorique(prev => [{ date: formattedDate, statut: 'Traitement commencé', type: 'success' }, ...prev])
+                        if (currentCase) {
+                          await startTreatmentMutation.mutateAsync({ id: currentCase.id })
+                          // refresh or optimistic update
+                          utils.cases.getByPatientId.invalidate({ patientId: patientId! })
+                          utils.patients.getById.invalidate({ id: patientId! })
+                        }
                       }}
                     >
                       <CheckCircle className="h-4 w-4 mr-2" />
@@ -946,16 +1101,16 @@ const PatientDetailPage = () => {
               </Dialog>
 
               {/* Treatment history */}
-              <DiamondCard className="bg-white border-slate-200 shadow-sm h-full">
-                <DiamondCardHeader>
+              <DiamondCard className="bg-white border-slate-200 shadow-sm h-full flex flex-col">
+                <DiamondCardHeader className="shrink-0">
                   <DiamondCardTitle className="flex items-center text-slate-800">
                     <Activity className="h-5 w-5 mr-2 text-[#0072B8]" />
                     {t('patients.detail.history.title')}
                   </DiamondCardTitle>
                 </DiamondCardHeader>
-                <DiamondCardContent>
+                <DiamondCardContent className="flex-1 overflow-y-auto max-h-[280px] 2xl:max-h-[450px] pr-2 custom-scrollbar">
                   <div className="space-y-4">
-                    {historique.map((item, index) => (
+                    {historique.map((item: any, index: number) => (
                       <div
                         key={index}
                         className="flex items-start space-x-3 p-3 rounded-lg bg-slate-50 border border-slate-200"
@@ -976,67 +1131,82 @@ const PatientDetailPage = () => {
             </div>
 
             {/* Patient information */}
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-4">
               <DiamondCard className="bg-white border-slate-200 shadow-sm">
-                <DiamondCardHeader>
-                  <DiamondCardTitle className="flex items-center text-slate-800">
-                    <User className="h-5 w-5 mr-2 text-[#0072B8]" />
-                    {t('patients.detail.info.title')}
-                  </DiamondCardTitle>
+                <DiamondCardHeader className="pb-2">
+                  <div className="flex flex-col items-center">
+                    <DiamondCardTitle className="flex w-full items-center text-slate-800 mb-4">
+                      <User className="h-5 w-5 mr-2 text-[#0072B8]" />
+                      {t('patients.detail.info.title')}
+                    </DiamondCardTitle>
+                    <Avatar className="h-36 w-36 border-2 border-white shadow-sm ring-1 ring-slate-100 mb-2">
+                      <AvatarImage src={patient?.photos?.image2?.url || patient?.photos?.image1?.url} alt="Profile" className="object-cover" />
+                      <AvatarFallback className="bg-slate-100 text-slate-600 font-semibold text-4xl">
+                        {patientData.prenom?.[0]}{patientData.nom?.[0]}
+                      </AvatarFallback>
+                    </Avatar>
+                  </div>
                 </DiamondCardHeader>
                 <DiamondCardContent>
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-sm text-slate-600">{t('patients.detail.info.full_name')}</p>
-                      <p className="font-medium">
-                        {patientData.prenom} {patientData.nom}
-                      </p>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-x-2 gap-y-3">
+                      <div>
+                        <p className="text-xs text-slate-500">{t('patients.detail.info.full_name')}</p>
+                        <p className="text-sm font-medium truncate" title={`${patientData.prenom} ${patientData.nom}`}>
+                          {patientData.prenom} {patientData.nom}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-500">{t('patients.detail.info.dob_age')}</p>
+                        <p className="text-sm font-medium truncate">
+                          {patientData.dateNaissance} ({age} {t('common.years')})
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-500">Category</p>
+                        <p className="text-sm font-medium truncate">{categorie}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-500">{t('patients.detail.info.submission_date')}</p>
+                        <p className="text-sm font-medium truncate">{patientData.dateInscription}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-500">{t('patients.detail.info.selected_pack')}</p>
+                        <p className="text-sm font-medium truncate" title={currentTP.pack}>{currentTP.pack}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-500">{t('patients.detail.info.validation_date')}</p>
+                        <p className="text-sm font-medium truncate">{currentTP.date}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-500">{t('patients.detail.info.order')}</p>
+                        <p className="text-sm font-medium truncate" title={commandeType}>{commandeType}</p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-slate-500">Valeur jusqu'au</p>
+                        <p className="text-sm font-medium truncate">30/12/2026</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm text-slate-600">{t('patients.detail.info.dob_age')}</p>
-                      <p className="font-medium">
-                        {patientData.dateNaissance} - {age} {t('common.years')}
-                      </p>
+
+                    <div className="flex flex-col gap-2 pt-2">
+                      <Button
+                        onClick={() => setOpenStartTreatmentDialog(true)}
+                        disabled={treatmentStarted || !canStartTreatment}
+                        className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-sm font-semibold px-4 py-2 h-10 rounded-lg shadow-md hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed disabled:from-slate-300 disabled:to-slate-300 disabled:shadow-none"
+                      >
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                        {treatmentStarted ? 'Traitement en cours' : 'Commencer le traitement'}
+                      </Button>
+                      {commandeType === 'Half pack' && (
+                        <Button
+                          onClick={() => setOpenRestPackDialog(true)}
+                          className="w-full bg-gradient-to-r from-[#0072B8] to-[#00B4D8] text-white text-sm font-semibold px-4 py-2 h-10 rounded-lg shadow-md ring-1 ring-[#00B4D8]/30 hover:from-[#005a94] hover:to-[#0099cc] hover:shadow-[0_8px_20px_rgba(0,114,184,0.30)] transform hover:scale-105 transition-all duration-200"
+                        >
+                          <Package className="h-4 w-4 mr-2" />
+                          {t('patients.detail.info.order_remaining')}
+                        </Button>
+                      )}
                     </div>
-                    <div>
-                      <p className="text-sm text-slate-600">Category</p>
-                      <p className="font-medium">{categorie}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-slate-600">{t('patients.detail.info.submission_date')}</p>
-                      <p className="font-medium">{patientData.dateInscription}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-slate-600">{t('patients.detail.info.selected_pack')}</p>
-                      <p className="font-medium">{currentTP.pack}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-slate-600">{t('patients.detail.info.validation_date')}</p>
-                      <p className="font-medium">{currentTP.date}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-slate-600">{t('patients.detail.info.order')}</p>
-                      <p className="font-medium">{commandeType}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-slate-600">Traitement valide jusqu'au</p>
-                      <p className="font-medium">30/12/2026</p>
-                    </div>
-                    <Button
-                      onClick={() => setOpenStartTreatmentDialog(true)}
-                      disabled={treatmentStarted}
-                      className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-base font-semibold px-5 py-3 h-11 rounded-lg shadow-md hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed disabled:from-slate-300 disabled:to-slate-300 disabled:shadow-none"
-                    >
-                      <CheckCircle className="h-4 w-4 mr-2" />
-                      {treatmentStarted ? 'Traitement en cours' : 'Commencer le traitement'}
-                    </Button>
-                    <Button
-                      onClick={() => setOpenRestPackDialog(true)}
-                      className="w-full bg-gradient-to-r from-[#0072B8] to-[#00B4D8] text-white text-base font-semibold px-5 py-3 h-11 rounded-lg shadow-2xl ring-2 ring-[#00B4D8]/30 hover:from-[#005a94] hover:to-[#0099cc] hover:shadow-[0_10px_25px_rgba(0,114,184,0.35)] transform hover:scale-105 transition-all duration-200"
-                    >
-                      <Package className="h-4 w-4 mr-2" />
-                      {t('patients.detail.info.order_remaining')}
-                    </Button>
                   </div>
                 </DiamondCardContent>
               </DiamondCard>
@@ -1061,7 +1231,15 @@ const PatientDetailPage = () => {
         )}
 
         {/* TP Check */}
-        {activeTab === 'treatment' && (
+        {activeTab === 'treatment' && globalStatus === 'EN_PLANIFICATION' && (
+          <div className="flex flex-col items-center justify-center p-12 bg-white rounded-xl border border-slate-200 shadow-sm">
+            <Package className="h-16 w-16 text-slate-300 mb-4" />
+            <h2 className="text-xl font-bold text-slate-700 mb-2">Traitement en cours de planification</h2>
+            <p className="text-slate-500 text-center max-w-md">Le traitement initial et le TP Check seront disponibles une fois que DiamondSuite aura validé le plan d'aligneurs.</p>
+          </div>
+        )}
+
+        {activeTab === 'treatment' && globalStatus !== 'EN_PLANIFICATION' && (
           <div className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
               {/* Informations du traitement - Gauche */}
@@ -1076,23 +1254,40 @@ const PatientDetailPage = () => {
                       <div className="flex flex-col gap-2 ml-1 mt-2">
                         <div className="flex items-center gap-4">
                           <button
-                            onClick={() => setActiveTPTab('initial')}
+                            onClick={() => {
+                              setActiveTPTab('initial')
+                              setTpChecksList(initialTpChecksList)
+                              setSelectedTPVersion(0)
+                            }}
                             className={`text-sm font-semibold pb-1 transition-colors ${activeTPTab === 'initial' ? 'text-slate-700 border-b-2 border-[#0072B8]' : 'text-slate-500 hover:text-slate-700'}`}
                           >
                             Traitement initial
                           </button>
-                          <button
-                            onClick={() => setActiveTPTab('c1')}
-                            className={`text-sm font-semibold pb-1 transition-colors ${activeTPTab === 'c1' ? 'text-slate-700 border-b-2 border-[#0072B8]' : 'text-slate-500 hover:text-slate-700'}`}
-                          >
-                            Correction 1
-                          </button>
-                          <button
-                            onClick={() => setActiveTPTab('c2')}
-                            className={`text-sm font-semibold pb-1 transition-colors ${activeTPTab === 'c2' ? 'text-slate-700 border-b-2 border-[#0072B8]' : 'text-slate-500 hover:text-slate-700'}`}
-                          >
-                            Correction 2
-                          </button>
+                          {correctionsTabs.map((corr: any, index: number) => (
+                            <button
+                              key={`corr-${corr.id}`}
+                              onClick={() => {
+                                setActiveTPTab(`c${corr.version}`)
+                                const corrTps = corr.tpChecks?.map((tp: any) => ({
+                                  id: tp.id,
+                                  date: new Date(tp.createdAt).toLocaleDateString('fr-TN'),
+                                  status: tp.status === 'APPROVED' ? t('patients.detail.status.validated') || 'Validé' : tp.status === 'REJECTED' ? t('patients.detail.status.rejected') || 'Rejeté' : 'En attente',
+                                  patientType: currentCase?.patientType || 'Adulte',
+                                  pack: currentCase?.pack || '',
+                                  stepsUpper: 0,
+                                  stepsLower: 0,
+                                  url: tp.url,
+                                  message: tp.message,
+                                  messages: tp.messages,
+                                })) || []
+                                setTpChecksList(corrTps)
+                                setSelectedTPVersion(0)
+                              }}
+                              className={`text-sm font-semibold pb-1 transition-colors ${activeTPTab === 'c' + corr.version ? 'text-slate-700 border-b-2 border-[#0072B8]' : 'text-slate-500 hover:text-slate-700'}`}
+                            >
+                              Finition {corr.version}
+                            </button>
+                          ))}
                         </div>
 
                         <div className={`flex items-center gap-1 transition-opacity duration-200 ${activeTPTab === 'initial' ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
@@ -1129,70 +1324,66 @@ const PatientDetailPage = () => {
                 </DiamondCardHeader>
                 <DiamondCardContent>
                   <div className="space-y-4">
-                    <DiamondCard className="bg-gradient-to-br from-[#0072B8] to-[#00B4D8] text-white border-0">
-                      <DiamondCardContent className="p-4">
-                        <div className="text-center">
-                          <h3 className="font-semibold mb-2">{t('patients.detail.tp_check.status_title')}</h3>
-                          <div className="text-lg font-bold mb-1">{currentTP.status}</div>
-                          <p className="text-sm opacity-90">{currentTP.date}</p>
-                        </div>
-                      </DiamondCardContent>
-                    </DiamondCard>
+                    <div className="flex items-center justify-between p-6 bg-gradient-to-br from-[#0072B8] to-[#00B4D8] text-white rounded-xl shadow-md my-2">
+                      <h3 className="font-semibold text-lg">{t('patients.detail.tp_check.status_title')}</h3>
+                      <div className="flex items-center gap-5">
+                        <span className="font-bold text-xl bg-white/20 px-5 py-2 rounded-full shadow-sm">{currentTP.status}</span>
+                        <span className="text-base font-medium opacity-90">{currentTP.date}</span>
+                      </div>
+                    </div>
 
                     <div className="space-y-3">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
                           <p className="text-sm text-slate-600">{t('patients.detail.tp_check.patient_type')}</p>
-                          <p className="font-medium text-slate-800">{currentTP.patientType}</p>
+                          <p className="font-medium text-slate-800">{currentTP?.patientType || '-'}</p>
                         </div>
 
                         <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
                           <p className="text-sm text-slate-600">{t('patients.detail.info.selected_pack')}</p>
-                          <p className="font-medium text-slate-800">{currentTP.pack}</p>
+                          <p className="font-medium text-slate-800">{currentTP?.pack || '-'}</p>
                         </div>
 
                         <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
                           <p className="text-sm text-slate-600">{t('patients.detail.tp_check.upper_steps')}</p>
                           <p className="font-medium text-slate-800">
-                            {currentTP.stepsUpper} {t('patients.detail.tp_check.aligners')}
+                            {currentTP?.stepsUpper || 0} {t('patients.detail.tp_check.aligners')}
                           </p>
                         </div>
 
                         <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
                           <p className="text-sm text-slate-600">{t('patients.detail.tp_check.lower_steps')}</p>
                           <p className="font-medium text-slate-800">
-                            {currentTP.stepsLower} {t('patients.detail.tp_check.aligners')}
+                            {currentTP?.stepsLower || 0} {t('patients.detail.tp_check.aligners')}
                           </p>
                         </div>
 
                         <div
-                          className="p-3 bg-slate-50 rounded-lg border border-slate-200 cursor-pointer hover:bg-slate-100"
-                          onClick={() => setOpenRhythmDialog(true)}
-                          aria-label={t('patients.detail.tp_check.change_rhythm')}
+                          className="p-3 bg-slate-50 rounded-lg border border-slate-200 cursor-default"
                         >
                           <p className="text-sm text-slate-600">{t('patients.detail.tp_check.change_rhythm')}</p>
-                          <p className="font-medium text-slate-800">{rythmeChangeDays} {t('patients.detail.tp_check.days')}</p>
+                          <p className="font-medium text-slate-800">{tpRhythm} {t('patients.detail.tp_check.days')}</p>
                         </div>
 
                         <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
                           <p className="text-sm text-slate-600">{t('patients.detail.tp_check.quote')}</p>
-                          <p className="font-medium text-[#0072B8]">2100 DT HT</p>
+                          <p className="font-medium text-[#0072B8]">{quoteHT} DT HT</p>
                         </div>
 
                         <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
                           <p className="text-sm text-slate-600">{t('patients.detail.tp_check.discount')}</p>
-                          <p className="font-medium text-green-600">-10%</p>
+                          <p className="font-medium text-green-600">{discount > 0 ? (isDiscountPercent ? `-${discount}%` : `-${discount} DT`) : '-'}</p>
                         </div>
 
                         <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
                           <p className="text-sm text-slate-600">{t('patients.detail.tp_check.final_quote_excl')}</p>
-                          <p className="font-medium text-[#0072B8]">1900 DT</p>
+                          <p className="font-medium text-[#0072B8]">{finalQuoteHT.toFixed(2)} DT</p>
                         </div>
                       </div>
 
-                      <div className="p-3 bg-gradient-to-br from-[#0072B8] to-[#00B4D8] text-white rounded-lg border-0 text-center">
-                        <p className="text-sm opacity-90">{t('patients.detail.tp_check.final_quote_incl')}</p>
-                        <p className="font-bold text-lg">
+                      <div className="p-5 bg-gradient-to-br from-[#0072B8] to-[#00B4D8] text-white rounded-xl border-0 text-center shadow-md my-4">
+                        <p className="text-sm font-medium opacity-90 mb-1">{t('patients.detail.tp_check.final_quote_incl')}</p>
+                        <p className="font-bold text-2xl tracking-wide">
                           {new Intl.NumberFormat('fr-TN', { style: 'currency', currency: 'TND' }).format(devisFinalTTC)}
                         </p>
                       </div>
@@ -1221,7 +1412,7 @@ const PatientDetailPage = () => {
                     className="w-full flex-1 bg-amber-100 text-amber-700 border border-amber-200 hover:bg-amber-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400 disabled:border-slate-200"
                   >
                     <AlertCircle className="h-4 w-4 mr-2" />
-                    Request Correction
+                    Modifier
                   </Button>
                   <Button
                     onClick={() => {
@@ -1257,7 +1448,7 @@ const PatientDetailPage = () => {
                           const isSingleVersion = tpChecksList.length === 1;
                           const historyMessage = isSingleVersion ? 'TP Check validé' : `TP Check ${selectedTPVersion + 1} validé`;
                           const today = new Date().toLocaleDateString('fr-TN', { day: '2-digit', month: '2-digit', year: 'numeric' });
-                          setHistorique(prev => [{ date: today, statut: historyMessage, type: 'success' }, ...prev])
+                          appendHistoryEvent(today, historyMessage, 'success')
                         })}
                         className="space-y-4"
                       >
@@ -1540,50 +1731,68 @@ const PatientDetailPage = () => {
                   </DialogContent>
                 </Dialog>
                 {/* Section Messagerie - Droite */}
-                <DiamondCard className="bg-white border-slate-200 shadow-sm">
-                  <DiamondCardHeader>
+                <DiamondCard className="bg-white border-slate-200 shadow-sm lg:col-span-2 h-[calc(100%-3.5rem)] flex flex-col">
+                  <DiamondCardHeader className="shrink-0">
                     <DiamondCardTitle className="flex items-center text-slate-800">
                       <MessageCircle className="h-5 w-5 mr-2 text-[#0072B8]" />
                       {t('patients.detail.tp_check.messages_title')}
                     </DiamondCardTitle>
                   </DiamondCardHeader>
-                  <DiamondCardContent>
-                    <div className="space-y-4">
+                  <DiamondCardContent className="flex-1 flex flex-col min-h-[300px]">
+                    <div className="flex-1 flex flex-col justify-end space-y-4 h-full relative">
                       {/* Messages existants */}
-                      <div className="max-h-64 overflow-y-auto space-y-3">
-                        <div className="flex items-start space-x-3">
-                          <div className="w-8 h-8 rounded-full bg-[#0072B8] flex items-center justify-center text-white text-sm font-medium">
-                            Dr
+                      <div className="absolute inset-0 overflow-y-auto px-1 custom-scrollbar pb-32 flex flex-col-reverse gap-3">
+                        {/* Si aucun message au total */}
+                        {!(currentCase?.messages && currentCase.messages.length > 0) && !currentTP?.message ? (
+                          <div className="flex items-center justify-center p-6 bg-slate-50 border border-dashed border-slate-200 rounded-lg h-full">
+                            <p className="text-sm text-slate-500 italic">Aucun message pour ce traitement.</p>
                           </div>
-                          <div className="flex-1">
-                            <div className="bg-slate-100 rounded-lg p-3">
-                              <p className="text-sm text-slate-800">
-                                The treatment plan has been approved. You can proceed with
-                                manufacturing the aligners.
-                              </p>
-                            </div>
-                            <p className="text-xs text-slate-500 mt-1">01/10/2024 at 14:30</p>
-                          </div>
-                        </div>
+                        ) : null}
 
-                        <div className="flex items-start space-x-3">
-                          <div className="w-8 h-8 rounded-full bg-green-600 flex items-center justify-center text-white text-sm font-medium">
-                            TP
-                          </div>
-                          <div className="flex-1">
-                            <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                              <p className="text-sm text-slate-800">
-                                Thanks for the validation. Aligners will be ready in 5-7 business
-                                days.
-                              </p>
+                        {/* Mapped messages from DB, reversed so newest is bottom-most in DOM (which is visually the bottom because of flex-col-reverse) */}
+                        {currentCase?.messages && currentCase.messages.length > 0 ? (
+                          [...(currentCase.messages as any[])].reverse().map((msg: any) => {
+                            const isDoctor = msg.sender === 'MEDECIN'
+                            return (
+                              <div key={msg.id} className={`flex items-start gap-3 ${isDoctor ? 'flex-row-reverse' : 'flex-row'}`}>
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0 ${isDoctor ? 'bg-[#0072B8]' : 'bg-[#00B2AF]'}`}>
+                                  {isDoctor ? 'Dr' : 'DS'}
+                                </div>
+                                <div className={`flex flex-col max-w-[85%] ${isDoctor ? 'items-end' : 'items-start'}`}>
+                                  <div className={`${isDoctor ? 'bg-[#0072B8] text-white rounded-2xl rounded-tr-sm' : 'bg-[#E5F6F6] border border-[#B3E5E4] shadow-sm rounded-2xl rounded-tl-sm'} p-3 inline-block`}>
+                                    <p className={`text-sm whitespace-pre-wrap ${isDoctor ? 'text-white' : 'text-[#00605E]'}`}>
+                                      {msg.text}
+                                    </p>
+                                  </div>
+                                  <p className={`text-xs text-slate-400 mt-1 ${isDoctor ? 'mr-1' : 'ml-1'}`}>
+                                    {new Date(msg.createdAt).toLocaleString('fr-FR')}
+                                  </p>
+                                </div>
+                              </div>
+                            )
+                          })
+                        ) : null}
+
+                        {/* Initial system message (oldest), so it should be visually at the very top (last in DOM) */}
+                        {currentTP?.message && (
+                          <div className="flex items-start space-x-3 justify-start">
+                            <div className="w-8 h-8 rounded-full bg-[#00B2AF] flex items-center justify-center text-white text-xs font-bold shrink-0">
+                              DS
                             </div>
-                            <p className="text-xs text-slate-500 mt-1">01/10/2024 at 15:45</p>
+                            <div className="flex-1 max-w-[85%]">
+                              <div className="bg-[#E5F6F6] border border-[#B3E5E4] shadow-sm rounded-2xl rounded-tl-sm p-3 inline-block">
+                                <p className="text-sm text-[#00605E] whitespace-pre-wrap">
+                                  {currentTP.message}
+                                </p>
+                              </div>
+                              <p className="text-xs text-slate-400 mt-1 ml-1">{currentTP.date}</p>
+                            </div>
                           </div>
-                        </div>
+                        )}
                       </div>
 
                       {/* Zone de saisie nouveau message */}
-                      <div className="border-t border-slate-200 pt-4">
+                      <div className="border-t border-slate-200 pt-4 mt-auto absolute bottom-0 w-full bg-white z-10">
                         <div className="flex gap-3">
                           <div className="flex-1">
                             <textarea
@@ -1591,11 +1800,27 @@ const PatientDetailPage = () => {
                               placeholder={t('patients.detail.tp_check.type_message')}
                               disabled={isTreatmentFinished}
                               className="w-full p-3 border border-slate-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#0072B8] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed hidden md:block"
-                              rows={3}
+                              rows={2}
                             />
                           </div>
                           <Button
-                            disabled={isTreatmentFinished}
+                            disabled={isTreatmentFinished || addMessageMutation.isPending}
+                            onClick={async () => {
+                              if (!messageInputRef.current?.value || !currentCase?.id) return
+                              const text = messageInputRef.current.value
+                              messageInputRef.current.value = ''
+                              try {
+                                await addMessageMutation.mutateAsync({
+                                  caseId: currentCase.id,
+                                  text,
+                                  sender: 'MEDECIN'
+                                })
+                                await utils.cases.getByPatientId.invalidate({ patientId: patientId! })
+                              } catch (e) {
+                                console.error('Failed to send message:', e)
+                                alert("Erreur lors de l'envoi du message")
+                              }
+                            }}
                             className={`bg-[#0072B8] text-white self-end transition-all ${!isTreatmentFinished ? 'hover:bg-[#005a94]' : 'opacity-50 cursor-not-allowed hidden md:flex'}`}
                           >
                             <Send className="h-4 w-4" />
@@ -1701,8 +1926,13 @@ const PatientDetailPage = () => {
                     <div className="flex items-center gap-2">
                       <Badge variant="secondary">{radioCount}</Badge>
                       <Button
-                        onClick={() => setShowCephModal(true)}
-                        className="bg-gradient-to-r from-[#0072B8] to-[#00B4D8] text-white text-sm px-4 py-2 h-9 rounded-md shadow-md hover:shadow-lg hover:from-[#005a94] hover:to-[#0099cc] transition-all"
+                        onClick={() => {
+                          setIsCephLoading(true)
+                          setShowCephModal(true)
+                        }}
+                        disabled={!cephalometricUrl}
+                        title={!cephalometricUrl ? "L'analyse n'est pas encore disponible" : ""}
+                        className="bg-gradient-to-r from-[#0072B8] to-[#00B4D8] text-white text-sm px-4 py-2 h-9 rounded-md shadow-md hover:shadow-lg hover:from-[#005a94] hover:to-[#0099cc] disabled:opacity-50 disabled:from-slate-300 disabled:to-slate-400 disabled:cursor-not-allowed transition-all"
                       >
                         {t('patients.detail.photos.view_ceph')}
                       </Button>
@@ -1879,8 +2109,8 @@ const PatientDetailPage = () => {
                 </div>
               )
             })()}
-            {/* Conditional render: If treatment finished, hide other cards */}
-            {!isTreatmentFinished && (
+            {/* Conditional render: If treatment hasn't started or is finished, hide other cards */}
+            {hasTreatmentStarted && !isTreatmentFinished && (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6" role="list">
                 {advOrder.slice(1).map((cid) => (
                   <div
@@ -1903,39 +2133,44 @@ const PatientDetailPage = () => {
         )}
       </div>
 
-      {show3DModal && (
-        <>
-          <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center" onClick={() => setShow3DModal(false)}>
-            <div
-              className="bg-white rounded-lg w-[95%] h-[95%] flex flex-col overflow-hidden shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex items-center justify-between p-4 border-b border-slate-200">
-                <h2 className="text-xl font-semibold text-slate-800 flex items-center">
-                  <Package className="h-6 w-6 mr-2 text-[#0072B8]" />
-                  Visualiseur 3D - Plan de traitement
-                </h2>
-                <Button
-                  onClick={() => setShow3DModal(false)}
-                  variant="outline"
-                  className="border-slate-300 text-slate-700 hover:bg-slate-50"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-              <div className="flex-1 bg-slate-50">
-                <TreatmentPlanViewer3D patientName={`${patientData.prenom} ${patientData.nom}`} versionLabel={`Version ${selectedTPVersion + 1}`} />
+      {
+        show3DModal && (
+          <>
+            <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center" onClick={() => { setShow3DModal(false); setOverride3DUrl(null); }}>
+              <div
+                className="bg-white rounded-lg w-[95%] h-[95%] flex flex-col overflow-hidden shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center justify-between p-4 border-b border-slate-200">
+                  <h2 className="text-xl font-semibold text-slate-800 flex items-center">
+                    <Package className="h-6 w-6 mr-2 text-[#0072B8]" />
+                    Visualiseur 3D - Plan de traitement
+                  </h2>
+                  <Button
+                    onClick={() => { setShow3DModal(false); setOverride3DUrl(null); }}
+                    variant="outline"
+                    className="border-slate-300 text-slate-700 hover:bg-slate-50"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+                <div className="flex-1 bg-slate-50">
+                  <TreatmentPlanViewer3D patientName={`${patientData.prenom} ${patientData.nom}`} versionLabel={override3DUrl ? "Version Validée" : `Version ${selectedTPVersion + 1}`} url={override3DUrl || currentTP?.url} />
+                </div>
               </div>
             </div>
-          </div>
-        </>
-      )}
+          </>
+        )
+      }
 
-      {/* Modal Analyse Céphalométrique (iframe) */}
-      {showCephModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg w-full h-full max-w-7xl max-h-[90vh] flex flex-col">
-            <div className="flex items-center justify-between p-6 border-b border-slate-200">
+      {/* Modal Analyse Céphalométrique (iframe) - Calqué sur le design du 3D Viewer */}
+      {showCephModal && cephalometricUrl && (
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => setShowCephModal(false)}>
+          <div
+            className="bg-white rounded-lg w-[95%] h-[95%] flex flex-col overflow-hidden shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between p-4 border-b border-slate-200">
               <h2 className="text-xl font-semibold text-slate-800 flex items-center">
                 <FileText className="h-6 w-6 mr-2 text-[#0072B8]" />
                 {t('patients.detail.photos.view_ceph')}
@@ -1948,70 +2183,82 @@ const PatientDetailPage = () => {
                 <X className="h-4 w-4" />
               </Button>
             </div>
-            <div className="flex-1 p-6">
-              <div className="bg-slate-50 rounded-lg border border-slate-200 h-full overflow-hidden">
-                <iframe
-                  title="Cephalometric analysis"
-                  src={cephalometricUrl}
-                  className="w-full h-full rounded-md"
-                  allowFullScreen
-                />
-              </div>
+            <div className="flex-1 bg-slate-50 relative overflow-hidden">
+              {/* Overlay pour cacher le logo en haut à gauche (taille réduite selon demande) */}
+              <div className="absolute top-0 left-0 w-[71px] h-[53px] bg-[#2E3038] z-10 pointer-events-none"></div>
+
+              {/* Loading Overlay Centré */}
+              {isCephLoading && (
+                <div className="absolute inset-0 bg-white z-20 flex flex-col items-center justify-center pointer-events-none">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0072B8] mb-4"></div>
+                  <p className="text-sm text-slate-500 font-medium animate-pulse">Chargement de l'analyse céphalométrique...</p>
+                </div>
+              )}
+
+              <iframe
+                title="Cephalometric analysis"
+                src={cephalometricUrl}
+                className={`absolute inset-0 w-full h-full border-0 transition-opacity duration-300 ${isCephLoading ? 'opacity-0' : 'opacity-100'}`}
+                allowFullScreen
+                onLoad={() => setIsCephLoading(false)}
+              />
             </div>
           </div>
         </div>
       )}
 
       {/* Modal Photos MyDiamond */}
-      {showPatientPhotosModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg w-full h-full max-w-7xl max-h-[90vh] flex flex-col">
-            <div className="flex items-center justify-between p-6 border-b border-slate-200">
-              <h2 className="text-xl font-semibold text-slate-800 flex items-center">
-                <Image className="h-6 w-6 mr-2 text-[#0072B8]" />
-                {t('patients.detail.photos.uploaded_photos')}
-              </h2>
-              <Button
-                onClick={() => setShowPatientPhotosModal(false)}
-                variant="outline"
-                className="border-slate-300 text-slate-700 hover:bg-slate-50"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-            <div className="flex-1 p-6">
-              <div className="bg-slate-50 rounded-lg border border-slate-200 h-full overflow-auto p-4">
-                {myDiamondPhotos.length === 0 ? (
-                  <div className="text-center py-16">
-                    <Image className="h-16 w-16 text-slate-400 mx-auto mb-4" />
-                    <p className="text-slate-600">
-                      Aucune photo MyDiamond disponible pour ce patient
-                    </p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {myDiamondPhotos.map((p) => (
-                      <div
-                        key={p.id}
-                        className="rounded-md overflow-hidden border border-slate-200 bg-white"
-                      >
-                        <img
-                          src={p.url}
-                          alt={`Photo ${p.id}`}
-                          className="w-full h-40 object-cover"
-                        />
-                        <div className="px-3 py-2 border-t border-slate-200">
-                          <p className="text-xs text-slate-500">{t('patients.detail.photos.imported_on')} {p.date}</p>
+      {
+        showPatientPhotosModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg w-full h-full max-w-7xl max-h-[90vh] flex flex-col">
+              <div className="flex items-center justify-between p-6 border-b border-slate-200">
+                <h2 className="text-xl font-semibold text-slate-800 flex items-center">
+                  <Image className="h-6 w-6 mr-2 text-[#0072B8]" />
+                  {t('patients.detail.photos.uploaded_photos')}
+                </h2>
+                <Button
+                  onClick={() => setShowPatientPhotosModal(false)}
+                  variant="outline"
+                  className="border-slate-300 text-slate-700 hover:bg-slate-50"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="flex-1 p-6">
+                <div className="bg-slate-50 rounded-lg border border-slate-200 h-full overflow-auto p-4">
+                  {myDiamondPhotos.length === 0 ? (
+                    <div className="text-center py-16">
+                      <Image className="h-16 w-16 text-slate-400 mx-auto mb-4" />
+                      <p className="text-slate-600">
+                        Aucune photo MyDiamond disponible pour ce patient
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {myDiamondPhotos.map((p) => (
+                        <div
+                          key={p.id}
+                          className="rounded-md overflow-hidden border border-slate-200 bg-white"
+                        >
+                          <img
+                            src={p.url}
+                            alt={`Photo ${p.id}`}
+                            className="w-full h-40 object-cover"
+                          />
+                          <div className="px-3 py-2 border-t border-slate-200">
+                            <p className="text-xs text-slate-500">{t('patients.detail.photos.imported_on')} {p.date}</p>
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       {/* Eterna Order Dialog */}
       <Dialog open={showEternaScanDialog} onOpenChange={setShowEternaScanDialog}>
@@ -2117,18 +2364,71 @@ const PatientDetailPage = () => {
             <Button
               className="bg-[#0072B8] text-white hover:bg-[#005a91]"
               disabled={eternaScanMode === 'scanner' ? (!eternaScans.upper || !eternaScans.lower) : !eternaScanLink}
-              onClick={() => {
+              onClick={async () => {
                 console.log('Ordering Eterna with:', { mode: eternaScanMode, scans: eternaScans, link: eternaScanLink });
 
-                const today = new Date();
-                const formattedDate = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
+                try {
+                  let uploadedScans: any = {};
+                  if (eternaScanMode === 'scanner') {
+                    // Upload files to local storage API
+                    const uploadEternaFile = async (val: File | string | null, label: string) => {
+                      if (val instanceof File) {
+                        const formData = new FormData();
+                        formData.append('file', val);
+                        formData.append('path', `patients/${patientId}/eterna`);
 
-                setHistorique(prev => [
-                  { date: formattedDate, statut: 'Commande Eterna soumise', type: 'info' },
-                  ...prev
-                ]);
+                        const res = await fetch('/api/upload', {
+                          method: 'POST',
+                          body: formData
+                        });
+                        const resData = await res.json();
 
-                setShowEternaScanDialog(false);
+                        if (resData.success) {
+                          return {
+                            name: val.name,
+                            size: val.size,
+                            type: val.type,
+                            lastModified: val.lastModified,
+                            url: resData.url
+                          };
+                        }
+                      }
+                      return val;
+                    };
+
+                    uploadedScans.upper = await uploadEternaFile(eternaScans.upper, 'upper');
+                    uploadedScans.lower = await uploadEternaFile(eternaScans.lower, 'lower');
+                  }
+
+                  // Fallback for link mode
+                  if (eternaScanMode === 'link' && eternaScanLink) {
+                    uploadedScans = { link: eternaScanLink };
+                  }
+
+                  // Update via TRPC
+                  await updateScansMutation.mutateAsync({
+                    id: patientId as string,
+                    scans: uploadedScans
+                  });
+
+                  // Update history & local state
+                  const today = new Date();
+                  const formattedDate = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
+                  appendHistoryEvent(formattedDate, 'Commande Eterna soumise', 'info')
+
+                  setPatient((prev: any) => prev ? {
+                    ...prev,
+                    scans: uploadedScans
+                  } : null);
+
+                  // Refresh cache
+                  await utils.patients.getById.invalidate({ id: patientId as string });
+
+                  setShowEternaScanDialog(false);
+                } catch (error) {
+                  console.error("Error saving Eterna scans:", error);
+                  alert("Erreur lors de la sauvegarde des scans Eterna.");
+                }
               }}
             >
               {t('patients.detail.eterna_order.confirm')}
@@ -2149,10 +2449,10 @@ const PatientDetailPage = () => {
                 </div>
               </div>
               <AlertDialogTitle className="text-xl font-bold text-gray-900 text-center">
-                {t('patients.detail.dialogs.refinement_confirm_title') || 'Demander une Correction ?'}
+                Demander une Finition ?
               </AlertDialogTitle>
               <AlertDialogDescription className="text-gray-500 text-center mt-2">
-                {t('patients.detail.dialogs.refinement_confirm_desc') || 'Êtes-vous sûr de vouloir demander une Correction pour ce patient ?'}
+                Êtes-vous sûr de vouloir demander une Finition pour ce patient ?
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter className="flex gap-3 mt-6">
@@ -2208,10 +2508,7 @@ const PatientDetailPage = () => {
                   const today = new Date();
                   const formattedDate = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
 
-                  setHistorique(prev => [
-                    { date: formattedDate, statut: 'Traitement terminé', type: 'success' },
-                    ...prev
-                  ]);
+                  appendHistoryEvent(formattedDate, 'Traitement terminé', 'success');
 
                   setShowFinishConfirm(false);
                 }}
@@ -2418,10 +2715,7 @@ const PatientDetailPage = () => {
                 const today = new Date();
                 const formattedDate = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
 
-                setHistorique(prev => [
-                  { date: formattedDate, statut: 'Demande de correction soumis', type: 'info' },
-                  ...prev
-                ]);
+                appendHistoryEvent(formattedDate, 'Nouvelle correction demandée', 'info');
 
                 setShowRefinementUpload(false);
                 setShowGalleryModal(false);
@@ -2434,76 +2728,78 @@ const PatientDetailPage = () => {
       </Dialog>
 
       {/* Viewer Galerie Générique */}
-      {showGalleryModal && galleryPhotos.length > 0 && (
-        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg w-full h-full max-w-6xl max-h-[90vh] flex flex-col overflow-hidden">
-            <div className="flex items-center justify-between p-4 border-b border-slate-200">
-              <h2 className="text-lg font-semibold text-slate-800">{galleryTitle}</h2>
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-slate-500">
-                  {galleryIndex + 1} / {galleryPhotos.length}
-                </span>
-                <Button
-                  onClick={closeGallery}
-                  variant="outline"
-                  className="border-slate-300 text-slate-700 hover:bg-slate-50"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-            <div className="flex-1 grid grid-cols-1 lg:grid-cols-5 gap-0">
-              {/* Aperçu principal */}
-              <div className="lg:col-span-3 flex items-center justify-center bg-slate-50">
-                <div className="relative w-full h-full max-h-[70vh] flex items-center justify-center">
-                  <img
-                    src={galleryPhotos[galleryIndex].url}
-                    alt={`Photo ${galleryIndex + 1}`}
-                    className="max-h-[70vh] max-w-full object-contain"
-                  />
-                  <div className="absolute inset-y-0 left-0 flex items-center">
-                    <Button
-                      onClick={prevPhoto}
-                      variant="ghost"
-                      className="text-slate-700 hover:bg-white/70"
-                    >
-                      <ChevronLeft className="h-6 w-6" />
-                    </Button>
-                  </div>
-                  <div className="absolute inset-y-0 right-0 flex items-center">
-                    <Button
-                      onClick={nextPhoto}
-                      variant="ghost"
-                      className="text-slate-700 hover:bg-white/70"
-                    >
-                      <ChevronRight className="h-6 w-6" />
-                    </Button>
-                  </div>
+      {
+        showGalleryModal && galleryPhotos.length > 0 && (
+          <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg w-full h-full max-w-6xl max-h-[90vh] flex flex-col overflow-hidden">
+              <div className="flex items-center justify-between p-4 border-b border-slate-200">
+                <h2 className="text-lg font-semibold text-slate-800">{galleryTitle}</h2>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-slate-500">
+                    {galleryIndex + 1} / {galleryPhotos.length}
+                  </span>
+                  <Button
+                    onClick={closeGallery}
+                    variant="outline"
+                    className="border-slate-300 text-slate-700 hover:bg-slate-50"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
-              {/* Miniatures */}
-              <div className="lg:col-span-2 p-4 overflow-auto">
-                <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
-                  {galleryPhotos.map((p, idx) => (
-                    <button
-                      key={p.id}
-                      onClick={() => setGalleryIndex(idx)}
-                      className={`relative rounded-md overflow-hidden border ${idx === galleryIndex ? 'border-[#00B4D8]' : 'border-slate-200'
-                        } bg-white focus:outline-none focus:ring-2 focus:ring-[#00B4D8]`}
-                    >
-                      <img
-                        src={p.url}
-                        alt={`Miniature ${idx + 1}`}
-                        className="w-full h-24 object-cover"
-                      />
-                    </button>
-                  ))}
+              <div className="flex-1 grid grid-cols-1 lg:grid-cols-5 gap-0">
+                {/* Aperçu principal */}
+                <div className="lg:col-span-3 flex items-center justify-center bg-slate-50">
+                  <div className="relative w-full h-full max-h-[70vh] flex items-center justify-center">
+                    <img
+                      src={galleryPhotos[galleryIndex].url}
+                      alt={`Photo ${galleryIndex + 1}`}
+                      className="max-h-[70vh] max-w-full object-contain"
+                    />
+                    <div className="absolute inset-y-0 left-0 flex items-center">
+                      <Button
+                        onClick={prevPhoto}
+                        variant="ghost"
+                        className="text-slate-700 hover:bg-white/70"
+                      >
+                        <ChevronLeft className="h-6 w-6" />
+                      </Button>
+                    </div>
+                    <div className="absolute inset-y-0 right-0 flex items-center">
+                      <Button
+                        onClick={nextPhoto}
+                        variant="ghost"
+                        className="text-slate-700 hover:bg-white/70"
+                      >
+                        <ChevronRight className="h-6 w-6" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+                {/* Miniatures */}
+                <div className="lg:col-span-2 p-4 overflow-auto">
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                    {galleryPhotos.map((p, idx) => (
+                      <button
+                        key={p.id}
+                        onClick={() => setGalleryIndex(idx)}
+                        className={`relative rounded-md overflow-hidden border ${idx === galleryIndex ? 'border-[#00B4D8]' : 'border-slate-200'
+                          } bg-white focus:outline-none focus:ring-2 focus:ring-[#00B4D8]`}
+                      >
+                        <img
+                          src={p.url}
+                          alt={`Miniature ${idx + 1}`}
+                          className="w-full h-24 object-cover"
+                        />
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
       {/* Dialog: Preview 3D */}
       <Dialog open={!!previewFile} onOpenChange={(open) => !open && setPreviewFile(null)}>
         <DialogContent className="w-[min(90vw,90vh)] h-[min(90vw,90vh)] !max-w-none flex flex-col p-0 overflow-hidden bg-slate-50">
@@ -2541,7 +2837,7 @@ const PatientDetailPage = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </div >
   )
 }
 
