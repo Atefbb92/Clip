@@ -1,9 +1,8 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { auth, db } from '@/firebase/firebase'
-import { collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore'
-import { onAuthStateChanged } from 'firebase/auth'
+import { authClient } from '@/lib/auth-client'
+import { trpc } from '@/lib/trpc/client'
 import {
   Users,
   UserPlus,
@@ -35,7 +34,7 @@ import {
   DiamondCardHeader,
   DiamondCardTitle,
 } from '@/components/ui/diamond-card'
-import StatCard from '@/components/StatCard/StatCard'
+import StatCard from '@/components/StatCard'
 import PacksDistributionChart from '@/components/charts/PacksDistributionChart'
 import PatientsEvolutionChart from '@/components/charts/PatientsEvolutionChart'
 import { HeadingTitle } from '@/components/HeadingTitle'
@@ -46,15 +45,16 @@ import { useTranslation } from '@/hooks/useTranslation'
 
 interface Patient {
   id: string
-  nom?: string
+  name?: string
+  surname?: string
+  nom?: string // Support legacy or mixed data
   prenom?: string
-  age?: number
+  age?: any
   category?: string
-  status?: string
+  status?: number
+  userId?: string
   medecinEmail?: string
-  createdAt?: {
-    toDate: () => Date
-  }
+  createdAt?: any
 }
 
 interface DashboardStats {
@@ -67,6 +67,23 @@ interface DashboardStats {
   averageTreatmentDuration: number
   successRate: number
   monthlyGrowth: number
+  chartData?: {
+    labels: string[]
+    datasets: {
+      label: string
+      data: number[]
+      backgroundColor: string
+      borderColor: string
+      borderWidth: number
+      fill?: boolean
+      pointBackgroundColor?: string
+      pointBorderColor?: string
+      pointBorderWidth?: number
+      pointRadius?: number
+      pointHoverRadius?: number
+      tension?: number
+    }[]
+  }
 }
 
 const Dashboard: React.FC = () => {
@@ -163,12 +180,13 @@ const Dashboard: React.FC = () => {
   // Messages de bienvenue dynamiques
   const getWelcomeMessage = () => {
     const hour = new Date().getHours()
+    const nameStr = user?.name ? user.name.split(' ')[0] : 'Dr.'
     if (hour >= 5 && hour < 12) {
-      return t('dashboard.welcome_morning')
+      return t('dashboard.welcome_morning', { name: nameStr })
     } else if (hour >= 12 && hour < 18) {
-      return t('dashboard.welcome_afternoon')
+      return t('dashboard.welcome_afternoon', { name: nameStr })
     } else {
-      return t('dashboard.welcome_evening')
+      return t('dashboard.welcome_evening', { name: nameStr })
     }
   }
 
@@ -177,34 +195,37 @@ const Dashboard: React.FC = () => {
     const phrases = t('dashboard.dynamic_phrases') as string[]
     return phrases[Math.floor(Math.random() * phrases.length)]
   }
-  const [userEmail, setUserEmail] = useState<string | null>(null)
+  const { data: session, isPending: sessionPending } = authClient.useSession()
+  const user = session?.user
+
+  const { data: fetchedPatients, isLoading: isPatientsLoading } = trpc.patients.getAll.useQuery(
+    { userId: user?.id as string },
+    { enabled: !!user?.id }
+  )
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setUserEmail(user.email)
-        fetchDashboardData(user.email)
-      }
-    })
+    if (sessionPending || isPatientsLoading) {
+      setLoading(true)
+      return
+    }
 
-    return () => unsubscribe()
-  }, [])
-
-  const fetchDashboardData = async (email: string | null) => {
-    if (!email) return
-
-    try {
-      const patientsRef = collection(db, 'patients')
-      const q = query(patientsRef, where('medecinEmail', '==', email || ''))
-      const querySnapshot = await getDocs(q)
-
-      const patients: Patient[] = querySnapshot.docs.map(
-        (doc) =>
-        ({
-          id: doc.id,
-          ...doc.data(),
-        } as Patient)
-      )
+    if (fetchedPatients) {
+      const patients: Patient[] = fetchedPatients.map((p: any) => ({
+        id: p.id,
+        name: p.name,
+        surname: p.surname,
+        genre: p.genre,
+        birthDate: p.birthDate,
+        conditions: p.conditions,
+        status: p.status,
+        caseStatus: p.caseStatus,
+        archived: p.archived,
+        userId: p.userId,
+        createdAt: p.createdAt,
+        updatedAt: p.updatedAt,
+        pack: p.pack,
+        patientType: p.patientType
+      }) as any)
 
       // Calculer les statistiques
       const now = new Date()
@@ -212,24 +233,34 @@ const Dashboard: React.FC = () => {
       const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
       const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0)
 
+      // Helper to safely convert Firestore timestamp or other date formats to Date
+      const toDate = (date: any) => {
+        if (!date) return new Date()
+        if (typeof date.toDate === 'function') return date.toDate()
+        if (date instanceof Date) return date
+        if (typeof date === 'number') return new Date(date)
+        if (typeof date === 'string') return new Date(date)
+        return new Date()
+      }
+
       const newThisMonth = patients.filter((patient) => {
-        const createdAt = patient.createdAt?.toDate() || new Date()
+        const createdAt = toDate(patient.createdAt)
         return createdAt >= startOfMonth
       }).length
 
       const newLastMonth = patients.filter((patient) => {
-        const createdAt = patient.createdAt?.toDate() || new Date()
+        const createdAt = toDate(patient.createdAt)
         return createdAt >= lastMonth && createdAt <= endOfLastMonth
       }).length
 
       const inTreatment = patients.filter((patient) =>
-        ['en-traitement', 'en-production', 'en-planification'].includes(patient.status || '')
+        [1, 3, 4].includes(Number(patient.status))
       ).length
 
-      const completed = patients.filter((patient) => patient.status === 'termine').length
+      const completed = patients.filter((patient) => Number(patient.status) === 5).length
 
       const pending = patients.filter((patient) =>
-        ['brouillon', 'en-attente'].includes(patient.status || '')
+        [0, 2].includes(Number(patient.status))
       ).length
 
       // Calculer la croissance mensuelle
@@ -246,21 +277,38 @@ const Dashboard: React.FC = () => {
       // Calculer la durée moyenne de traitement (simulée)
       const averageTreatmentDuration = 180 // 6 mois en moyenne
 
-      // Récupérer les patients récents
-      const recentPatientsQuery = query(
-        patientsRef,
-        where('medecinEmail', '==', email || ''),
-        orderBy('createdAt', 'desc'),
-        limit(5)
-      )
-      const recentSnapshot = await getDocs(recentPatientsQuery)
-      const recentPatients: Patient[] = recentSnapshot.docs.map(
-        (doc) =>
-        ({
-          id: doc.id,
-          ...doc.data(),
-        } as Patient)
-      )
+      // Calculate chart data for last 6 months (current + 5 previous)
+      const last6Months = []
+      const monthNames = []
+      const locale = language === 'FR' ? 'fr-FR' : language === 'DE' ? 'de-DE' : 'en-US'
+
+      for (let i = 6; i >= 1; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1)
+        last6Months.push(d)
+        monthNames.push(d.toLocaleDateString(locale, { month: 'short' }))
+      }
+
+      const newCasesData = last6Months.map(monthDate => {
+        const nextMonth = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 1)
+        return patients.filter(p => {
+          const createdAt = toDate(p.createdAt)
+          return createdAt >= monthDate && createdAt < nextMonth
+        }).length
+      })
+
+      const approvedCasesData = last6Months.map(monthDate => {
+        const nextMonth = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 1)
+        return patients.filter(p => {
+          const createdAt = toDate(p.createdAt)
+          const isApproved = ![0, 2].includes(Number(p.status))
+          return createdAt >= monthDate && createdAt < nextMonth && isApproved
+        }).length
+      })
+
+      // Use local sorting for recent patients to avoid composite index requirements
+      const recentPatientsSorted = [...patients]
+        .sort((a, b) => toDate(b.createdAt).getTime() - toDate(a.createdAt).getTime())
+        .slice(0, 5)
 
       setStats({
         totalPatients: patients.length,
@@ -268,32 +316,76 @@ const Dashboard: React.FC = () => {
         patientsInTreatment: inTreatment,
         completedTreatments: completed,
         pendingActions: pending,
-        recentPatients,
+        recentPatients: recentPatientsSorted,
         averageTreatmentDuration,
         successRate,
         monthlyGrowth,
+        chartData: {
+          labels: monthNames,
+          datasets: [
+            {
+              label: t('dashboard.charts.evolution_new_cases'),
+              data: newCasesData,
+              fill: true,
+              backgroundColor: 'rgba(1, 112, 180, 0.1)',
+              borderColor: '#0170B4',
+              borderWidth: 3,
+              pointBackgroundColor: '#0170B4',
+              pointBorderColor: '#fff',
+              pointBorderWidth: 2,
+              pointRadius: 6,
+              pointHoverRadius: 8,
+              tension: 0.4,
+            },
+            {
+              label: t('dashboard.charts.evolution_approved_cases'),
+              data: approvedCasesData,
+              fill: true,
+              backgroundColor: 'rgba(0, 182, 174, 0.1)',
+              borderColor: '#00B6AE',
+              borderWidth: 3,
+              pointBackgroundColor: '#00B6AE',
+              pointBorderColor: '#fff',
+              pointBorderWidth: 2,
+              pointRadius: 6,
+              pointHoverRadius: 8,
+              tension: 0.4,
+            }
+          ]
+        }
       })
-    } catch (error) {
-      console.error('Error loading data:', error)
-    } finally {
+      setLoading(false)
+    } else if (!sessionPending && !isPatientsLoading) {
       setLoading(false)
     }
-  }
+  }, [fetchedPatients, sessionPending, isPatientsLoading])
 
-  const getStatusColor = (status: string) => {
-    const statusColors: { [key: string]: string } = {
-      brouillon: '#6B7280',
-      'en-attente': '#F59E0B',
-      'en-planification': '#3B82F6',
-      'en-production': '#8B5CF6',
-      'en-traitement': '#10B981',
-      termine: '#059669',
+  const getStatusLabel = (status: any) => {
+    const statusKeys: { [key: number]: string } = {
+      0: 'brouillon',
+      1: 'planning',
+      2: 'en-attente',
+      3: 'en-production',
+      4: 'en-traitement',
+      5: 'termine',
+      6: 'rejete'
     }
-    return statusColors[status] || '#6B7280'
+    const key = typeof status === 'number' ? statusKeys[status] : status
+    return t(`status.${key || 'unknown'}`)
   }
 
-  const getStatusLabel = (status: string) => {
-    return t(`status.${status}`)
+  const getStatusColor = (status: any) => {
+    const numericStatus = Number(status)
+    const statusColors: { [key: number]: string } = {
+      0: '#6B7280', // brouillon
+      1: '#3B82F6', // planning
+      2: '#F59E0B', // en-attente
+      3: '#8B5CF6', // en-production
+      4: '#10B981', // en-traitement
+      5: '#059669', // termine
+      6: '#EF4444', // rejete
+    }
+    return statusColors[numericStatus] || '#6B7280'
   }
 
   if (loading) {
@@ -339,7 +431,7 @@ const Dashboard: React.FC = () => {
             </PopoverTrigger>
             <PopoverContent className="w-80 p-0 bg-white border border-gray-200 shadow-xl z-[100]" align="end" sideOffset={5}>
               <div className="flex items-center justify-between border-b px-4 py-3 bg-white rounded-t-lg">
-                <h4 className="font-semibold text-gray-900">Messages</h4>
+                <h4 className="font-semibold text-gray-900">{t('dashboard.messages.title')}</h4>
                 {unreadMessagesCount > 0 && (
                   <Button
                     variant="ghost"
@@ -347,7 +439,7 @@ const Dashboard: React.FC = () => {
                     className="h-auto px-2 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                     onClick={markAllMessagesAsRead}
                   >
-                    Tout lire
+                    {t('dashboard.messages.read_all')}
                   </Button>
                 )}
               </div>
@@ -385,7 +477,7 @@ const Dashboard: React.FC = () => {
                 ) : (
                   <div className="flex flex-col items-center justify-center gap-2 py-12 text-center text-gray-500 bg-white">
                     <MessageCircle className="h-8 w-8 text-gray-300" />
-                    <p className="text-sm">Aucun message</p>
+                    <p className="text-sm">{t('dashboard.messages.empty')}</p>
                   </div>
                 )}
               </ScrollArea>
@@ -405,7 +497,7 @@ const Dashboard: React.FC = () => {
             </PopoverTrigger>
             <PopoverContent className="w-80 p-0 bg-white border border-gray-200 shadow-xl z-[100]" align="end" sideOffset={5}>
               <div className="flex items-center justify-between border-b px-4 py-3 bg-white rounded-t-lg">
-                <h4 className="font-semibold text-gray-900">Notifications</h4>
+                <h4 className="font-semibold text-gray-900">{t('dashboard.notifications.title')}</h4>
                 {unreadCount > 0 && (
                   <Button
                     variant="ghost"
@@ -413,7 +505,7 @@ const Dashboard: React.FC = () => {
                     className="h-auto px-2 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                     onClick={markAllAsRead}
                   >
-                    Tout marquer comme lu
+                    {t('dashboard.notifications.mark_all_read')}
                   </Button>
                 )}
               </div>
@@ -446,7 +538,7 @@ const Dashboard: React.FC = () => {
                 ) : (
                   <div className="flex flex-col items-center justify-center gap-2 py-12 text-center text-gray-500 bg-white">
                     <Bell className="h-8 w-8 text-gray-300" />
-                    <p className="text-sm">Aucune notification</p>
+                    <p className="text-sm">{t('dashboard.notifications.empty')}</p>
                   </div>
                 )}
               </ScrollArea>
@@ -517,7 +609,7 @@ const Dashboard: React.FC = () => {
             </DiamondCardTitle>
           </DiamondCardHeader>
           <DiamondCardContent>
-            <PatientsEvolutionChart />
+            <PatientsEvolutionChart data={stats.chartData} />
           </DiamondCardContent>
         </DiamondCard>
       </div>
@@ -543,12 +635,12 @@ const Dashboard: React.FC = () => {
                       className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors"
                     >
                       <div className="flex items-center justify-center w-12 h-12 bg-blue-500 text-white rounded-full font-semibold text-sm">
-                        {(patient.nom || 'N').charAt(0)}
-                        {(patient.prenom || 'P').charAt(0)}
+                        {(patient.surname || patient.nom || 'N').charAt(0)}
+                        {(patient.name || patient.prenom || 'P').charAt(0)}
                       </div>
                       <div className="flex-1">
                         <h4 className="font-semibold text-gray-900">
-                          {patient.nom || 'Last name'} {patient.prenom || 'First name'}
+                          {patient.name || patient.nom || 'Last name'} {patient.surname || patient.prenom || 'First name'}
                         </h4>
                         <p className="text-sm text-gray-600">
                           {patient.age} {t('common.days')} • {patient.category}
@@ -556,9 +648,9 @@ const Dashboard: React.FC = () => {
                       </div>
                       <div
                         className="px-3 py-1 rounded-full text-xs font-medium text-white"
-                        style={{ backgroundColor: getStatusColor(patient.status || '') }}
+                        style={{ backgroundColor: getStatusColor(patient.status ?? 0) }}
                       >
-                        {getStatusLabel(patient.status || '')}
+                        {getStatusLabel(patient.status ?? 0)}
                       </div>
                     </div>
                   ))}

@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useTranslation } from '@/hooks/useTranslation';
 import styles from '../../pages/profile/profile.module.css';
 import Image from 'next/image';
 
@@ -12,17 +13,17 @@ import termine from "../../assets/img/termine.png"
 import enTraitement from "../../assets/img/en traitement.png"
 
 const AnonymousIcon = () => (
-  <svg 
-      viewBox="0 0 24 24" 
-      style={{
-          width: '100%',
-          height: '100%',
-          color: '#718096',
-          backgroundColor: '#E2E8F0'
-      }}
-      fill="currentColor"
+  <svg
+    viewBox="0 0 24 24"
+    style={{
+      width: '100%',
+      height: '100%',
+      color: '#718096',
+      backgroundColor: '#E2E8F0'
+    }}
+    fill="currentColor"
   >
-      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
   </svg>
 );
 
@@ -45,7 +46,7 @@ const getStatusImage = (status) => {
 
 // Function to get action button based on status
 const getActionButton = (status) => {
-  switch(status) {
+  switch (status) {
     case 0:
       return <button className={styles.actionButton}>Continuer la prescription</button>;
     case 2:
@@ -56,15 +57,16 @@ const getActionButton = (status) => {
 };
 
 const PatientsTable = ({ patients, onPatientClick, isActionsTab }) => {
+  const { t } = useTranslation();
   return (
     <table className={styles.patientsTable}>
       <thead>
         <tr className={styles.tableRow}>
-          <th className={styles.tableHeader}>ID</th>
-          <th className={styles.tableHeader}>Patient</th>
-          <th className={styles.tableHeader}>Date de début</th>
-          <th className={styles.tableHeader}>Statut</th>
-          <th className={styles.tableHeader}>{isActionsTab ? "Actions" : "Conditions cliniques"}</th>
+          <th className={styles.tableHeader}>{t('patients.table.header.id')}</th>
+          <th className={styles.tableHeader}>{t('patients.table.header.patient')}</th>
+          <th className={styles.tableHeader}>{t('patients.table.header.start_date')}</th>
+          <th className={styles.tableHeader}>{t('patients.table.header.status')}</th>
+          <th className={styles.tableHeader}>{isActionsTab ? t('patients.table.header.actions') : t('patients.table.header.clinical_conditions')}</th>
         </tr>
       </thead>
       <tbody id="patientsTableBody">
@@ -74,9 +76,9 @@ const PatientsTable = ({ patients, onPatientClick, isActionsTab }) => {
             <td className={styles.tableCell}>
               <div className={styles.patientInfo}>
                 {patient.images?.img2 ? (
-                  <Image 
-                    src={patient.images.img2} 
-                    alt={`${patient.name}`} 
+                  <Image
+                    src={patient.images.img2}
+                    alt={`${patient.name}`}
                     className={styles.patientAvatar}
                     width={40}
                     height={40}
@@ -91,9 +93,9 @@ const PatientsTable = ({ patients, onPatientClick, isActionsTab }) => {
             </td>
             <td className={styles.tableCell}>{patient.createdAt?.toDate().toLocaleDateString()}</td>
             <td className={styles.tableCell}>
-              <Image 
+              <Image
                 src={patient.alignersShippedDate ? enTraitement : getStatusImage(patient.status)}
-                alt={`Status ${patient.status}`} 
+                alt={`Status ${patient.status}`}
                 className={styles.statusIcon}
                 width={60}
                 height={40}
@@ -102,7 +104,7 @@ const PatientsTable = ({ patients, onPatientClick, isActionsTab }) => {
             <td className={styles.tableCell}>
               {isActionsTab ? (
                 <div className={styles.actionButtonContainer}>
-                  {getActionButton(patient.status)}
+                  {getActionButton(patient.status, t)}
                 </div>
               ) : (
                 <div className={styles.conditionTags}>

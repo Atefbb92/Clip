@@ -8,8 +8,25 @@ import * as z from 'zod'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, X, User, FileText, Camera, Scan, Stethoscope, CheckCircle, Maximize2, ClipboardCheck, Plus } from 'lucide-react'
+import { ArrowLeft, X, User, FileText, Camera, Scan, Stethoscope, CheckCircle, Maximize2, ClipboardCheck, Plus, AlertTriangle, Loader2 } from 'lucide-react'
 import { HeadingTitle } from '@/components/HeadingTitle'
+import { useSession } from '@/lib/auth-client'
+import { trpc } from '@/lib/trpc/client'
+
+import rightSideImg from '@/assets/img/right.png'
+import leftSideImg from '@/assets/img/left.png'
+import frontTeethImg from '@/assets/img/front teeth.png'
+import lowerScanImg from '@/assets/img/Lower.png'
+import panoramicImg from '@/assets/img/panoramic final.png'
+import lateralXrayImg from '@/assets/img/lateral x ray.png'
+
+import manProfileImg from '@/assets/img/man profile.png'
+import manFrontNoSmilingImg from '@/assets/img/man front no smiling.png'
+import manFrontSmilingImg from '@/assets/img/man font smiling.png'
+
+import upperScanPlaceholderImg from '@/assets/img/upper scan.png'
+import lowerScanPlaceholderImg from '@/assets/img/lower scan.png'
+
 import {
   DiamondCard,
   DiamondCardHeader,
@@ -43,6 +60,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { useTranslation } from '@/hooks/useTranslation'
@@ -140,6 +159,9 @@ interface PatientData {
 export default function AjouterPatient() {
   const { t } = useTranslation()
   const router = useRouter()
+  const { data: session } = useSession()
+  const utils = trpc.useUtils()
+  const createPatientMutation = trpc.patients.create.useMutation()
   const [currentStep, setCurrentStep] = useState(0)
   const [showCancelDialog, setShowCancelDialog] = useState(false)
   const [selectedPatientType, setSelectedPatientType] = useState<string | null>(null)
@@ -153,6 +175,9 @@ export default function AjouterPatient() {
   const [uploadTarget, setUploadTarget] = useState<{ type: 'photos' | 'radiographies' | 'scans'; key: string } | null>(null)
   const [previewFile, setPreviewFile] = useState<{ file: File | string, title: string } | null>(null)
   const [otherPhotosCount, setOtherPhotosCount] = useState(0)
+  const [isSummaryRead, setIsSummaryRead] = useState(false)
+  const [isPrescriptionRead, setIsPrescriptionRead] = useState(false)
+  const [showSubmitConfirmDialog, setShowSubmitConfirmDialog] = useState(false)
 
   const handleUploadClick = (type: 'photos' | 'radiographies' | 'scans', key: string) => {
     setUploadTarget({ type, key })
@@ -169,7 +194,7 @@ export default function AjouterPatient() {
     // 15MB limit for photos/radiographies
     if (uploadTarget?.type === 'photos' || uploadTarget?.type === 'radiographies') {
       if (file.size > 15 * 1024 * 1024) {
-        alert("Le fichier dépasse la limite de 15 Mo.")
+        alert(t('patients.new.alerts.file_limit'))
         event.target.value = ''
         return
       }
@@ -342,6 +367,18 @@ export default function AjouterPatient() {
     defaultValues: { mode: 'link', link: '' },
   })
 
+  // Window scroll detection for prescription read gate (step 4)
+  useEffect(() => {
+    if (currentStep !== 4 || isPrescriptionRead) return
+    const handleScroll = () => {
+      const scrolledToBottom =
+        window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 60
+      if (scrolledToBottom) setIsPrescriptionRead(true)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [currentStep, isPrescriptionRead])
+
   // Age calculation effect
   useEffect(() => {
     const { day, month, year } = patientData.birthDate
@@ -411,7 +448,7 @@ export default function AjouterPatient() {
           !!patientData.scans['lower']
         )
       case 4: // Prescription
-        return patientData.prescription !== undefined && patientData.prescription !== null
+        return isPrescriptionRead
       case 5: // Vérifier et soumettre
         return areAllStepsCompleted()
       default:
@@ -427,7 +464,8 @@ export default function AjouterPatient() {
         return false
       }
     }
-    return true
+    // Also check if the summary has been read (mandatory for step 5 validation)
+    return isSummaryRead
   }
 
   // Function to navigate to a specific step
@@ -454,16 +492,180 @@ export default function AjouterPatient() {
     }
   }
 
-  const handleSubmit = () => {
+  const handleSaveAndClose = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const user = session?.user;
+      if (!user) {
+        const msg = "Vous devez être connecté pour enregistrer un brouillon";
+        setError(msg);
+        alert(msg);
+        return;
+      }
+
+      // Ensure we have current prescription data if possible
+      let currentPrescription = patientData.prescription;
+      if (prescriptionRef.current) {
+        currentPrescription = prescriptionRef.current.getPrescriptionData();
+      }
+
+      // Upload files to local storage API
+      const uploadGroupToLocal = async (group: any, userId: string) => {
+        if (!group) return {};
+        const result: any = {};
+        for (const key of Object.keys(group)) {
+          const val = group[key];
+          if (val instanceof File) {
+            const formData = new FormData();
+            formData.append('file', val);
+            formData.append('path', `patients/${userId}`);
+
+            const res = await fetch('/api/upload', {
+              method: 'POST',
+              body: formData
+            });
+            const resData = await res.json();
+
+            if (resData.success) {
+              result[key] = {
+                name: val.name,
+                size: val.size,
+                type: val.type,
+                lastModified: val.lastModified,
+                url: resData.url
+              };
+            }
+          } else {
+            result[key] = val;
+          }
+        }
+        return result;
+      };
+
+      const [photosData, radiographiesData, scansData] = await Promise.all([
+        uploadGroupToLocal(patientData.photos, user.id),
+        uploadGroupToLocal(patientData.radiographies, user.id),
+        uploadGroupToLocal(patientData.scans, user.id),
+      ]);
+
+      await createPatientMutation.mutateAsync({
+        name: patientData.nom,
+        surname: patientData.prenom,
+        genre: patientData.genre,
+        birthDate: patientData.birthDate,
+        conditions: patientData.conditions,
+        photos: photosData,
+        radiographies: radiographiesData,
+        scans: scansData,
+        cbctUrl: patientData.cbctUrl || null,
+        scanMode: patientData.scanMode || null,
+        scanLink: patientData.scanLink || null,
+        prescription: currentPrescription || null,
+        userId: user.id,
+        status: "Brouillon",
+        patientType: selectedPatientType || undefined,
+        pack: selectedPack || undefined,
+      });
+      await utils.patients.getAll.invalidate();
+      router.push('/patients');
+    } catch (err: any) {
+      console.error('Error saving draft:', err);
+      const errorMsg = "Erreur lors de l'enregistrement du brouillon: " + (err.message || "Erreur inconnue");
+      setError(errorMsg);
+      alert(errorMsg);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  const handleSubmit = async () => {
     // Ensure we have the latest prescription data
+    let currentPrescription = patientData.prescription;
     if (prescriptionRef.current) {
-      const prescriptionData = prescriptionRef.current.getPrescriptionData()
-      setPatientData(prev => ({ ...prev, prescription: prescriptionData }))
+      currentPrescription = prescriptionRef.current.getPrescriptionData()
+      setPatientData(prev => ({ ...prev, prescription: currentPrescription }))
     }
 
     if (areAllStepsCompleted()) {
-      console.log('Submitting patient data:', patientData)
-      router.push('/patients')
+      setIsLoading(true);
+      setError(null);
+      try {
+        const user = session?.user;
+        if (!user) {
+          const msg = "Vous devez être connecté pour soumettre un cas";
+          setError(msg);
+          alert(msg);
+          return;
+        }
+
+        // Upload files to local storage API
+        const uploadGroupToLocal = async (group: any, userId: string) => {
+          if (!group) return {};
+          const result: any = {};
+          for (const key of Object.keys(group)) {
+            const val = group[key];
+            if (val instanceof File) {
+              const formData = new FormData();
+              formData.append('file', val);
+              formData.append('path', `patients/${userId}`);
+
+              const res = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+              });
+              const resData = await res.json();
+
+              if (resData.success) {
+                result[key] = {
+                  name: val.name,
+                  size: val.size,
+                  type: val.type,
+                  lastModified: val.lastModified,
+                  url: resData.url
+                };
+              }
+            } else {
+              result[key] = val;
+            }
+          }
+          return result;
+        };
+
+        const [photosData, radiographiesData, scansData] = await Promise.all([
+          uploadGroupToLocal(patientData.photos, user.id),
+          uploadGroupToLocal(patientData.radiographies, user.id),
+          uploadGroupToLocal(patientData.scans, user.id),
+        ]);
+
+        await createPatientMutation.mutateAsync({
+          name: patientData.nom,
+          surname: patientData.prenom,
+          genre: patientData.genre,
+          birthDate: patientData.birthDate,
+          conditions: patientData.conditions,
+          photos: photosData,
+          radiographies: radiographiesData,
+          scans: scansData,
+          cbctUrl: patientData.cbctUrl || null,
+          scanMode: patientData.scanMode || null,
+          scanLink: patientData.scanLink || null,
+          prescription: currentPrescription || null,
+          userId: user.id,
+          status: "En attente",
+          patientType: selectedPatientType || undefined,
+          pack: selectedPack || undefined,
+        });
+        await utils.patients.getAll.invalidate();
+        router.push('/patients');
+      } catch (err: any) {
+        console.error('Error submitting case:', err);
+        const errorMsg = "Erreur lors de la soumission du cas: " + (err.message || "Erreur inconnue");
+        setError(errorMsg);
+        alert(errorMsg);
+      } finally {
+        setIsLoading(false);
+      }
     }
   }
 
@@ -507,16 +709,56 @@ export default function AjouterPatient() {
     const data = (patientData.prescription || {}) as Record<string, any>
 
     const items = [
-      { id: 'arcade', label: t('patients.new.prescription.summary.arcade'), value: data.arcade === 'both' ? t('patients.new.prescription.summary.both_arcades') : data.arcade === 'maxillaire' ? t('patients.new.prescription.summary.maxillary') : t('patients.new.prescription.summary.mandibular') },
-      { id: 'restrictions', label: t('patients.new.prescription.summary.restrictions'), value: data.restrictions === 'none' ? t('patients.new.prescription.summary.none') : `${t('patients.new.prescription.summary.do_not_move')} : ${Array.from(data.restrictionsTeeth || []).join(', ')}` },
-      { id: 'taquets', label: t('patients.new.prescription.summary.attachments'), value: data.taquets === 'none' ? t('patients.new.prescription.summary.place_if_needed') : `${t('patients.new.prescription.summary.do_not_place_on')} : ${Array.from(data.taquetsTeeth || []).join(', ')}` },
-      { id: 'rapportAP', label: t('patients.new.prescription.summary.ap_report'), value: `D: ${data.rapportAP?.D || '-'}, G: ${data.rapportAP?.G || '-'}` },
-      { id: 'overjet', label: t('patients.new.prescription.summary.overjet'), value: data.overjet },
-      { id: 'overbite', label: t('patients.new.prescription.summary.overbite'), value: data.overbite },
-      { id: 'biteRamps', label: t('patients.new.prescription.summary.bite_ramps'), value: data.biteRamps },
-      { id: 'milieux', label: t('patients.new.prescription.summary.midlines'), value: data.milieux },
-      { id: 'extractions', label: t('patients.new.prescription.summary.extractions'), value: data.extractions === 'none' ? t('patients.new.prescription.summary.none') : `${t('patients.new.prescription.summary.extract')} : ${Array.from(data.extractionsTeeth || []).join(', ')}` },
-      { id: 'Espacement', label: t('patients.new.prescription.summary.spacing'), value: data.espacement },
+      {
+        id: 'arcade',
+        label: t('patients.new.prescription.summary.arcade'),
+        value: (data.arcade === 'both' || !data.arcade) ? t('patients.new.prescription.summary.both_arcades') : data.arcade === 'maxillaire' ? t('patients.new.prescription.summary.maxillary') : t('patients.new.prescription.summary.mandibular')
+      },
+      {
+        id: 'restrictions',
+        label: t('patients.new.prescription.summary.restrictions'),
+        value: (data.restrictions === 'none' || !data.restrictions) ? t('patients.new.prescription.summary.none') : `${t('patients.new.prescription.summary.do_not_move')} : ${Array.from(data.restrictionsTeeth || []).join(', ')}`
+      },
+      {
+        id: 'taquets',
+        label: t('patients.new.prescription.summary.attachments'),
+        value: (data.taquets === 'none' || !data.taquets) ? t('patients.new.prescription.summary.place_if_needed') : `${t('patients.new.prescription.summary.do_not_place_on')} : ${Array.from(data.taquetsTeeth || []).join(', ')}`
+      },
+      {
+        id: 'rapportAP',
+        label: t('patients.new.prescription.summary.ap_report'),
+        value: `D: ${(data.rapportAP?.D === 'conserver' || !data.rapportAP?.D) ? t('patients.new.prescription.summary.ap_report_conserve') : data.rapportAP.D}, G: ${(data.rapportAP?.G === 'conserver' || !data.rapportAP?.G) ? t('patients.new.prescription.summary.ap_report_conserve') : data.rapportAP.G}`
+      },
+      {
+        id: 'overjet',
+        label: t('patients.new.prescription.summary.overjet'),
+        value: (data.overjet === 'realiser' || !data.overjet) ? t('patients.new.prescription.summary.overjet_default') : data.overjet
+      },
+      {
+        id: 'overbite',
+        label: t('patients.new.prescription.summary.overbite'),
+        value: (data.overbite === 'realiser' || !data.overbite) ? t('patients.new.prescription.summary.overbite_default') : data.overbite
+      },
+      {
+        id: 'biteRamps',
+        label: t('patients.new.prescription.summary.bite_ramps'),
+        value: (data.biteRamps === 'auto' || !data.biteRamps) ? t('patients.new.prescription.summary.bite_ramps_auto') : data.biteRamps
+      },
+      {
+        id: 'milieux',
+        label: t('patients.new.prescription.summary.midlines'),
+        value: (data.milieux === 'realiser' || !data.milieux) ? t('patients.new.prescription.summary.midlines_default') : data.milieux
+      },
+      {
+        id: 'extractions',
+        label: t('patients.new.prescription.summary.extractions'),
+        value: (data.extractions === 'none' || !data.extractions) ? t('patients.new.prescription.summary.extractions_none') : `${t('patients.new.prescription.summary.extract')} : ${Array.from(data.extractionsTeeth || []).join(', ')}`
+      },
+      {
+        id: 'Espacement',
+        label: t('patients.new.prescription.summary.spacing'),
+        value: (data.espacement === 'fermer' || !data.espacement) ? t('patients.new.prescription.summary.spacing_default') : data.espacement
+      },
       { id: 'specialInstructions', label: t('patients.new.prescription.summary.instructions'), value: data.specialInstructions || t('patients.new.prescription.summary.none') },
     ]
 
@@ -540,6 +782,24 @@ export default function AjouterPatient() {
               </Button>
             </div>
           ))}
+        </div>
+
+        <div className="pt-6 border-t mt-6">
+          <div className="flex items-center space-x-3 p-4 bg-[#0170B4]/5 border border-[#0170B4]/20 rounded-xl">
+            <Checkbox
+              id="validate-summary"
+              checked={isSummaryRead}
+              disabled={!isPrescriptionRead}
+              onCheckedChange={(checked: boolean | 'indeterminate') => setIsSummaryRead(checked === true)}
+              className="border-[#0170B4] data-[state=checked]:bg-[#0170B4] data-[state=checked]:border-[#0170B4] disabled:opacity-40 disabled:cursor-not-allowed"
+            />
+            <Label
+              htmlFor="validate-summary"
+              className={`text-sm font-medium cursor-pointer ${isPrescriptionRead ? 'text-[#0170B4]' : 'text-gray-400'}`}
+            >
+              {t('patients.new.verify.validation_checkbox')}
+            </Label>
+          </div>
         </div>
       </div>
     )
@@ -683,10 +943,10 @@ export default function AjouterPatient() {
                           </p>
                           <p className="font-bold text-slate-800 text-lg">
                             {pack.id === '1'
-                              ? '7 étapes'
+                              ? t('patients.new.product.step_count', { count: '7' })
                               : pack.id === '2'
-                                ? '12 étapes'
-                                : '24 étapes'}
+                                ? t('patients.new.product.step_count', { count: '12' })
+                                : t('patients.new.product.step_count', { count: '24' })}
                           </p>
                         </div>
 
@@ -694,10 +954,10 @@ export default function AjouterPatient() {
                           <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Corrections incluses</p>
                           <p className="font-bold text-slate-800 text-lg">
                             {pack.id === '1'
-                              ? '1 correction'
+                              ? t('patients.new.product.correction_count', { count: '1' })
                               : pack.id === '2'
-                                ? '1 correction'
-                                : '2 corrections'}
+                                ? t('patients.new.product.correction_count', { count: '1' })
+                                : t('patients.new.product.correction_count_plural', { count: '2' })}
                           </p>
                         </div>
 
@@ -819,7 +1079,12 @@ export default function AjouterPatient() {
                   className="w-24"
                 />
               </div>
-              {age !== null && <p className="text-sm text-gray-600 font-medium mt-1">{t('patients.new.details.age_display').replace('{age}', String(age))}</p>}
+              {age !== null && (
+                <div className="flex items-center gap-2 mt-2 px-3 py-2 bg-[#0170B4]/10 border border-[#0170B4]/20 rounded-lg w-fit">
+                  <span className="text-xs text-[#0170B4] font-semibold uppercase tracking-wide">{t('patients.new.details.age') || 'Âge'}</span>
+                  <span className="text-[#0170B4] font-bold text-sm">{age} {t('common.years') || 'ans'}</span>
+                </div>
+              )}
               {ageError && error && <p className="text-sm text-red-600">{error}</p>}
             </div>
 
@@ -882,25 +1147,26 @@ export default function AjouterPatient() {
                 </p>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {[
-                    { key: 'image1', label: t('patients.new.photos.labels.portrait_profile'), required: true },
-                    { key: 'image2', label: t('patients.new.photos.labels.portrait_face'), required: true },
-                    { key: 'image3', label: t('patients.new.photos.labels.portrait_smile'), required: true },
-                    { key: 'image4', label: t('patients.new.photos.labels.occlusal_upper'), required: true },
-                    { key: 'image6', label: t('patients.new.photos.labels.occlusal_lower'), required: true },
-                    { key: 'image7', label: t('patients.new.photos.labels.intra_right'), required: true },
+                    { key: 'image1', label: t('patients.new.photos.labels.portrait_profile'), required: true, placeholder: patientData.genre === 'Male' ? manProfileImg.src : '/images/p1.png' },
+                    { key: 'image2', label: t('patients.new.photos.labels.portrait_face'), required: true, placeholder: patientData.genre === 'Male' ? manFrontNoSmilingImg.src : '/images/p2.png' },
+                    { key: 'image3', label: t('patients.new.photos.labels.portrait_smile'), required: true, placeholder: patientData.genre === 'Male' ? manFrontSmilingImg.src : '/images/p3.png' },
+                    { key: 'image4', label: t('patients.new.photos.labels.occlusal_upper'), required: true, placeholder: '/images/p4.png' },
+                    { key: 'image6', label: t('patients.new.photos.labels.occlusal_lower'), required: true, placeholder: '/images/p5.png' },
+                    { key: 'image7', label: t('patients.new.photos.labels.intra_right'), required: true, placeholder: '/images/p6.png' },
 
-                    { key: 'image8', label: t('patients.new.photos.labels.intra_face'), required: true },
-                    { key: 'image9', label: t('patients.new.photos.labels.intra_left'), required: true },
+                    { key: 'image8', label: t('patients.new.photos.labels.intra_face'), required: true, placeholder: '/images/p7.png' },
+                    { key: 'image9', label: t('patients.new.photos.labels.intra_left'), required: true, placeholder: '/images/p8.png' },
                     // Generate "Other" photos dynamically
                     ...Array.from({ length: otherPhotosCount }).map((_, index) => ({
                       key: `other_${index}`,
                       label: t('patients.new.photos.labels.other') || 'Autre',
                       required: false,
+                      placeholder: undefined,
                     })),
                   ].map((photo) => (
-                    <div key={photo.key} className="border-0 bg-gray-50 rounded-lg p-4 text-center transition-colors relative group">
+                    <div key={photo.key} className="border-0 bg-gray-50 rounded-lg p-2 md:p-4 text-center transition-colors relative group">
                       <div
-                        className="w-full h-32 bg-gray-100 rounded mb-2 flex items-center justify-center overflow-hidden relative cursor-pointer"
+                        className="w-full h-48 md:h-56 bg-white border border-gray-100 rounded mb-3 flex items-center justify-center overflow-hidden relative cursor-pointer"
                         onClick={() => {
                           if (patientData.photos && patientData.photos[photo.key] instanceof File) {
                             setPreviewFile({ file: patientData.photos[photo.key] as File, title: photo.label })
@@ -925,6 +1191,14 @@ export default function AjouterPatient() {
                               </Button>
                             </div>
                           </>
+                        ) : photo.placeholder ? (
+                          <div className="w-full h-full flex items-center justify-center bg-white">
+                            <img
+                              src={photo.placeholder}
+                              alt={photo.label}
+                              className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                            />
+                          </div>
                         ) : (
                           <Camera className="w-8 h-8 text-gray-400" />
                         )}
@@ -961,9 +1235,9 @@ export default function AjouterPatient() {
               <div>
                 <h4 className="font-medium mb-3">{t('patients.new.photos.xrays')}</h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="border-0 bg-gray-50 rounded-lg p-4 text-center transition-colors relative group">
+                  <div className="border-0 bg-gray-50 rounded-lg p-2 md:p-4 text-center transition-colors relative group">
                     <div
-                      className="w-full h-32 bg-gray-100 rounded mb-2 flex items-center justify-center overflow-hidden relative cursor-pointer"
+                      className="w-full h-48 md:h-56 bg-white border border-gray-100 rounded mb-3 flex items-center justify-center overflow-hidden relative cursor-pointer"
                       onClick={() => {
                         if (patientData.radiographies && patientData.radiographies['panoramic'] instanceof File) {
                           setPreviewFile({ file: patientData.radiographies['panoramic'] as File, title: t('patients.new.photos.panoramic') })
@@ -989,7 +1263,13 @@ export default function AjouterPatient() {
                           </div>
                         </>
                       ) : (
-                        <FileText className="w-8 h-8 text-gray-400" />
+                        <div className="w-full h-full flex items-center justify-center bg-[#2B3041] overflow-hidden">
+                          <img
+                            src={panoramicImg.src}
+                            alt={t('patients.new.photos.panoramic')}
+                            className="w-full h-auto min-h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                          />
+                        </div>
                       )}
                     </div>
                     <p className="text-xs text-gray-600 mb-2">
@@ -1004,9 +1284,9 @@ export default function AjouterPatient() {
                       {patientData.radiographies && patientData.radiographies['panoramic'] ? t('patients.new.photos.modify') : t('patients.new.photos.select_plus')}
                     </Button>
                   </div>
-                  <div className="border-0 bg-gray-50 rounded-lg p-4 text-center transition-colors relative group">
+                  <div className="border-0 bg-gray-50 rounded-lg p-2 md:p-4 text-center transition-colors relative group">
                     <div
-                      className="w-full h-32 bg-gray-100 rounded mb-2 flex items-center justify-center overflow-hidden relative cursor-pointer"
+                      className="w-full h-48 md:h-56 bg-white border border-gray-100 rounded mb-3 flex items-center justify-center overflow-hidden relative cursor-pointer"
                       onClick={() => {
                         if (patientData.radiographies && patientData.radiographies['xray_profile'] instanceof File) {
                           setPreviewFile({ file: patientData.radiographies['xray_profile'] as File, title: t('patients.new.photos.xray_profile') })
@@ -1032,7 +1312,13 @@ export default function AjouterPatient() {
                           </div>
                         </>
                       ) : (
-                        <FileText className="w-8 h-8 text-gray-400" />
+                        <div className="w-full h-full flex items-center justify-center bg-[#2B3041] overflow-hidden">
+                          <img
+                            src={lateralXrayImg.src}
+                            alt={t('patients.new.photos.xray_profile')}
+                            className="w-full h-auto min-h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                          />
+                        </div>
                       )}
                     </div>
                     <p className="text-xs text-gray-600 mb-2">{t('patients.new.photos.xray_profile')}</p>
@@ -1147,7 +1433,13 @@ export default function AjouterPatient() {
                       </div>
                     </>
                   ) : (
-                    <Scan className="w-8 h-8 text-gray-400 cursor-pointer" />
+                    <div className="w-full h-full p-2 flex items-center justify-center bg-transparent group-hover:bg-[#f8f9fa] transition-colors rounded">
+                      <img
+                        src={upperScanPlaceholderImg.src}
+                        alt="Upper Jaw Scan Placeholder"
+                        className="w-full h-full object-contain opacity-80 group-hover:opacity-100 transition-opacity drop-shadow-sm"
+                      />
+                    </div>
                   )}
                 </div>
                 <p className="text-xs text-gray-600 mb-2">
@@ -1189,7 +1481,13 @@ export default function AjouterPatient() {
                       </div>
                     </>
                   ) : (
-                    <Scan className="w-8 h-8 text-gray-400 cursor-pointer" />
+                    <div className="w-full h-full p-2 flex items-center justify-center bg-transparent group-hover:bg-[#f8f9fa] transition-colors rounded">
+                      <img
+                        src={lowerScanPlaceholderImg.src}
+                        alt="Lower Jaw Scan Placeholder"
+                        className="w-full h-full object-contain opacity-80 group-hover:opacity-100 transition-opacity drop-shadow-sm"
+                      />
+                    </div>
                   )}
                 </div>
                 <p className="text-xs text-gray-600 mb-2">
@@ -1313,7 +1611,14 @@ export default function AjouterPatient() {
                 category: selectedPatientType
               }}
               prescriptionData={typeof patientData.prescription === 'object' ? patientData.prescription : {}}
+              onChange={(data) => setPatientData(prev => ({ ...prev, prescription: data }))}
             />
+            {!isPrescriptionRead && (
+              <div className="flex items-center gap-2 px-4 py-2 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-700">
+                <span className="text-amber-500">↓</span>
+                {t('patients.new.verify.scroll_to_read') || 'Faites défiler jusqu\'en bas pour valider la lecture de la prescription'}
+              </div>
+            )}
           </div>
         )
       case 5:
@@ -1321,15 +1626,56 @@ export default function AjouterPatient() {
           <div className="space-y-6">
             <h3 className="text-lg font-semibold">{t('patients.new.verify.title')}</h3>
             <div className="space-y-4">
-              <div className="p-4 bg-gray-50 rounded-lg">
-                <h4 className="font-medium mb-2">{t('patients.new.verify.patient_summary')}</h4>
-                <div className="text-sm space-y-1">
-                  <p>
-                    <strong>{t('patients.new.verify.type')}</strong> {selectedPatientType || t('patients.new.verify.not_selected')}
-                  </p>
-                  <p>
-                    <strong>{t('patients.new.details.last_name')}:</strong> {patientData.nom || t('patients.new.verify.not_filled')} {patientData.prenom || ''}
-                  </p>
+              <div className="p-5 bg-gradient-to-br from-[#0170B4]/5 to-[#00B6AE]/5 rounded-xl border border-[#0170B4]/10">
+                <h4 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                  <span className="w-1 h-5 bg-gradient-to-b from-[#0170B4] to-[#00B6AE] rounded-full inline-block" />
+                  {t('patients.new.verify.patient_summary')}
+                </h4>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  {/* Nom & Prénom */}
+                  <div className="col-span-2 bg-white rounded-lg p-3 shadow-sm border border-gray-100">
+                    <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">{t('patients.new.details.last_name')} / {t('patients.new.details.first_name')}</p>
+                    <p className="font-medium text-gray-800">
+                      {patientData.nom
+                        ? `${patientData.nom} ${patientData.prenom || ''}`
+                        : <span className="text-gray-400 italic">{t('patients.new.verify.not_filled')}</span>
+                      }
+                    </p>
+                  </div>
+                  {/* Age */}
+                  <div className="bg-white rounded-lg p-3 shadow-sm border border-gray-100">
+                    <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">{t('patients.new.details.age') || 'Âge'}</p>
+                    <p className="font-medium text-gray-800">
+                      {age !== null ? `${age} ${t('common.years') || 'ans'}` : <span className="text-gray-400 italic">{t('patients.new.verify.not_filled')}</span>}
+                    </p>
+                  </div>
+                  {/* Sexe */}
+                  <div className="bg-white rounded-lg p-3 shadow-sm border border-gray-100">
+                    <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">{t('patients.new.details.gender') || 'Sexe'}</p>
+                    <p className="font-medium text-gray-800">
+                      {patientData.genre
+                        ? t(`patients.new.details.gender_${patientData.genre.toLowerCase()}`) || patientData.genre
+                        : <span className="text-gray-400 italic">{t('patients.new.verify.not_filled')}</span>
+                      }
+                    </p>
+                  </div>
+                  {/* Type */}
+                  <div className="bg-white rounded-lg p-3 shadow-sm border border-gray-100">
+                    <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">{t('patients.new.verify.type')}</p>
+                    <p className="font-medium text-gray-800">
+                      {selectedPatientType || <span className="text-gray-400 italic">{t('patients.new.verify.not_selected')}</span>}
+                    </p>
+                  </div>
+                  {/* Pack */}
+                  <div className="bg-white rounded-lg p-3 shadow-sm border border-gray-100">
+                    <p className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">{t('patients.new.verify.pack') || 'Pack souhaité'}</p>
+                    <p className="font-medium text-gray-800">
+                      {selectedPack
+                        ? (mockPacks.find(p => p.id === selectedPack)?.name || selectedPack)
+                        : <span className="text-gray-400 italic">{t('patients.new.verify.not_selected')}</span>
+                      }
+                    </p>
+                  </div>
                 </div>
               </div>
 
@@ -1377,8 +1723,19 @@ export default function AjouterPatient() {
               </div>
 
               <div className="flex items-center gap-3">
-                <Button className="bg-[#0170B4] hover:bg-[#005f99] text-white shadow-md transition-all hover:translate-y-[-1px]">
-                  {t('patients.new.buttons.save_close')}
+                <Button
+                  onClick={handleSaveAndClose}
+                  disabled={isLoading}
+                  className="bg-[#0170B4] hover:bg-[#005f99] text-white shadow-md transition-all hover:translate-y-[-1px] min-w-[140px]"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      {t('common.loading') || 'Chargement...'}
+                    </>
+                  ) : (
+                    t('patients.new.buttons.save_close')
+                  )}
                 </Button>
 
                 {currentStep < steps.length - 1 ? (
@@ -1390,7 +1747,7 @@ export default function AjouterPatient() {
                   </Button>
                 ) : (
                   <Button
-                    onClick={handleSubmit}
+                    onClick={() => setShowSubmitConfirmDialog(true)}
                     disabled={!areAllStepsCompleted()}
                     className={`shadow-lg transition-all hover:translate-y-[-1px] ${areAllStepsCompleted()
                       ? 'bg-gradient-to-r from-[#0170B4] to-[#00B6AE] hover:from-[#005f99] hover:to-[#00a099] text-white border-0'
@@ -1484,21 +1841,74 @@ export default function AjouterPatient() {
         </div>
       </div>
 
+      {/* Submit confirmation dialog */}
+      <AlertDialog open={showSubmitConfirmDialog} onOpenChange={setShowSubmitConfirmDialog}>
+        <AlertDialogContent className="bg-white/95 backdrop-blur-md border-[#0170B4]/20 shadow-2xl max-w-md rounded-2xl p-0 overflow-hidden">
+          <div className="h-2 bg-gradient-to-r from-[#0170B4] to-[#00B6AE] w-full" />
+          <div className="p-8">
+            <AlertDialogHeader className="text-center">
+              <div className="flex justify-center mb-4">
+                <div className="p-3 bg-[#0170B4]/10 rounded-full">
+                  <CheckCircle className="w-8 h-8 text-[#0170B4]" />
+                </div>
+              </div>
+              <AlertDialogTitle className="text-xl font-bold text-gray-900 text-center">
+                {t('patients.new.dialogs.submit_confirm_title') || 'Confirmer la soumission'}
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-gray-500 text-center mt-2">
+                {t('patients.new.dialogs.submit_confirm_desc') || 'Êtes-vous sûr de vouloir soumettre ce cas ? Il sera envoyé pour traitement et vous ne pourrez plus le modifier.'}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex gap-3 mt-6">
+              <AlertDialogCancel
+                onClick={() => setShowSubmitConfirmDialog(false)}
+                className="flex-1 rounded-xl border-gray-200 text-gray-600 hover:bg-gray-50"
+              >
+                {t('patients.new.dialogs.continue_editing')}
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => {
+                  setShowSubmitConfirmDialog(false)
+                  handleSubmit()
+                }}
+                disabled={isLoading}
+                className="flex-1 rounded-xl bg-gradient-to-r from-[#0170B4] to-[#00B6AE] text-white hover:from-[#005f99] hover:to-[#00a099] border-0"
+              >
+                {isLoading ? t('common.loading') || 'Chargement...' : t('patients.new.buttons.submit_case')}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Cancel confirmation dialog */}
       <AlertDialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t('patients.new.dialogs.cancel_title')}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t('patients.new.dialogs.cancel_desc')}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t('patients.new.dialogs.continue_editing')}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleCancel} className="bg-red-600 hover:bg-red-700">
-              {t('patients.new.dialogs.yes_cancel')}
-            </AlertDialogAction>
-          </AlertDialogFooter>
+        <AlertDialogContent className="bg-white/95 backdrop-blur-md border-[#0170B4]/20 shadow-2xl max-w-md rounded-2xl p-0 overflow-hidden">
+          <div className="h-2 bg-gradient-to-r from-red-500 to-orange-400 w-full" />
+          <div className="p-8">
+            <AlertDialogHeader className="space-y-4">
+              <div className="mx-auto w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-2">
+                <AlertTriangle className="w-8 h-8 text-red-500" />
+              </div>
+              <AlertDialogTitle className="text-2xl font-bold text-slate-900 text-center">
+                {t('patients.new.dialogs.cancel_title')}
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-slate-600 text-center text-base leading-relaxed">
+                {t('patients.new.dialogs.cancel_desc')}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="mt-10 sm:justify-center gap-3">
+              <AlertDialogCancel className="mt-0 border-2 border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-slate-900 font-semibold px-6 py-2 h-11 rounded-xl transition-all">
+                {t('patients.new.dialogs.continue_editing')}
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleCancel}
+                className="bg-red-500 hover:bg-red-600 text-white font-semibold px-8 py-2 h-11 rounded-xl shadow-lg shadow-red-200 active:scale-95 transition-all"
+              >
+                {t('patients.new.dialogs.yes_cancel')}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </div>
         </AlertDialogContent>
       </AlertDialog>
 

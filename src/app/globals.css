@@ -77,7 +77,7 @@
   }
 
   body {
-    @apply bg-white text-gray-900 min-h-full;
+    @apply bg-gray-50 text-gray-900 min-h-full;
   }
 
   .dark body {

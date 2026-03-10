@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { NuqsProvider } from "@/providers/nuqs-provider";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { TRPCProvider } from "@/providers/trpc-provider";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -19,11 +20,13 @@ export default function RootLayout({
   return (
     <html>
       <body className={inter.className} suppressHydrationWarning={true}>
-        <LanguageProvider>
-          <NuqsProvider>
-            {children}
-          </NuqsProvider>
-        </LanguageProvider>
+        <TRPCProvider>
+          <LanguageProvider>
+            <NuqsProvider>
+              {children}
+            </NuqsProvider>
+          </LanguageProvider>
+        </TRPCProvider>
       </body>
     </html>
   );

@@ -63,15 +63,16 @@ const DemoPage = () => {
   const [expandedId, setExpandedId] = useState<string | null>(null)
   const [show3D, setShow3D] = useState<boolean>(false)
   const [searchTerm, setSearchTerm] = useState('')
+  const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const mountRef = useRef<HTMLDivElement | null>(null)
 
   // Expanded Data
   const cases: CaseItem[] = [
     {
       id: 'crowding',
-      title: 'Crowding',
-      titleFr: 'Encombrement',
-      description: "Correction d'un encombrement sévère via expansion et IPR.",
+      title: t('demo.cases.crowding.title'),
+      titleFr: t('demo.cases.crowding.title'), // Using same key as requested
+      description: t('demo.cases.crowding.description'),
       beforeImage: 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=500&h=400&fit=crop',
       afterImage: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=500&h=400&fit=crop',
       color: 'bg-blue-500',
@@ -81,9 +82,9 @@ const DemoPage = () => {
     },
     {
       id: 'spacing',
-      title: 'Spacing',
-      titleFr: 'Espacement',
-      description: 'Fermeture des diastèmes multiples avec alignement esthétique.',
+      title: t('demo.cases.spacing.title'),
+      titleFr: t('demo.cases.spacing.title'),
+      description: t('demo.cases.spacing.description'),
       beforeImage: 'https://images.unsplash.com/photo-1609840114035-3c981407e31f?w=500&h=400&fit=crop',
       afterImage: 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?w=500&h=400&fit=crop',
       color: 'bg-emerald-500',
@@ -93,9 +94,9 @@ const DemoPage = () => {
     },
     {
       id: 'openbite',
-      title: 'Open Bite',
-      titleFr: 'Béance',
-      description: 'Correction de béance par ingression molaire et élastiques.',
+      title: t('demo.cases.openbite.title'),
+      titleFr: t('demo.cases.openbite.title'),
+      description: t('demo.cases.openbite.description'),
       beforeImage: 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=500&h=400&fit=crop',
       afterImage: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=500&h=400&fit=crop',
       color: 'bg-amber-500',
@@ -105,9 +106,9 @@ const DemoPage = () => {
     },
     {
       id: 'deepbite',
-      title: 'Deep Bite',
-      titleFr: 'Supraclusion',
-      description: "Nivellement de la courbe de Spee et ouverture de l'occlusion.",
+      title: t('demo.cases.deepbite.title'),
+      titleFr: t('demo.cases.deepbite.title'),
+      description: t('demo.cases.deepbite.description'),
       beforeImage: 'https://images.unsplash.com/photo-1609840114035-3c981407e31f?w=500&h=400&fit=crop',
       afterImage: 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?w=500&h=400&fit=crop',
       color: 'bg-violet-500',
@@ -117,9 +118,9 @@ const DemoPage = () => {
     },
     {
       id: 'class2',
-      title: 'Class II',
-      titleFr: 'Classe II',
-      description: 'Correction sagittale avec distalisation séquentielle.',
+      title: t('demo.cases.class2.title'),
+      titleFr: t('demo.cases.class2.title'),
+      description: t('demo.cases.class2.description'),
       beforeImage: 'https://images.unsplash.com/photo-1609840114035-3c981407e31f?w=500&h=400&fit=crop',
       afterImage: 'https://images.unsplash.com/photo-1598256989800-fe5f95da9787?w=500&h=400&fit=crop',
       color: 'bg-rose-500',
@@ -129,9 +130,9 @@ const DemoPage = () => {
     },
     {
       id: 'class3',
-      title: 'Class III',
-      titleFr: 'Classe III',
-      description: 'Camouflage orthodontique avec IPR mandibulaire.',
+      title: t('demo.cases.class3.title'),
+      titleFr: t('demo.cases.class3.title'),
+      description: t('demo.cases.class3.description'),
       beforeImage: 'https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=500&h=400&fit=crop',
       afterImage: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=500&h=400&fit=crop',
       color: 'bg-cyan-500',
@@ -155,11 +156,13 @@ const DemoPage = () => {
     const scene = new Scene()
     scene.background = new Color(0xffffff)
 
-    const camera = new PerspectiveCamera(50, mountRef.current.clientWidth / mountRef.current.clientHeight, 0.1, 100)
+    // @ts-ignore
+    const camera = new PerspectiveCamera(50, mountRef.current.clientWidth / mountRef.current.clientHeight, 0.1, 100) as any
     camera.position.z = 5
     camera.position.y = 1
 
-    const renderer = new WebGLRenderer({ antialias: true, alpha: true })
+    // @ts-ignore
+    const renderer = new WebGLRenderer({ antialias: true, alpha: true }) as any
     renderer.setSize(mountRef.current.clientWidth, mountRef.current.clientHeight)
     mountRef.current.appendChild(renderer.domElement)
 
@@ -240,8 +243,8 @@ const DemoPage = () => {
       {/* 1. Header & Hero Combined */}
       <div className="space-y-6">
         <HeadingTitle
-          title={t('gallery.title')}
-          subtitle={t('gallery.subtitle')}
+          title={t('demo.hero.title')}
+          subtitle={t('demo.hero.description')}
         />
 
         {/* Compact Hero Stats */}
@@ -251,15 +254,15 @@ const DemoPage = () => {
             <DiamondCardContent className="h-full flex flex-col justify-center relative z-10 p-8">
               <div className="flex items-center gap-2 text-blue-300 mb-2 font-medium">
                 <Sparkles className="w-5 h-5" />
-                <span>Technologie Diamond AI</span>
+                <span>{t('demo.hero.techno_ai')}</span>
               </div>
-              <h2 className="text-3xl font-bold mb-2">Visualisez le futur du sourire</h2>
+              <h2 className="text-3xl font-bold mb-2">{t('demo.hero.title')}</h2>
               <p className="text-blue-100/80 max-w-lg mb-6">
-                Nos algorithmes prédictifs simulent les mouvements dentaires avec une précision de 98%.
+                {t('demo.hero.description')}
               </p>
               <div className="flex gap-4">
-                <Badge variant="outline" className="text-white border-white/20 px-3 py-1">Précision 98%</Badge>
-                <Badge variant="outline" className="text-white border-white/20 px-3 py-1">50k+ Cas</Badge>
+                <Badge variant="outline" className="text-white border-white/20 px-3 py-1">{t('demo.hero.precision')}</Badge>
+                <Badge variant="outline" className="text-white border-white/20 px-3 py-1">{t('demo.hero.cases_count')}</Badge>
               </div>
             </DiamondCardContent>
           </DiamondCard>
@@ -269,9 +272,9 @@ const DemoPage = () => {
               <div className="mx-auto w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 mb-4">
                 <Database className="w-6 h-6" />
               </div>
-              <h3 className="text-2xl font-bold text-slate-900">Bibliothèque</h3>
-              <p className="text-slate-500 text-sm mb-4">Accédez à plus de 50 types de malocclusions documentées.</p>
-              <Button variant="outline" className="w-full">Voir Documentation</Button>
+              <h3 className="text-2xl font-bold text-slate-900">{t('demo.library.title')}</h3>
+              <p className="text-slate-500 text-sm mb-4">{t('demo.library.description')}</p>
+              <Button variant="outline" className="w-full">{t('demo.library.button')}</Button>
             </DiamondCardContent>
           </DiamondCard>
         </div>
@@ -282,12 +285,12 @@ const DemoPage = () => {
         <div className="flex items-center justify-between">
           <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
             <Layers className="w-5 h-5 text-blue-600" />
-            Malocclusions Courantes
+            {t('demo.gallery.title')}
           </h3>
           <div className="relative w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
             <Input
-              placeholder="Filtrer..."
+              placeholder={t('demo.gallery.filter_placeholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-9 h-9 text-sm"
@@ -330,7 +333,7 @@ const DemoPage = () => {
                   <p className="text-white/80 text-sm line-clamp-1">{caseItem.difficulty} • {caseItem.duration}</p>
                   <div className="mt-4 opacity-0 group-hover:opacity-100 transition-opacity translate-y-2 group-hover:translate-y-0">
                     <span className="text-white text-xs font-bold uppercase tracking-widest border border-white/30 px-3 py-1 rounded-full hover:bg-white/10 backdrop-blur-sm">
-                      Voir Détails
+                      {t('demo.gallery.view_details')}
                     </span>
                   </div>
                 </div>
@@ -341,7 +344,7 @@ const DemoPage = () => {
                     <div className="h-full flex flex-col">
                       <div className="flex justify-between items-start mb-6">
                         <div>
-                          <Badge className={`${caseItem.color} text-white mb-2 border-none`}>{caseItem.category === 'class' ? 'Classe' : 'Malocclusion'}</Badge>
+                          <Badge className={`${caseItem.color} text-white mb-2 border-none`}>{caseItem.category === 'class' ? t('demo.gallery.class') : t('demo.gallery.malocclusion')}</Badge>
                           <h2 className="text-3xl font-bold text-slate-900">{caseItem.titleFr}</h2>
                           <p className="text-lg text-slate-500 mt-1">{caseItem.description}</p>
                         </div>
@@ -362,18 +365,18 @@ const DemoPage = () => {
                         <div className="md:col-span-4 space-y-6 overflow-y-auto pr-2">
                           <div className="grid grid-cols-2 gap-4">
                             <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
-                              <p className="text-xs text-slate-400 uppercase font-semibold">Durée</p>
+                              <p className="text-xs text-slate-400 uppercase font-semibold">{t('demo.gallery.duration')}</p>
                               <p className="text-xl font-bold text-slate-800">{caseItem.duration}</p>
                             </div>
                             <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
-                              <p className="text-xs text-slate-400 uppercase font-semibold">Difficulté</p>
+                              <p className="text-xs text-slate-400 uppercase font-semibold">{t('demo.gallery.difficulty')}</p>
                               <p className="text-xl font-bold text-slate-800">{caseItem.difficulty}</p>
                             </div>
                           </div>
 
                           <div className="p-4 rounded-xl bg-blue-50 border border-blue-100 text-blue-900">
-                            <h4 className="font-semibold mb-2 flex items-center gap-2"><Zap className="w-4 h-4" /> IA Insights</h4>
-                            <p className="text-sm opacity-80">L&apos;IA suggère une approche par aligneurs séquentiels pour une résolution optimale en {caseItem.duration}.</p>
+                            <h4 className="font-semibold mb-2 flex items-center gap-2"><Zap className="w-4 h-4" /> {t('demo.gallery.ai_insights')}</h4>
+                            <p className="text-sm opacity-80">{t('demo.gallery.ai_suggestion', { duration: caseItem.duration })}</p>
                           </div>
 
                           <div className="flex flex-col gap-3">
@@ -381,13 +384,13 @@ const DemoPage = () => {
                               onClick={(e) => { e.stopPropagation(); setShow3D(true); }}
                               className={`w-full justify-start ${show3D ? 'bg-blue-600' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'}`}
                             >
-                              <RotateCw className="w-4 h-4 mr-2" /> Simulation 3D
+                              <RotateCw className="w-4 h-4 mr-2" /> {t('demo.gallery.simulation_3d')}
                             </Button>
                             <Button
                               onClick={(e) => { e.stopPropagation(); setShow3D(false); }}
                               className={`w-full justify-start ${!show3D ? 'bg-slate-900 text-white' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'}`}
                             >
-                              <Maximize2 className="w-4 h-4 mr-2" /> Photos Avant/Après
+                              <Maximize2 className="w-4 h-4 mr-2" /> {t('demo.gallery.before_after')}
                             </Button>
                           </div>
                         </div>
@@ -398,18 +401,24 @@ const DemoPage = () => {
                             <div className="w-full h-full relative cursor-grab active:cursor-grabbing">
                               <div ref={mountRef} className="w-full h-full" />
                               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur px-4 py-1.5 rounded-full shadow-sm text-xs font-medium text-slate-500 border border-slate-200">
-                                Modèle 3D Interactif
+                                {t('demo.gallery.interactive_model')}
                               </div>
                             </div>
                           ) : (
                             <div className="w-full h-full grid grid-cols-2 gap-px bg-slate-200">
-                              <div className="relative bg-white group/img overflow-hidden">
+                              <div
+                                className="relative bg-white group/img overflow-hidden cursor-zoom-in"
+                                onClick={(e) => { e.stopPropagation(); setSelectedImage(caseItem.beforeImage); }}
+                              >
                                 <img src={caseItem.beforeImage} className="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110" alt="Avant" />
-                                <div className="absolute top-4 left-4 bg-black/60 text-white text-xs px-2 py-1 rounded backdrop-blur-md">Avant</div>
+                                <div className="absolute top-4 left-4 bg-black/60 text-white text-xs px-2 py-1 rounded backdrop-blur-md">{t('demo.gallery.before')}</div>
                               </div>
-                              <div className="relative bg-white group/img overflow-hidden">
+                              <div
+                                className="relative bg-white group/img overflow-hidden cursor-zoom-in"
+                                onClick={(e) => { e.stopPropagation(); setSelectedImage(caseItem.afterImage); }}
+                              >
                                 <img src={caseItem.afterImage} className="w-full h-full object-cover transition-transform duration-700 group-hover/img:scale-110" alt="Après" />
-                                <div className="absolute top-4 left-4 bg-green-600/80 text-white text-xs px-2 py-1 rounded backdrop-blur-md">Après</div>
+                                <div className="absolute top-4 left-4 bg-green-600/80 text-white text-xs px-2 py-1 rounded backdrop-blur-md">{t('demo.gallery.after')}</div>
                               </div>
                             </div>
                           )}
@@ -424,6 +433,30 @@ const DemoPage = () => {
           })}
         </div>
       </div>
+
+      {/* Lightbox Modal */}
+      {selectedImage && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200"
+          onClick={() => setSelectedImage(null)}
+        >
+          <div className="relative max-w-7xl max-h-[90vh] w-full h-full flex flex-col items-center justify-center">
+            <Button
+              className="absolute top-4 right-4 text-white hover:bg-white/20 rounded-full h-12 w-12 z-50"
+              variant="ghost"
+              onClick={() => setSelectedImage(null)}
+            >
+              <X className="w-8 h-8" />
+            </Button>
+            <img
+              src={selectedImage}
+              alt="Full view"
+              className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </div>
+      )}
 
     </div>
   )

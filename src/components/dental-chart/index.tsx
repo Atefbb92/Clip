@@ -1,11 +1,54 @@
 "use client";
 
-import React, { useState, forwardRef, useImperativeHandle, useEffect } from "react";
+import React, { useState, forwardRef, useImperativeHandle, useEffect, useRef, useLayoutEffect } from "react";
+import ReactDOM from "react-dom";
 import { Dent } from "../../lib/types";
 import { matureMouthData } from "../../lib/data";
 import ContextualMenu from "../../components/contextual-menu";
 import { cn } from "../../lib/utils";
 import styles from './dental.module.css';
+
+// ------ Portal for click-relative contextual menu ------
+interface DentMenuPortalProps {
+  clickX: number;
+  clickY: number;
+  onClose: () => void;
+  children: React.ReactNode;
+}
+
+function DentMenuPortal({ clickX, clickY, onClose, children }: DentMenuPortalProps) {
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close when clicking outside
+  useEffect(() => {
+    const handle = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        onClose();
+      }
+    };
+    document.addEventListener('mousedown', handle);
+    return () => document.removeEventListener('mousedown', handle);
+  }, [onClose]);
+
+  return ReactDOM.createPortal(
+    <div
+      ref={menuRef}
+      className={styles.stateOpen}
+      style={{
+        position: 'fixed',
+        // right edge = clickX (translateX(-100%) shifts left by own width)
+        top: clickY,
+        left: clickX,
+        transform: 'translateX(-100%)',
+        zIndex: 99999,
+      }}
+    >
+      {children}
+    </div>,
+    document.body
+  );
+}
+// ---------------------------------------------------------
 
 interface DentalChartProps {
   initialStates?: Record<string, string>;
@@ -13,10 +56,12 @@ interface DentalChartProps {
     modifications: { code: string; type: string }[],
     states: Record<string, string>
   ) => void;
+  readOnly?: boolean;
+  onChartClick?: () => void;
 }
 
 const DentalChart = forwardRef<any, DentalChartProps>(function DentalChart(
-  { initialStates = {}, onSave = () => { } },
+  { initialStates = {}, onSave = () => { }, readOnly = false, onChartClick },
   ref
 ) {
   const [selectedTeeth, setSelectedTeeth] = useState<Dent | null>(null);
@@ -29,8 +74,15 @@ const DentalChart = forwardRef<any, DentalChartProps>(function DentalChart(
     setTeethStates(initialStates);
   }, [initialStates]);
 
-  const teethIdentify = (teeth: Dent) => {
+  const [clickCoords, setClickCoords] = useState<{ x: number; y: number } | null>(null);
+
+  const teethIdentify = (teeth: Dent, e: React.MouseEvent) => {
+    if (readOnly) {
+      if (onChartClick) onChartClick();
+      return;
+    }
     setSelectedTeeth(teeth);
+    setClickCoords({ x: e.clientX, y: e.clientY });
     setShowContextualMenu(true);
   };
 
@@ -107,21 +159,21 @@ const DentalChart = forwardRef<any, DentalChartProps>(function DentalChart(
       if (["11", "21", "31", "41"].includes(code)) {
         return styles.scaleUp;
       }
+      // Wisdom teeth should be smaller
+      if (["18", "28", "38", "48"].includes(code)) {
+        return styles.scaleDown;
+      }
       // Les molaires sont plus larges
       if (
         [
           "16",
           "17",
-          "18",
           "26",
           "27",
-          "28",
           "36",
           "37",
-          "38",
           "46",
           "47",
-          "48",
         ].includes(code)
       ) {
         return styles.scaleNormal;
@@ -228,24 +280,25 @@ const DentalChart = forwardRef<any, DentalChartProps>(function DentalChart(
 
   // Fonction pour collecter et sauvegarder les modifications
   const handleSave = () => {
-    // Convertir l'objet teethStates en tableau de modifications
-    const modifications = Object.entries(teethStates).map(([code, type]) => ({
-      code,
-      type,
-    }));
-
-    // Appeler la fonction onSave avec les modifications et l'état complet
+    const modifications = Object.entries(teethStates).map(([code, type]) => ({ code, type }));
     onSave(modifications, teethStates);
   };
 
-  // Exposer la méthode handleSave via la référence
+  // Restaurer tous les états dentaires à zéro
+  const handleReset = () => {
+    setTeethStates({});
+    onSave([], {});
+  };
+
+  // Exposer les méthodes via la référence
   useImperativeHandle(ref, () => ({
     handleSave,
+    handleReset,
   }));
 
   return (
     <div data-dental-chart>
-      <div className={styles.chartContainer}>
+      <div className={cn(styles.chartContainer, readOnly && styles.noHover)}>
         {matureMouthData.map((item, idx) => (
           <div
             key={`orientation-${idx}`}
@@ -281,10 +334,10 @@ const DentalChart = forwardRef<any, DentalChartProps>(function DentalChart(
                           )}
                           id={`dentimage-${teeth.code}`}
                           title={`Dent ${teeth.code}${teethStates[teeth.code]
-                              ? ` (${teethStates[teeth.code]})`
-                              : ""
+                            ? ` (${teethStates[teeth.code]})`
+                            : ""
                             }`}
-                          onClick={() => teethIdentify(teeth)}
+                          onClick={(e) => teethIdentify(teeth, e)}
                         >
                           {getTeethImage(
                             teeth.code,
@@ -294,26 +347,18 @@ const DentalChart = forwardRef<any, DentalChartProps>(function DentalChart(
                         </div>
 
                         {/* Replace Popover with custom positioned context menu */}
-                        {showContextualMenu && selectedTeeth?.code === teeth.code && (
-                          <div
-                            className={cn(
-                              styles.contextualMenuContainer,
-                              styles.stateOpen
-                            )}
-                            style={{
-                              top: item.orientation === "bottom" ? "-220px" : "100%",
-                              left: "50%",
-                              transform: "translateX(-50%)",
-                              marginTop: item.orientation === "bottom" ? 0 : "5px",
-                              marginBottom: item.orientation === "bottom" ? "5px" : 0
-                            }}
+                        {showContextualMenu && selectedTeeth?.code === teeth.code && clickCoords && (
+                          <DentMenuPortal
+                            clickX={clickCoords.x}
+                            clickY={clickCoords.y}
+                            onClose={closeContextualMenu}
                           >
                             <ContextualMenu
                               selectedTeeth={teeth}
                               onSelectTeethType={updateTeethType}
                               onClose={closeContextualMenu}
                             />
-                          </div>
+                          </DentMenuPortal>
                         )}
                       </div>
                     </div>

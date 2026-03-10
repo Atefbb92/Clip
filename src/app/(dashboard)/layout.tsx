@@ -2,9 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import { onAuthStateChanged } from 'firebase/auth'
-import { auth, db } from '@/firebase/firebase'
-import { collection, query, where, getDocs } from 'firebase/firestore'
+import { authClient } from '@/lib/auth-client'
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar'
 import DashboardSidebar from '@/components/dashboard-sidebar'
 import {
@@ -48,34 +46,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname()
   const isNewPatientPage = pathname === '/patients/new'
 
+  const { data: session, isPending } = authClient.useSession()
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        setIsAuthenticated(true)
-        try {
-          // Get user role from Firestore
-          const medecinsRef = collection(db, 'medecins')
-          const q = query(medecinsRef, where('email', '==', user.email))
-          const querySnapshot = await getDocs(q)
-
-          if (!querySnapshot.empty) {
-            const userDoc = querySnapshot.docs[0]
-            setUserRole(userDoc.data().role)
-          }
-        } catch (error) {
-          console.error('Error fetching user role:', error)
-        }
-      } else {
-        setIsAuthenticated(false)
+    if (!isPending) {
+      if (!session) {
         router.push('/signin')
+      } else {
+        setUserRole(session.user.role || null)
       }
-      setIsLoading(false)
-    })
+    }
+  }, [session, isPending, router])
 
-    return () => unsubscribe()
-  }, [router])
-
-  if (isLoading) {
+  if (isPending) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
@@ -83,7 +66,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     )
   }
 
-  if (!isAuthenticated) {
+  if (!session) {
     return null
   }
 

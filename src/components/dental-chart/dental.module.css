@@ -1,44 +1,28 @@
 /* styles.module.css */
 .chartContainer {
-  width: fit-content;
-  margin: 0 auto;
-  padding-top: 20px;
-  padding-bottom: 40px;
-  transform: scale(1);
-  transform-origin: top center;
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background: linear-gradient(
-    45deg,
-    white 0%,
-    white 15%,
-    rgba(0, 188, 227, 0.1) 35%,
-    rgba(0, 188, 227, 0.3) 50%,
-    rgba(0, 188, 227, 0.1) 65%,
-    white 85%,
-    white 100%
-  );
   position: relative;
-  display: flex;
-  flex-direction: row;
-  width: 100%;
+  background: transparent;
 }
 
-.dentImage:hover > div {
+
+.dentImage:hover>div {
   z-index: 10;
   transform: scale(1.1);
   transition: transform 0.2s ease;
   opacity: 0.7;
 }
 
-.noHover .dentImage:hover > div,
-.chartContainer:has(.noHover:hover) .dentImage:hover > div {
+.noHover .dentImage:hover>div,
+.chartContainer:has(.noHover:hover) .dentImage:hover>div {
   transform: none;
   opacity: 1;
 }
 
-.dentImage > div {
+.dentImage>div {
   transition: all 0.2s ease;
 }
 
@@ -59,8 +43,8 @@
 }
 
 .dentGroup {
-  padding: 5px 8px;
-  margin: 0 2px;
+  padding: 0;
+  margin: 0;
 }
 
 .incisorsGroup {
@@ -98,13 +82,11 @@
 }
 
 .chartContainer::after {
-  content: "GAUCHE";
-  right: -15px;
+  content: none;
 }
 
 .chartContainer::before {
-  content: "DROITE";
-  left: -15px;
+  content: none;
 }
 
 .teethNormal {
@@ -201,11 +183,24 @@
   pointer-events: none;
 }
 
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -217,6 +212,7 @@
     opacity: 1;
     transform: translateY(0);
   }
+
   to {
     opacity: 0;
     transform: translateY(10px);
@@ -225,12 +221,6 @@
 
 
 /* dental.module.css */
-
-.chartContainer {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
 
 .orientationContainer {
   display: flex;
@@ -241,17 +231,18 @@
 }
 
 .orientationTop {
-  /* Top orientation specific styles if needed */
+  margin-bottom: 20px;
 }
 
 .orientationBottom {
-  /* Bottom orientation specific styles if needed */
+  margin-top: 20px;
 }
 
 .dentGroup {
   display: flex;
   flex-direction: column;
-  padding: 0.125rem;
+  padding: 0;
+  margin: 0;
 }
 
 .flexColReverse {
@@ -259,12 +250,13 @@
 }
 
 .incisorsGroup {
-  /* Specific styles for incisor groups */
+  min-width: 200px;
+  /* Reduced to match closer spacing */
 }
 
 .teethRow {
   display: flex;
-  gap: 0.25rem;
+  gap: 0.05rem;
   align-items: center;
   justify-content: center;
 }
@@ -272,8 +264,8 @@
 .teethWrapper {
   width: 100%;
   position: relative;
-  padding-left: 0.25rem;
-  padding-right: 0.25rem;
+  padding-left: 0.05rem;
+  padding-right: 0.05rem;
 }
 
 .teethTooltip {
@@ -291,7 +283,7 @@
 
 .teethContainer {
   position: relative;
-  width: 4rem;
+  width: 3.2rem;
   height: 4rem;
   cursor: pointer;
 }
@@ -302,6 +294,10 @@
 
 .scaleNormal {
   transform: scale(1);
+}
+
+.scaleDown {
+  transform: scale(0.9);
 }
 
 .relative {
@@ -326,36 +322,23 @@
 .contextualMenuContainer {
   position: absolute;
   z-index: 50;
+  left: 50%;
+  transform: translateX(-50%);
   background-color: white;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   border-radius: 0.375rem;
 }
 
 .stateOpen {
-  /* Additional styles for when contextual menu is open */
+  animation: popIn 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
 /* Teeth type specific styles */
-.teethNormal {
-  /* Default styles for normal teeth */
-}
-
-.teethAbsente {
-  /* Styles for absent teeth */
-}
-
-.teethCouronne {
-  /* Styles for crowned teeth */
-}
-
-.teethPontique {
-  /* Styles for pontic teeth */
-}
-
-.teethImplant {
-  /* Styles for implant teeth */
-}
-
+.teethNormal,
+.teethAbsente,
+.teethCouronne,
+.teethPontique,
+.teethImplant,
 .teethDentTemporaire {
-  /* Styles for temporary teeth */
+  transition: all 0.2s ease;
 }

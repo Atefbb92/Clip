@@ -11,7 +11,10 @@
         "support": "Support & Maintenance",
         "settings": "Settings",
         "clinical_preferences": "Clinical Preferences",
-        "logout": "Logout"
+        "logout": "Logout",
+        "main": "Main Navigation",
+        "demo": "Demo",
+        "system": "System"
     },
     "common": {
         "language": "Language",
@@ -25,12 +28,14 @@
         "view": "View",
         "new_patient": "New patient",
         "days": "d",
-        "months": "months"
+        "months": "months",
+        "years": "years",
+        "week": "Week"
     },
     "dashboard": {
-        "welcome_morning": "Good morning User ☀️",
-        "welcome_afternoon": "Good afternoon User 👋",
-        "welcome_evening": "Good evening User 🌙",
+        "welcome_morning": "Good morning {{name}} ☀️",
+        "welcome_afternoon": "Good afternoon {{name}} 👋",
+        "welcome_evening": "Good evening {{name}} 🌙",
         "stats": {
             "total_patients": "Total patients",
             "new_this_month": "New this month",
@@ -47,7 +52,9 @@
             "evolution": "Patient evolution",
             "status_dist": "Status distribution",
             "performance": "Performance metrics",
-            "pack_dist": "Pack distribution"
+            "pack_dist": "Pack distribution",
+            "evolution_new_cases": "New cases",
+            "evolution_approved_cases": "Approved cases"
         },
         "recent_patients": {
             "title": "Recent patients",
@@ -65,7 +72,17 @@
             "A new day, new smiles to create",
             "Your orthodontic expertise in action",
             "Together, let’s create perfect smiles"
-        ]
+        ],
+        "notifications": {
+            "title": "Notifications",
+            "mark_all_read": "Mark all as read",
+            "empty": "No notifications"
+        },
+        "messages": {
+            "title": "Messages",
+            "read_all": "Read all",
+            "empty": "No messages"
+        }
     },
     "status": {
         "brouillon": "Draft",
@@ -157,9 +174,13 @@
             "category": "Category",
             "submission_date": "Submission date",
             "validation_date": "Validation date",
+            "start_date": "Start date",
             "clinical_conditions": "Clinical conditions",
             "tp_check": "TP Check",
-            "actions": "Actions"
+            "actions": "Actions",
+            "continue_prescription": "Continue prescription",
+            "validate_tp": "Validate TP Check",
+            "start_treatment": "Start treatment"
         },
         "categories": {
             "adult": "Adult",
@@ -182,13 +203,35 @@
         "detail": {
             "actions": {
                 "back": "Back",
-                "request_correction": "Correction",
+                "request_correction": "Refinement",
                 "view_tp_check": "TP Check",
                 "finish": "Finish",
                 "order_eterna": "ETERNA®"
             },
             "status": {
-                "active": "Active"
+                "active": "Active",
+                "rejected": "Rejected",
+                "revision_requested": "Revision requested",
+                "validated": "Validated",
+                "treatment_started": "Treatment started",
+                "aligner_delivered": "Aligner set delivered",
+                "tp_validated": "TP Check validated",
+                "tp_ready": "TP Check ready",
+                "prescription_submitted": "Prescription submitted"
+            },
+            "alerts": {
+                "reject_error": "Error rejecting patient."
+            },
+            "dialogs": {
+                "refinement_confirm_title": "Request a refinement?",
+                "refinement_confirm_desc": "Are you sure you want to request a refinement for this patient?",
+                "refinement_upload_title": "Refinement Files",
+                "refinement_upload_desc": "Please upload new photos and scans for the patient. Scans are mandatory.",
+                "submit_refinement": "Submit",
+                "reject_title": "Reject patient",
+                "reject_desc": "Please confirm that you want to reject this patient. This action cannot be undone.",
+                "validate_tp_title": "Validate Treatment Plan",
+                "validate_tp_desc": "You are about to validate version {{version}} of the TP Check."
             },
             "tabs": {
                 "overview": "Overview",
@@ -284,10 +327,10 @@
                     "choose": "Choose this profile",
                     "pack_title": "Select a pack",
                     "steps_per_arch": "Steps per arch",
-                    "step_count": "{count} steps",
+                    "step_count": "{{count}} steps",
                     "corrections": "Corrections included",
-                    "correction_count": "{count} correction",
-                    "correction_count_plural": "{count} corrections",
+                    "correction_count": "{{count}} correction",
+                    "correction_count_plural": "{{count}} corrections",
                     "one_arch": "1 Arch",
                     "two_arches": "2 Arches",
                     "choose_pack": "Choose this pack",
@@ -330,6 +373,7 @@
                     "month": "MM",
                     "year": "YYYY",
                     "age_display": "Age: {age} years",
+                    "age": "Age",
                     "gender": "Gender",
                     "male": "Male",
                     "female": "Female",
@@ -388,13 +432,20 @@
                         "place_if_needed": "Place if necessary",
                         "do_not_place_on": "Do not place on",
                         "ap_report": "4. A-P Report",
+                        "ap_report_conserve": "Keep current situation",
                         "overjet": "5. Overjet",
+                        "overjet_default": "Achieve other objectives and I will evaluate overjet",
                         "overbite": "6. Overbite",
+                        "overbite_default": "Achieve other objectives and I will evaluate overbite",
                         "bite_ramps": "7. Bite Ramps",
+                        "bite_ramps_auto": "Automatically place bite ramps whenever lower incisor intrusion is > 1.5mm",
                         "midlines": "8. Midlines",
-                        "extractions": "9. Extractions",
+                        "midlines_default": "Achieve other objectives and I will evaluate midlines",
+                        "extractions": "9. Posterior crossbite",
+                        "extractions_none": "Do not correct",
                         "extract": "Extract",
                         "spacing": "10. Spacing",
+                        "spacing_default": "Close all spaces",
                         "instructions": "11. Instructions"
                     }
                 },
@@ -405,7 +456,10 @@
                     "not_selected": "Not selected",
                     "not_filled": "Not filled",
                     "not_specified": "Not specified",
-                    "modify": "Modify"
+                    "modify": "Modify",
+                    "pack": "Desired Pack",
+                    "scroll_to_read": "Scroll to the bottom to validate the reading of the prescription",
+                    "validation_checkbox": "I certify that I have checked the entire prescription and I validate it."
                 },
                 "buttons": {
                     "prev": "Previous",
@@ -423,6 +477,8 @@
                     "cancel_desc": "All entered data will be lost. This action cannot be undone.",
                     "continue_editing": "Continue editing",
                     "yes_cancel": "Yes, cancel",
+                    "submit_confirm_title": "Confirm case submission",
+                    "submit_confirm_desc": "Are you sure you want to submit this case? It will be sent for processing and you will no longer be able to modify it.",
                     "add_cbct_title": "Add CBCT",
                     "add_cbct_desc": "Enter CBCT URL",
                     "scan_options_title": "Scan sending options",
@@ -447,6 +503,10 @@
                     "scan_link_req": "Please enter the scan link",
                     "age_adult_error": "Age must be 18 or older for an adult patient",
                     "age_teen_error": "Age must be between 12 and 17 for a teen patient"
+                },
+                "alerts": {
+                    "file_limit": "File size exceeds 15 MB limit.",
+                    "file_format": "Unsupported file format. Use .stl, .ply or .obj"
                 }
             },
             "photos": {
@@ -459,7 +519,7 @@
                 "my_diamond_title": "My Diamond App",
                 "uploaded_photos": "Photos uploaded from MyDiamond App",
                 "download_all": "Download All",
-                "follow_up_desc": "The patient sends follow-up photos every week via the MyDiamond mobile app"
+                "follow_up_desc": "The patient sends follow-up photos every 5 aligners via the MyDiamond mobile app"
             },
             "quick_actions": {
                 "title": "Quick Actions"
@@ -521,10 +581,10 @@
         "title": "Invoice Management",
         "subtitle": "Manage, track and analyze your client billing",
         "stats": {
-            "revenue": "Revenue",
-            "pending": "Pending",
-            "paid_amount": "Paid Amount",
-            "total_bills": "Total Invoices"
+            "revenue": "Total purchases",
+            "pending": "Pending payment",
+            "paid_amount": "Paid amount",
+            "total_bills": "Total invoices"
         },
         "tabs": {
             "all": "All",
@@ -622,6 +682,8 @@
             "first_name": "First Name",
             "last_name": "Last Name",
             "email": "Professional Email",
+            "phone": "Phone",
+            "active_since": "Active since",
             "specialty": "Specialty",
             "specialty_placeholder": "Select your specialty",
             "verified": "Verified Account",
@@ -856,6 +918,256 @@
                     "no_add": "Do not add overcorrection aligners"
                 }
             }
+        }
+    },
+    "support": {
+        "title": "Diamond Help Center",
+        "subtitle": "Find answers quickly and optimize your platform usage",
+        "clinical_support": "Clinical Support",
+        "search_placeholder": "Search documentation, FAQ, tutorials...",
+        "tabs": {
+            "documentation": "Documentation",
+            "faq": "FAQ",
+            "tutorials": "Tutorials",
+            "contact": "Contact"
+        },
+        "documentation": {
+            "getting_started": {
+                "title": "Getting Started",
+                "description": "Quick start guide for using Diamond",
+                "subsections": {
+                    "login": {
+                        "title": "Platform Login",
+                        "content": "Use credentials provided by Diamond team. Contact support if needed."
+                    },
+                    "interface": {
+                        "title": "User Interface",
+                        "content": "Sidebar navigation and main content area. Dashboard overview."
+                    },
+                    "navigation": {
+                        "title": "Navigation",
+                        "content": "Use sidebar to access Dashboard, Patients, New Patient, Statistics."
+                    }
+                }
+            },
+            "patients": {
+                "title": "Patient Management",
+                "description": "Everything about managing patient files",
+                "subsections": {
+                    "add_patient": {
+                        "title": "Add Patient",
+                        "content": "Click 'New Patient' and fill required forms."
+                    },
+                    "patient_status": {
+                        "title": "Patient Status",
+                        "content": "Draft, Pending, Planning, Production, Treatment, Completed."
+                    },
+                    "patient_files": {
+                        "title": "File Management",
+                        "content": "Manage X-rays, photos, 3D scans in Files tab."
+                    }
+                }
+            },
+            "dashboard": {
+                "title": "Dashboard",
+                "description": "Understand metrics and charts",
+                "subsections": {
+                    "metrics": {
+                        "title": "Key Metrics",
+                        "content": "Total patients, New this month, In treatment, Completed, Actions required, Growth rate."
+                    },
+                    "charts": {
+                        "title": "Charts & Analysis",
+                        "content": "Patient evolution, status distribution, performance metrics."
+                    }
+                }
+            },
+            "settings": {
+                "title": "Settings",
+                "description": "Account configuration and preferences",
+                "subsections": {
+                    "profile": {
+                        "title": "User Profile",
+                        "content": "Edit personal info, password, notification preferences."
+                    },
+                    "security": {
+                        "title": "Security",
+                        "content": "Change password regularly, enable 2FA."
+                    }
+                }
+            }
+        },
+        "faq": {
+            "categories": {
+                "all": "All",
+                "patients": "Patients",
+                "dashboard": "Dashboard",
+                "files": "Files",
+                "account": "Account"
+            },
+            "items": {
+                "add_patient": {
+                    "question": "How to add a new patient?",
+                    "answer": "Click 'New Patient' in sidebar, fill forms."
+                },
+                "modify_status": {
+                    "question": "How to modify patient status?",
+                    "answer": "Go to patient file, click 'Edit', change status."
+                },
+                "interpret_charts": {
+                    "question": "How to interpret dashboard charts?",
+                    "answer": "Dashboard shows evolution, status distribution, metrics."
+                },
+                "download_files": {
+                    "question": "How to download patient files?",
+                    "answer": "In patient file, go to Files tab, click download icon."
+                },
+                "forgot_password": {
+                    "question": "What if I forgot my password?",
+                    "answer": "Click 'Forgot password' on login page."
+                },
+                "archive_patient": {
+                    "question": "How to archive a patient?",
+                    "answer": "In patient file, click 'Edit', check 'Archive this patient'."
+                }
+            }
+        },
+        "contact": {
+            "title": "Contact Us",
+            "subtitle": "Ways to reach us quickly",
+            "email_support": {
+                "title": "Email Support",
+                "value": "support@diamond-aligner.com",
+                "desc": "Response within 2h average"
+            },
+            "whatsapp": {
+                "title": "Whatsapp",
+                "value": "+49 176 89739948",
+                "desc": "Instant direct support"
+            },
+            "hours": {
+                "title": "Opening Hours",
+                "value": "Mon - Fri: 9:00 - 18:00",
+                "desc": "24/7 email support"
+            },
+            "teamviewer": {
+                "title": "TeamViewer Remote Assistance",
+                "value": "Start secure session",
+                "desc": "Requires TeamViewer installed",
+                "button": "Start TeamViewer"
+            },
+            "form": {
+                "title": "Quick Contact",
+                "subtitle": "Send us a message, response within 2h",
+                "name": "Full Name",
+                "email": "Email",
+                "subject": "Subject",
+                "message": "Message",
+                "submit": "Send Message",
+                "privacy": "Your data is secure and never shared"
+            },
+            "system_status": {
+                "title": "System Status",
+                "desc": "Real-time state of Diamond services",
+                "web_platform": "Web Platform",
+                "database": "Database",
+                "external_api": "External API",
+                "operational": "Operational",
+                "maintenance": "Maintenance"
+            }
+        }
+    },
+    "demo": {
+        "hero": {
+            "techno_ai": "Diamond AI Technology",
+            "title": "Visualize the future of smiles",
+            "description": "Our predictive algorithms simulate dental movements with 98% accuracy.",
+            "precision": "98% Accuracy",
+            "cases_count": "50k+ Cases"
+        },
+        "library": {
+            "title": "Library",
+            "description": "Access over 50 types of documented malocclusions.",
+            "button": "View Documentation"
+        },
+        "gallery": {
+            "title": "Common Malocclusions",
+            "subtitle": "Explore our database of treated cases",
+            "filter_placeholder": "Filter...",
+            "view_details": "View Details",
+            "malocclusion": "Malocclusion",
+            "class": "Class",
+            "duration": "Duration",
+            "difficulty": "Difficulty",
+            "ai_insights": "AI Insights",
+            "ai_suggestion": "AI suggests a sequential aligner approach for optimal resolution in {{duration}}.",
+            "simulation_3d": "3D Simulation",
+            "before_after": "Before/After Photos",
+            "interactive_model": "Interactive 3D Model",
+            "before": "Before",
+            "after": "After"
+        },
+        "cases": {
+            "crowding": {
+                "title": "Crowding",
+                "description": "Severe crowding correction via expansion and IPR."
+            },
+            "spacing": {
+                "title": "Spacing",
+                "description": "Closure of multiple diastemas with aesthetic alignment."
+            },
+            "openbite": {
+                "title": "Open Bite",
+                "description": "Open bite correction via molar intrusion and elastics."
+            },
+            "deepbite": {
+                "title": "Deep Bite",
+                "description": "Leveling the curve of Spee and opening the bite."
+            },
+            "class2": {
+                "title": "Class II",
+                "description": "Sagittal correction with sequential distalization."
+            },
+            "class3": {
+                "title": "Class III",
+                "description": "Orthodontic camouflage with mandibular IPR."
+            }
+        }
+    },
+    "diamond_purity": {
+        "title": "Diamond Purity Program",
+        "subtitle": "Track your progress and unlock exclusive benefits",
+        "current_level": "Current Level",
+        "validity": "Validity: Jul 1, 2025 - Jun 30, 2026",
+        "discount_current": "Discount",
+        "validated_cases_count": "Validated Cases",
+        "stats": {
+            "validated_cases": "Cases validated as of {{date}}",
+            "pending": "Pending",
+            "submitted": "Submitted",
+            "required_maintain": "Cases required to maintain Starter",
+            "current_discount": "current discount",
+            "required_next": "Cases required to reach Prime",
+            "future_discount": "future discount"
+        },
+        "progress": {
+            "title": "Annual Progress",
+            "label": "Progress",
+            "to_ultimate": "to Ultimate"
+        },
+        "info": "Please note that from July 1st, displayed values may be adjusted. This progress is based on the current fiscal year.",
+        "details": {
+            "title": "Program Details",
+            "subtitle": "Comprehensive overview of levels and associated discounts",
+            "level": "Level",
+            "badge": "Badge",
+            "required_cases": "Required Cases",
+            "granted_discount": "Granted Discount"
+        },
+        "banner": {
+            "title": "Ready to level up?",
+            "subtitle": "Use our simulator to see how increasing your case volume can impact your profitability.",
+            "button": "Access Simulator"
         }
     }
 }

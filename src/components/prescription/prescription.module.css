@@ -42,6 +42,44 @@
     margin: 0 auto;
 }
 
+.dentalChartContainer {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 1rem 0;
+}
+
+.chartPreviewWrapper {
+    width: 100%;
+    max-width: 750px;
+    background-color: #f9fafb;
+    border-radius: 12px;
+    padding: 0.5rem;
+    border: 1px solid #e5e7eb;
+    transition: all 0.2s ease;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.chartPreviewWrapper [data-dental-chart] {
+    transform: scale(0.65);
+    transform-origin: center;
+    width: 140%;
+    /* Compensate for scale to fill width */
+    flex-shrink: 0;
+}
+
+
+.chartPreviewWrapper:hover {
+    border-color: #0170B4;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    background-color: #ffffff;
+}
+
+
 /* Prescription form container */
 .prescriptionForm {
     background-color: white;
@@ -664,7 +702,8 @@
 .modalOverlay {
     position: fixed;
     top: 0;
-    left: 0;
+    left: 16rem;
+    /* SIDEBAR_WIDTH */
     right: 0;
     bottom: 0;
     background-color: rgba(0, 0, 0, 0.7);
@@ -672,16 +711,20 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    width: calc(100% - 16rem);
 }
 
 .modalContainer {
     background-color: white;
     border-radius: 12px;
     padding: 20px;
-    width: 90%;
-    max-width: 1200px;
-    max-height: 90vh;
-    overflow: auto;
+    width: 95%;
+    max-width: 1400px;
+    max-height: 95vh;
+    overflow: hidden;
+    /* Prevent container scroll if content fits */
+    display: flex;
+    flex-direction: column;
     position: relative;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
 }
@@ -708,6 +751,29 @@
     background-color: #e5e7eb;
 }
 
+.resetButton {
+    position: absolute;
+    top: 12px;
+    right: 52px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: #eff6ff;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: bold;
+    color: #3b82f6;
+    transition: background-color 0.2s ease;
+}
+
+.resetButton:hover {
+    background-color: #dbeafe;
+}
+
 .modalHeader {
     margin-bottom: 16px;
 }
@@ -727,8 +793,10 @@
 .chartContainer {
     display: flex;
     justify-content: center;
-    overflow: auto;
+    overflow: visible;
+    /* Allow content to be seen if taller */
     padding-bottom: 80px;
+    flex: 1;
 }
 
 .modalFooter {
@@ -754,19 +822,27 @@
 }
 
 .submitButton {
-    background-color: #2563eb;
+    background-color: #0170B4;
     color: white;
-    padding: 10px 20px;
-    border-radius: 6px;
+    padding: 10px 24px;
+    border-radius: 8px;
     border: none;
     cursor: pointer;
-    font-weight: bold;
+    font-weight: 600;
     font-size: 16px;
-    transition: background-color 0.2s ease;
+    font-family: inherit;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(1, 112, 180, 0.2);
 }
 
 .submitButton:hover {
-    background-color: #1d4ed8;
+    background-color: #005fa9;
+    box-shadow: 0 4px 12px rgba(1, 112, 180, 0.3);
+    transform: translateY(-1px);
+}
+
+.submitButton:active {
+    transform: translateY(0);
 }
 
 /* DDM Section Styles */
@@ -891,4 +967,18 @@
 
 .resolutionIndented {
     margin-left: 2rem;
+}
+
+.auxiliaryText {
+    margin-top: 2rem;
+    color: #6b7280;
+    font-size: 14px;
+    line-height: 1.5;
+}
+.extractionsTitle {
+    margin-top: 3rem;
+    margin-bottom: 1.5rem;
+    color: #425567;
+    font-size: 1.25rem;
+    font-weight: 700;
 }
